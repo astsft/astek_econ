@@ -1,0 +1,417 @@
+﻿/**
+  * @file    gt911_config.c
+  * @brief   GOODIX GT911 Touchpad driver config
+  * @author  Igor T. <research.tahoe@gmail.com>
+  */
+
+
+#include <stdint.h>
+#include "gt9xx.h"
+
+/*
+uint8_t gt911_cfg_data[ GT9XX_CONFIG_SIZE ] =
+{
+        0x52,0x20,0x03,0xE0,0x01,0x05,0xFD,0x00,
+        0x22,0x08,0x28,0x08,0x46,0x32,0x03,0x03,
+        0x00,0x00,0x00,0x00,0x11,0x11,0x00,0x18,
+        0x1A,0x1E,0x14,0x8C,0x2E,0x0E,0x8D,0x8F,
+        0x82,0x0A,0x00,0x00,0x00,0xBA,0x02,0x1D,
+        0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x7D,0xA0,0xDE,0xD5,0xF4,
+        0x07,0x00,0x00,0x04,0x99,0x80,0x00,0x99,
+        0x86,0x00,0x99,0x8D,0x00,0x99,0x94,0x00,
+        0x99,0x9C,0x00,0x99,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x04,0x06,0x08,0x0A,0x0C,0x0E,0x10,
+        0x12,0x14,0x16,0x18,0x1A,0x1C,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x2A,0x29,
+        0x28,0x26,0x24,0x22,0x21,0x20,0x1F,0x1E,
+        0x1D,0x1C,0x18,0x16,0x14,0x13,0x12,0x10,
+        0x0F,0x0C,0x0A,0x08,0x06,0x04,0x02,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+};
+*/
+
+uint8_t gt911_cfg_data[ GT9XX_CONFIG_SIZE ] =
+{
+        0x52,           //0x8047 Config_Version
+        0x20,           //0x8048 X Output Max (Low Byte)
+        0x03,           //0x8049 X Output Max (High Byte)
+        0xE0,           //0x804A Y Output Max (Low Byte)
+        0x01,           //0x804B Y Output Max (High Byte)
+        0x01,   //0x05, //0x804C Touch Number
+        0x3D,   //0xFD, //0x804D Module_Switch1 // 
+        0x00,           //0x804E Module_switch2
+        0x22,           //0x804F Shake_Count
+        0x08,           //0x8050 Filter
+        0x28,           //0x8051 Large_Touch
+        0x08,           //0x8052 Noise_Reduction
+        0x46,           //0x8053 Screen_Touch_Level
+        0x32,           //0x8054 Screen_Leave_Level
+        0x00,   //0x03, //0x8055 Low_Power_Control
+        0x03,           //0x8056 Refresh_Rate
+        0x00,           //0x8057 x_threshold
+        0x00,           //0x8058 y_threshold
+        0x00,           //0x8059 X_Speed_Limit
+        0x00,           //0x805A Y_Speed_Limit
+        0x77,   //0x11, //0x805B Space - Space of border top (coefficient: 32) Space of border bottom (coefficient: 32)
+        0x77,   //0x11, //0x805C Space - Space of border left (coefficient: 32) Space of border right (coefficient: 32)
+        0x00,           //0x805D Mini_Filter
+        0x18,           //0x805E Stretch_R0
+        0x1A,           //0x805F Stretch_R1
+        0x1E,           //0x8060 Stretch_R2
+        0x14,           //0x8061 Stretch_RM
+        0x8C,           //0x8062 Drv_GroupA_Num
+        0x2E,           //0x8063 Drv_GroupB_Num
+        0x0E,           //0x8064 Sensor_Num
+        0x8D,           //0x8065 FreqA_factor
+        0x8F,           //0x8066 FreqB_factor
+        0x82,           //0x8067 Pannel_BitFreqL
+        0x0A,           //0x8068 Pannel_BitFreqH
+        0x00,           //0x8069 Pannel_Sensor_TimeL
+        0x00,           //0x806A Pannel_Sensor_TimeH
+        0x00,           //0x806B Pannel_Tx_Gain
+        0xBA,           //0x806C Pannel_Rx_Gain
+        0x02,           //0x806D Pannel_Dump_Shift
+        0x1D,           //0x806E Drv_Frame_Control
+        0x00,           //0x806F Charging_Level_Up
+        0x01,           //0x8070 Module_Switch3
+        0x00,           //0x8071 GESTURE_DIS
+        0x00,           //0x8072 Gesture_Long_Press_Time
+        0x00,           //0x8073 X/Y_Slope_Adjust
+        0x00,           //0x8074 Gesture_Control
+        0x00,           //0x8075 Gesture_Switch1
+        0x00,           //0x8076 Gesture_Switch2
+        0x00,           //0x8077 Gesture_Refresh_Rate
+        0x00,           //0x8078 Gesture_Touch_Level
+        0x00,           //0x8079 NewGreenWakeUpLevel
+        0x7D,           //0x807A Freq_Hopping_Start
+        0xA0,           //0x807B Freq_Hopping_End
+        0xDE,           //0x807C Noise_Detect_Times
+        0xD5,           //0x807D Hopping_Flag
+        0xF4,           //0x807E Hopping_Threshold
+        0x07,           //0x807F Noise_Threshold
+        0x00,           //0x8080 Noise_Min_Threshold
+        0x00,           //0x8081 NC
+        0x04,           //0x8082 Hopping_Sensor_Group
+        0x99,           //0x8083 Hopping_seg1_Normalize
+        0x80,           //0x8084 Hopping_seg1_Factor
+        0x00,           //0x8085 Main_Clock_Ajdust
+        0x99,           //0x8086 Hopping_seg2_Normalize
+        0x86,           //0x8087 Hopping_seg2_Factor
+        0x00,           //0x8088 NC
+        0x99,           //0x8089 Hopping_seg3_Normalize
+        0x8D,           //0x808A Hopping_seg3_Factor
+        0x00,           //0x808B NC
+        0x99,           //0x808C Hopping_seg4_Normalize
+        0x94,           //0x808D Hopping_seg4_Factor
+        0x00,           //0x808E NC
+        0x99,           //0x808F Hopping_seg5_Normalize
+        0x9C,           //0x8090 Hopping_seg5_Factor
+        0x00,           //0x8091 NC
+        0x99,           //0x8092 Hopping_seg6_Normalize
+        0x00,           //0x8093 Key 1
+        0x00,           //0x8094 Key 2
+        0x00,           //0x8095 Key 3
+        0x00,           //0x8096 Key 4
+        0x00,           //0x8097 Key_Area
+        0x00,           //0x8098 Key_Touch_Level
+        0x00,           //0x8099 Key_Leave_Level
+        0x00,           //0x809A Key_Sens - KeySens_1(sensitivity coefficient of Key 1) KeySens_2 (sensitivity coefficient of Key 2)
+        0x00,           //0x809B Key_Sens - KeySens_3(sensitivity coefficient of Key 3) KeySens_4 (sensitivity coefficient of Key 4)
+        0x00,           //0x809C Key_Restrain
+        0x00,           //0x809D Key_Restrain_Time
+        0x00,           //0x809E GESTURE_LARGE_TOUCH
+        0x00,           //0x809F NC
+        0x00,           //0x80A0 NC
+        0x00,           //0x80A1 Hotknot_Noise_Map
+        0x00,           //0x80A2 Link_Threshold
+        0x00,           //0x80A3 Pxy_Threshold
+        0x00,           //0x80A4 GHot_Dump_Shift
+        0x00,           //0x80A5 GHot_Rx_Gain
+        0x00,           //0x80A6 Freq_Gain0
+        0x00,           //0x80A7 Freq_Gain1
+        0x00,           //0x80A8 Freq_Gain2
+        0x00,           //0x80A9 Freq_Gain3
+        0x00,           //0x80AA NC
+        0x00,           //0x80AB NC
+        0x00,           //0x80AC NC
+        0x00,           //0x80AD NC
+        0x00,           //0x80AE NC
+        0x00,           //0x80AF NC
+        0x00,           //0x80B0 NC
+        0x00,           //0x80B1 NC
+        0x00,           //0x80B2 NC
+        0x00,           //0x80B3 Combine_Dis
+        0x00,           //0x80B4 Split_Set
+        0x00,           //0x80B5 NC
+        0x00,           //0x80B6 NC
+        0x02,           //0x80B7 Sensor_CH0
+        0x04,           //0x80B8 Sensor_CH1
+        0x06,           //0x80B9 Sensor_CH2
+        0x08,           //0x80BA Sensor_CH3
+        0x0A,           //0x80BB Sensor_CH4
+        0x0C,           //0x80BC Sensor_CH5
+        0x0E,           //0x80BD Sensor_CH6
+        0x10,           //0x80BE Sensor_CH7
+        0x12,           //0x80BF Sensor_CH8
+        0x14,           //0x80C0 Sensor_CH9
+        0x16,           //0x80C1 Sensor_CH10
+        0x18,           //0x80C2 Sensor_CH11
+        0x1A,           //0x80C3 Sensor_CH12
+        0x1C,           //0x80C4 Sensor_CH13
+        0x00,           //0x80C5 NC
+        0x00,           //0x80C6 NC
+        0x00,           //0x80C7 NC
+        0x00,           //0x80C8 NC
+        0x00,           //0x80C9 NC
+        0x00,           //0x80CA NC
+        0x00,           //0x80CB NC
+        0x00,           //0x80CC NC
+        0x00,           //0x80CD NC
+        0x00,           //0x80CE NC
+        0x00,           //0x80CF NC
+        0x00,           //0x80D0 NC
+        0x00,           //0x80D1 NC
+        0x00,           //0x80D2 NC
+        0x00,           //0x80D3 NC
+        0x00,           //0x80D4 NC
+        0x2A,           //0x80D5 Driver_CH0
+        0x29,           //0x80D6 Driver_CH1
+        0x28,           //0x80D7 Driver_CH2
+        0x26,           //0x80D8 Driver_CH3
+        0x24,           //0x80D9 Driver_CH4
+        0x22,           //0x80DA Driver_CH5
+        0x21,           //0x80DB Driver_CH6
+        0x20,           //0x80DC Driver_CH7
+        0x1F,           //0x80DD Driver_CH8
+        0x1E,           //0x80DE Driver_CH9
+        0x1D,           //0x80DF Driver_CH10
+        0x1C,           //0x80E0 Driver_CH11
+        0x18,           //0x80E1 Driver_CH12
+        0x16,           //0x80E2 Driver_CH13
+        0x14,           //0x80E3 Driver_CH14
+        0x13,           //0x80E4 Driver_CH15
+        0x12,           //0x80E5 Driver_CH16
+        0x10,           //0x80E6 Driver_CH17
+        0x0F,           //0x80E7 Driver_CH18
+        0x0C,           //0x80E8 Driver_CH19
+        0x0A,           //0x80E9 Driver_CH20
+        0x08,           //0x80EA Driver_CH21
+        0x06,           //0x80EB Driver_CH22
+        0x04,           //0x80EC Driver_CH23
+        0x02,           //0x80ED Driver_CH24
+        0x00,           //0x80EE Driver_CH25
+        0x00,           //0x80EF NC
+        0x00,           //0x80F0 NC
+        0x00,           //0x80F1 NC
+        0x00,           //0x80F2 NC
+        0x00,           //0x80F3 NC
+        0x00,           //0x80F4 NC
+        0x00,           //0x80F5 NC
+        0x00,           //0x80F6 NC
+        0x00,           //0x80F7 NC
+        0x00,           //0x80F8 NC
+        0x00,           //0x80F9 NC
+        0x00,           //0x80FA NC
+        0x00,           //0x80FB NC
+        0x00,           //0x80FC NC
+        0x00,           //0x80FD NC
+        0x00,           //0x80FE NC
+        0xF3,   //CHECKSUM
+};
+
+uint8_t gt911_cfg_data_rotate180[ GT9XX_CONFIG_SIZE ] =
+{
+        0x52,           //0x8047 Config_Version
+        0x20,           //0x8048 X Output Max (Low Byte)
+        0x03,           //0x8049 X Output Max (High Byte)
+        0xE0,           //0x804A Y Output Max (Low Byte)
+        0x01,           //0x804B Y Output Max (High Byte)
+        0x01,   //0x05, //0x804C Touch Number
+        0xFD,   //0x3D, //0x804D Module_Switch1 // Rotate TOUCH!!!
+        0x00,           //0x804E Module_switch2
+        0x22,           //0x804F Shake_Count
+        0x08,           //0x8050 Filter
+        0x28,           //0x8051 Large_Touch
+        0x08,           //0x8052 Noise_Reduction
+        0x46,           //0x8053 Screen_Touch_Level
+        0x32,           //0x8054 Screen_Leave_Level
+        0x00,   //0x03, //0x8055 Low_Power_Control
+        0x03,           //0x8056 Refresh_Rate
+        0x00,           //0x8057 x_threshold
+        0x00,           //0x8058 y_threshold
+        0x00,           //0x8059 X_Speed_Limit
+        0x00,           //0x805A Y_Speed_Limit
+        0x77,   //0x11, //0x805B Space - Space of border top (coefficient: 32) Space of border bottom (coefficient: 32)
+        0x77,   //0x11, //0x805C Space - Space of border left (coefficient: 32) Space of border right (coefficient: 32)
+        0x00,           //0x805D Mini_Filter
+        0x18,           //0x805E Stretch_R0
+        0x1A,           //0x805F Stretch_R1
+        0x1E,           //0x8060 Stretch_R2
+        0x14,           //0x8061 Stretch_RM
+        0x8C,           //0x8062 Drv_GroupA_Num
+        0x2E,           //0x8063 Drv_GroupB_Num
+        0x0E,           //0x8064 Sensor_Num
+        0x8D,           //0x8065 FreqA_factor
+        0x8F,           //0x8066 FreqB_factor
+        0x82,           //0x8067 Pannel_BitFreqL
+        0x0A,           //0x8068 Pannel_BitFreqH
+        0x00,           //0x8069 Pannel_Sensor_TimeL
+        0x00,           //0x806A Pannel_Sensor_TimeH
+        0x00,           //0x806B Pannel_Tx_Gain
+        0xBA,           //0x806C Pannel_Rx_Gain
+        0x02,           //0x806D Pannel_Dump_Shift
+        0x1D,           //0x806E Drv_Frame_Control
+        0x00,           //0x806F Charging_Level_Up
+        0x01,           //0x8070 Module_Switch3
+        0x00,           //0x8071 GESTURE_DIS
+        0x00,           //0x8072 Gesture_Long_Press_Time
+        0x00,           //0x8073 X/Y_Slope_Adjust
+        0x00,           //0x8074 Gesture_Control
+        0x00,           //0x8075 Gesture_Switch1
+        0x00,           //0x8076 Gesture_Switch2
+        0x00,           //0x8077 Gesture_Refresh_Rate
+        0x00,           //0x8078 Gesture_Touch_Level
+        0x00,           //0x8079 NewGreenWakeUpLevel
+        0x7D,           //0x807A Freq_Hopping_Start
+        0xA0,           //0x807B Freq_Hopping_End
+        0xDE,           //0x807C Noise_Detect_Times
+        0xD5,           //0x807D Hopping_Flag
+        0xF4,           //0x807E Hopping_Threshold
+        0x07,           //0x807F Noise_Threshold
+        0x00,           //0x8080 Noise_Min_Threshold
+        0x00,           //0x8081 NC
+        0x04,           //0x8082 Hopping_Sensor_Group
+        0x99,           //0x8083 Hopping_seg1_Normalize
+        0x80,           //0x8084 Hopping_seg1_Factor
+        0x00,           //0x8085 Main_Clock_Ajdust
+        0x99,           //0x8086 Hopping_seg2_Normalize
+        0x86,           //0x8087 Hopping_seg2_Factor
+        0x00,           //0x8088 NC
+        0x99,           //0x8089 Hopping_seg3_Normalize
+        0x8D,           //0x808A Hopping_seg3_Factor
+        0x00,           //0x808B NC
+        0x99,           //0x808C Hopping_seg4_Normalize
+        0x94,           //0x808D Hopping_seg4_Factor
+        0x00,           //0x808E NC
+        0x99,           //0x808F Hopping_seg5_Normalize
+        0x9C,           //0x8090 Hopping_seg5_Factor
+        0x00,           //0x8091 NC
+        0x99,           //0x8092 Hopping_seg6_Normalize
+        0x00,           //0x8093 Key 1
+        0x00,           //0x8094 Key 2
+        0x00,           //0x8095 Key 3
+        0x00,           //0x8096 Key 4
+        0x00,           //0x8097 Key_Area
+        0x00,           //0x8098 Key_Touch_Level
+        0x00,           //0x8099 Key_Leave_Level
+        0x00,           //0x809A Key_Sens - KeySens_1(sensitivity coefficient of Key 1) KeySens_2 (sensitivity coefficient of Key 2)
+        0x00,           //0x809B Key_Sens - KeySens_3(sensitivity coefficient of Key 3) KeySens_4 (sensitivity coefficient of Key 4)
+        0x00,           //0x809C Key_Restrain
+        0x00,           //0x809D Key_Restrain_Time
+        0x00,           //0x809E GESTURE_LARGE_TOUCH
+        0x00,           //0x809F NC
+        0x00,           //0x80A0 NC
+        0x00,           //0x80A1 Hotknot_Noise_Map
+        0x00,           //0x80A2 Link_Threshold
+        0x00,           //0x80A3 Pxy_Threshold
+        0x00,           //0x80A4 GHot_Dump_Shift
+        0x00,           //0x80A5 GHot_Rx_Gain
+        0x00,           //0x80A6 Freq_Gain0
+        0x00,           //0x80A7 Freq_Gain1
+        0x00,           //0x80A8 Freq_Gain2
+        0x00,           //0x80A9 Freq_Gain3
+        0x00,           //0x80AA NC
+        0x00,           //0x80AB NC
+        0x00,           //0x80AC NC
+        0x00,           //0x80AD NC
+        0x00,           //0x80AE NC
+        0x00,           //0x80AF NC
+        0x00,           //0x80B0 NC
+        0x00,           //0x80B1 NC
+        0x00,           //0x80B2 NC
+        0x00,           //0x80B3 Combine_Dis
+        0x00,           //0x80B4 Split_Set
+        0x00,           //0x80B5 NC
+        0x00,           //0x80B6 NC
+        0x02,           //0x80B7 Sensor_CH0
+        0x04,           //0x80B8 Sensor_CH1
+        0x06,           //0x80B9 Sensor_CH2
+        0x08,           //0x80BA Sensor_CH3
+        0x0A,           //0x80BB Sensor_CH4
+        0x0C,           //0x80BC Sensor_CH5
+        0x0E,           //0x80BD Sensor_CH6
+        0x10,           //0x80BE Sensor_CH7
+        0x12,           //0x80BF Sensor_CH8
+        0x14,           //0x80C0 Sensor_CH9
+        0x16,           //0x80C1 Sensor_CH10
+        0x18,           //0x80C2 Sensor_CH11
+        0x1A,           //0x80C3 Sensor_CH12
+        0x1C,           //0x80C4 Sensor_CH13
+        0x00,           //0x80C5 NC
+        0x00,           //0x80C6 NC
+        0x00,           //0x80C7 NC
+        0x00,           //0x80C8 NC
+        0x00,           //0x80C9 NC
+        0x00,           //0x80CA NC
+        0x00,           //0x80CB NC
+        0x00,           //0x80CC NC
+        0x00,           //0x80CD NC
+        0x00,           //0x80CE NC
+        0x00,           //0x80CF NC
+        0x00,           //0x80D0 NC
+        0x00,           //0x80D1 NC
+        0x00,           //0x80D2 NC
+        0x00,           //0x80D3 NC
+        0x00,           //0x80D4 NC
+        0x2A,           //0x80D5 Driver_CH0
+        0x29,           //0x80D6 Driver_CH1
+        0x28,           //0x80D7 Driver_CH2
+        0x26,           //0x80D8 Driver_CH3
+        0x24,           //0x80D9 Driver_CH4
+        0x22,           //0x80DA Driver_CH5
+        0x21,           //0x80DB Driver_CH6
+        0x20,           //0x80DC Driver_CH7
+        0x1F,           //0x80DD Driver_CH8
+        0x1E,           //0x80DE Driver_CH9
+        0x1D,           //0x80DF Driver_CH10
+        0x1C,           //0x80E0 Driver_CH11
+        0x18,           //0x80E1 Driver_CH12
+        0x16,           //0x80E2 Driver_CH13
+        0x14,           //0x80E3 Driver_CH14
+        0x13,           //0x80E4 Driver_CH15
+        0x12,           //0x80E5 Driver_CH16
+        0x10,           //0x80E6 Driver_CH17
+        0x0F,           //0x80E7 Driver_CH18
+        0x0C,           //0x80E8 Driver_CH19
+        0x0A,           //0x80E9 Driver_CH20
+        0x08,           //0x80EA Driver_CH21
+        0x06,           //0x80EB Driver_CH22
+        0x04,           //0x80EC Driver_CH23
+        0x02,           //0x80ED Driver_CH24
+        0x00,           //0x80EE Driver_CH25
+        0x00,           //0x80EF NC
+        0x00,           //0x80F0 NC
+        0x00,           //0x80F1 NC
+        0x00,           //0x80F2 NC
+        0x00,           //0x80F3 NC
+        0x00,           //0x80F4 NC
+        0x00,           //0x80F5 NC
+        0x00,           //0x80F6 NC
+        0x00,           //0x80F7 NC
+        0x00,           //0x80F8 NC
+        0x00,           //0x80F9 NC
+        0x00,           //0x80FA NC
+        0x00,           //0x80FB NC
+        0x00,           //0x80FC NC
+        0x00,           //0x80FD NC
+        0x00,           //0x80FE NC
+        0xF3,           //CHECKSUM
+};
+

@@ -1,0 +1,12 @@
+#include "version.h"
+
+#ifdef NDEBUG 
+#define _CONFIG_STR_ "Release"
+#else 
+#define _CONFIG_STR_ "Debug"
+#endif
+uint8_t* firmware_commit =(uint8_t*)"------";
+uint8_t* version = (uint8_t*) "-.-" _CONFIG_STR_;
+uint8_t* built_date = (uint8_t*) __DATE__;
+uint8_t* built_time = (uint8_t*) __TIME__;
+uint8_t* built_date_time = (uint8_t*) "-_-";

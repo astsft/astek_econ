@@ -1,0 +1,59 @@
+/**
+  * @file    os_user.h
+  * @brief   OS User Header
+  * @author  Igor T. <research.tahoe@gmail.com>
+  */
+
+
+#ifndef OS_USER_H
+#define OS_USER_H
+
+
+typedef enum    sys_sync_e
+{
+    OS_USER_TAG_TMR_1SEC,
+    OS_USER_TAG_USART1_RECV_IDLE,
+    OS_USER_TAG_USART1_RECV_RXNE,
+    OS_USER_TAG_UART4_RECV_IDLE,
+    OS_USER_TAG_UART4_RECV_TOUT,
+    OS_USER_TAG_UART4_XMIT_FULL,
+    OS_USER_TAG_UART7_RECV,
+    OS_USER_TAG_CAL0_UPDATE,
+    OS_USER_TAG_CAL1_UPDATE,
+    OS_USER_TAG_CAL0_RESTORE,
+    OS_USER_TAG_CAL1_RESTORE,
+    OS_USER_TAG_CAL0_FACTORY_UPDATE,
+    OS_USER_TAG_CAL1_FACTORY_UPDATE,
+    OS_USER_TAG_CAL0_FACTORY_RESTORE,
+    OS_USER_TAG_CAL1_FACTORY_RESTORE,
+    OS_USER_TAG_TRIM_READ,
+    OS_USER_TAG_TOUCH_INT,
+    OS_USER_TAG_SENS_CONF_FILTER,
+    OS_USER_TAG_IBUS_REFRESH,
+    OS_USER_TAG_IBUS_CL420_CH1_UPDATE,
+    OS_USER_TAG_IBUS_CL420_CH2_UPDATE,
+    OS_USER_TAG_RELAY1_OPEN,
+    OS_USER_TAG_RELAY2_OPEN,
+    OS_USER_TAG_RELAY1_CLOSE,
+    OS_USER_TAG_RELAY2_CLOSE,
+    OS_USER_TAG_CAL_CLOOP_4MA_WRITE,   
+    OS_USER_TAG_CAL_CLOOP_20MA_WRITE,   
+    OS_USER_TAG_CAL_CLOOP_SET_RAW_4MA,
+    OS_USER_TAG_CAL_CLOOP_SET_RAW_20MA,
+    OS_USER_TAG_IBUS_BOARDS_INIT,
+    OS_USER_TAG_CAL_CLOOP_SET_RANGE,
+    //OS_USER_TAG_CL_SENS,
+    //OS_USER_TAG_THLD_1_ON,
+    //OS_USER_TAG_THLD_1_OFF,
+    //OS_USER_TAG_THLD_2_ON,
+    //OS_USER_TAG_THLD_2_OFF,
+} os_user_tag_t;
+
+void send_cmd_for_cloop_set_raw_4mA (void);
+void send_cmd_for_cloop_set_raw_20mA (void);
+void send_cmd_for_cloop_4mA_write (void);
+void send_cmd_for_cloop_20mA_write (void);
+void send_cmd_for_cloop_write_range (void);
+
+
+#endif //OS_USER_H
