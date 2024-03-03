@@ -1,0 +1,11 @@
+iar/output/
+iar/settings/*
+iar/project/astek_econ/output/
+iar/project/astek_econ/settings/*
+*.html
+*.dep
+*.ewd
+*.ewt
+
+src/app/astek_econ/version/version.c
+
