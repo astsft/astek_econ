@@ -49,6 +49,7 @@ scr_update(                             WM_HWIN         hWin,
     int32_t     ppm         = p->sens->meas.ppm.integral;
     int16_t     temp_digc_i = p->sens->meas.digc.integral;
     uint16_t    temp_digc_f = p->sens->meas.digc.fractional;
+    if (ppm < 0) ppm = 0;
 
     switch( dev.cfg.display_mode )
     {

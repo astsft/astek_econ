@@ -45,7 +45,7 @@ dev_init(                       dev_t *         p )
     p->cfg.lang = (l10n_lang_t) ( p->nvm.get( NVM_REG_LANGUAGE ) );
 
     p->cfg.launch_timestamp = p->mcu->rtc.get_timestamp();
-    p->nvm.put( NVM_REG_LAUNCH_TIMESTAMP, p->cfg.launch_timestamp );
+    //p->nvm.put( NVM_REG_LAUNCH_TIMESTAMP, p->cfg.launch_timestamp );
 
     p->cfg.cal_auto_start_timestamp = p->nvm.get( NVM_REG_CAL_AUTO_START_TIMESTAMP );
     p->cfg.cal_auto_cycle_hours     = p->nvm.get( NVM_REG_CAL_AUTO_CYCLE_HOURS );
@@ -56,14 +56,14 @@ dev_init(                       dev_t *         p )
     //dev.log.buf_size    = CONFIG_LOG_DATA_SIZE;
     //dev.log.head        = 0;
 
-    p->cl420.range_idx              = (dev_range_idx_t) (p->nvm.get( NVM_REG_RANGE_IDX ));
-    p->cl420.range[ 0].ppm          = p->nvm.get( NVM_REG_RANGE_R1_PPM );
-    p->cl420.range[ 1].ppm          = p->nvm.get( NVM_REG_RANGE_R2_PPM );
-    p->cl420.range[ 2].ppm          = p->nvm.get( NVM_REG_RANGE_R3_PPM );
-    for (int i = 0; i < 3; i++)
-    {
-      p->cl420.range[ 0].units      = p->nvm.get( NVM_REG_RANGE_UNITS );
-    }
+    //p->cl420.range_idx              = (dev_range_idx_t) (p->nvm.get( NVM_REG_RANGE_IDX ));
+    //p->cl420.range[ 0].ppm          = p->nvm.get( NVM_REG_RANGE_R1_PPM );
+    //p->cl420.range[ 1].ppm          = p->nvm.get( NVM_REG_RANGE_R2_PPM );
+    //p->cl420.range[ 2].ppm          = p->nvm.get( NVM_REG_RANGE_R3_PPM );
+    //for (int i = 0; i < 3; i++)
+    //{
+    //  p->cl420.range[ 0].units      = p->nvm.get( NVM_REG_RANGE_UNITS );
+    //}
     
     if (dev.cl420.range_idx > 2)
     {
@@ -177,31 +177,22 @@ dev_factory_reset(                      dev_cfg_t *         p )
 static int
 dev_conf_zero_save(                     dev_t *         p )
 {
-    //ant3n_point_t *  zero    = &( p->sens->cal.zero );
-    //ant3n_point_t    bckp;
-
-    //nvm_read16( NVM_ADDR_CAL0_PPM_HI,   &( bckp.ppm.u16[ 1]      ) );
-    //nvm_read16( NVM_ADDR_CAL0_PPM_LO,   &( bckp.ppm.u16[ 0]      ) );
-    //nvm_read16( NVM_ADDR_CAL0_RAW_HI,   &( bckp.raw.u16[ 1]      ) );
-    //nvm_read16( NVM_ADDR_CAL0_RAW_LO,   &( bckp.raw.u16[ 0]      ) );
-    //nvm_read16( NVM_ADDR_CAL0_TIME_HI,  &( bckp.timestamp.u16[ 1]) );
-    //nvm_read16( NVM_ADDR_CAL0_TIME_LO,  &( bckp.timestamp.u16[ 0]) );
-
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_PPM_HI,  bckp.ppm.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_PPM_LO,  bckp.ppm.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_RAW_HI,  bckp.raw.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_RAW_LO,  bckp.raw.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_TIME_HI, bckp.timestamp.u16[ 1]  );
-    //nvm_write16( NVM_ADDR_CAL0_BCKP_TIME_LO, bckp.timestamp.u16[ 0]  );
-
-    //nvm_write16( NVM_ADDR_CAL0_PPM_HI,  zero->ppm.u16[ 1]       );
-    //nvm_write16( NVM_ADDR_CAL0_PPM_LO,  zero->ppm.u16[ 0]       );
-    //nvm_write16( NVM_ADDR_CAL0_RAW_HI,  zero->raw.u16[ 1]       );
-    //nvm_write16( NVM_ADDR_CAL0_RAW_LO,  zero->raw.u16[ 0]       );
-    //nvm_write16( NVM_ADDR_CAL0_TIME_HI, zero->timestamp.u16[ 1] );
-    //nvm_write16( NVM_ADDR_CAL0_TIME_LO, zero->timestamp.u16[ 0] );
-
-    return( 0 );
+  uint32_t ppm;
+  uint32_t raw;
+  
+    // Read current zero cal value
+  ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+  
+    // Write current value to backup
+  dev.nvm.put(NVM_REG_CAL0_RESTORE_PPM, ppm);
+  dev.nvm.put(NVM_REG_CAL0_RESTORE_RAW, raw);
+  
+    // Write new value
+  dev.nvm.put(NVM_REG_CAL0_PPM, p->sens->cal.zero.ppm.u32);
+  dev.nvm.put(NVM_REG_CAL0_RAW, p->sens->cal.zero.raw.u32);
+ 
+  return( 0 );
 }
 
 
@@ -211,31 +202,22 @@ dev_conf_zero_save(                     dev_t *         p )
 static int
 dev_conf_span_save(                     dev_t *         p )
 {
-    //ant3n_point_t *  span    = &( p->sens->cal.span );
-    //ant3n_point_t    bckp;
+  uint32_t ppm;
+  uint32_t raw;
+  
+    // Read current span cal value
+  ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL1_RAW);
+  
+    // Write current value to backup
+  dev.nvm.put(NVM_REG_CAL1_RESTORE_PPM, ppm);
+  dev.nvm.put(NVM_REG_CAL1_RESTORE_RAW, raw);
+  
+    // Write new value
+  dev.nvm.put(NVM_REG_CAL1_PPM, p->sens->cal.span.ppm.u32);
+  dev.nvm.put(NVM_REG_CAL1_RAW, p->sens->cal.span.raw.u32);
 
-    //nvm_read16( NVM_ADDR_CAL1_PPM_HI,   &( bckp.ppm.u16[ 1]      ) );
-    //nvm_read16( NVM_ADDR_CAL1_PPM_LO,   &( bckp.ppm.u16[ 0]      ) );
-    //nvm_read16( NVM_ADDR_CAL1_RAW_HI,   &( bckp.raw.u16[ 1]      ) );
-    //nvm_read16( NVM_ADDR_CAL1_RAW_LO,   &( bckp.raw.u16[ 0]      ) );
-    //nvm_read16( NVM_ADDR_CAL1_TIME_HI,  &( bckp.timestamp.u16[ 1]) );
-    //nvm_read16( NVM_ADDR_CAL1_TIME_LO,  &( bckp.timestamp.u16[ 0]) );
-
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_PPM_HI,  bckp.ppm.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_PPM_LO,  bckp.ppm.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_RAW_HI,  bckp.raw.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_RAW_LO,  bckp.raw.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_TIME_HI, bckp.timestamp.u16[ 1]  );
-    //nvm_write16( NVM_ADDR_CAL1_BCKP_TIME_LO, bckp.timestamp.u16[ 0]  );
-
-    //nvm_write16( NVM_ADDR_CAL1_PPM_HI,  span->ppm.u16[ 1]       );
-    //nvm_write16( NVM_ADDR_CAL1_PPM_LO,  span->ppm.u16[ 0]       );
-    //nvm_write16( NVM_ADDR_CAL1_RAW_HI,  span->raw.u16[ 1]       );
-    //nvm_write16( NVM_ADDR_CAL1_RAW_LO,  span->raw.u16[ 0]       );
-    //nvm_write16( NVM_ADDR_CAL1_TIME_HI, span->timestamp.u16[ 1] );
-    //nvm_write16( NVM_ADDR_CAL1_TIME_LO, span->timestamp.u16[ 0] );
-
-    return( 0 );
+  return( 0 );
 }
 
 /**
@@ -245,28 +227,27 @@ static int
 dev_conf_zero_restore(                  dev_t *     p,
                                 const   uint16_t    key )
 {
-    //ant3n_point_t *  zero    = &( p->sens->cal.zero );
-
-    //if( key != DEV_CONF_CAL_RESTORE_KEY )
-    //{
-    //    return( -1 );
-    //}
-
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_PPM_HI,  &( zero->ppm.u16[ 1]       ) );
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_PPM_LO,  &( zero->ppm.u16[ 0]       ) );
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_RAW_HI,  &( zero->raw.u16[ 1]       ) );
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_RAW_LO,  &( zero->raw.u16[ 0]       ) );
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_TIME_HI, &( zero->timestamp.u16[ 1] ) );
-    //nvm_read16( NVM_ADDR_CAL0_BCKP_TIME_LO, &( zero->timestamp.u16[ 0] ) );
-
-    //nvm_write16( NVM_ADDR_CAL0_PPM_HI,  zero->ppm.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL0_PPM_LO,  zero->ppm.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL0_RAW_HI,  zero->raw.u16[ 1]        );
-    //nvm_write16( NVM_ADDR_CAL0_RAW_LO,  zero->raw.u16[ 0]        );
-    //nvm_write16( NVM_ADDR_CAL0_TIME_HI, zero->timestamp.u16[ 1]  );
-    //nvm_write16( NVM_ADDR_CAL0_TIME_LO, zero->timestamp.u16[ 0]  );
-
-    return( 0 );
+   uint32_t ppm;
+   uint32_t raw;
+   
+   if( key != DEV_CONF_CAL_RESTORE_KEY )
+   {
+       return( -1 );
+   }   
+    
+   // Read backup value
+   ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
+   raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW);
+      
+   // Write backup value   
+   dev.nvm.put(NVM_REG_CAL0_PPM, ppm);
+   dev.nvm.put(NVM_REG_CAL0_RAW, raw);   
+  
+   p->sens->cal.zero.ppm.u32 = ppm;
+   p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
+   p->sens->cal.zero.raw.u32 = raw;
+   
+   return( 0 );
 }
 
 /**
@@ -276,26 +257,25 @@ static int
 dev_conf_span_restore(                  dev_t *     p,
                                 const   uint16_t    key )
 {
-    //ant3n_point_t *  span    = &( p->sens->cal.span );
-
-    //if( key != DEV_CONF_CAL_RESTORE_KEY )
-    //{
-    //    return( -1 );
-    //}
-
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_PPM_HI,  &( span->ppm.u16[ 1]       ) );
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_PPM_LO,  &( span->ppm.u16[ 0]       ) );
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_RAW_HI,  &( span->raw.u16[ 1]       ) );
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_RAW_LO,  &( span->raw.u16[ 0]       ) );
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_TIME_HI, &( span->timestamp.u16[ 1] ) );
-    //nvm_read16(     NVM_ADDR_CAL1_BCKP_TIME_LO, &( span->timestamp.u16[ 0] ) );
-
-    //nvm_write16(    NVM_ADDR_CAL1_PPM_HI,   span->ppm.u16[ 1]        );
-    //nvm_write16(    NVM_ADDR_CAL1_PPM_LO,   span->ppm.u16[ 0]        );
-    //nvm_write16(    NVM_ADDR_CAL1_RAW_HI,   span->raw.u16[ 1]        );
-    //nvm_write16(    NVM_ADDR_CAL1_RAW_LO,   span->raw.u16[ 0]        );
-    //nvm_write16(    NVM_ADDR_CAL1_TIME_HI,  span->timestamp.u16[ 1]  );
-    //nvm_write16(    NVM_ADDR_CAL1_TIME_LO,  span->timestamp.u16[ 0]  );
+   uint32_t ppm;
+   uint32_t raw;
+   
+   if( key != DEV_CONF_CAL_RESTORE_KEY )
+   {
+       return( -1 );
+   }   
+    
+   // Read backup value
+   ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
+   raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);
+      
+   // Write backup value   
+   dev.nvm.put(NVM_REG_CAL1_PPM, ppm);
+   dev.nvm.put(NVM_REG_CAL1_RAW, raw);   
+  
+   p->sens->cal.span.ppm.u32 = ppm;
+   p->sens->cal.span.ppm.i32 = (int32_t)ppm;
+   p->sens->cal.span.raw.u32 = raw;
 
     return( 0 );
 }
@@ -386,7 +366,7 @@ dev_cl420_set_range_idx(                dev_cl420_t *       p,
     if( idx < DEV_RANGE_IDX_MAX )
     {
         p->range_idx  = idx;
-        dev.nvm.put( NVM_REG_RANGE_IDX, idx );        
+        //dev.nvm.put( NVM_REG_RANGE_IDX, idx );        
     }
     
      send_cmd_for_cloop_write_range(); 
@@ -405,15 +385,15 @@ dev_cl420_set_range(                    dev_cl420_t *       p,
     {
         case DEV_RANGE_IDX_R1:
             p->range[ 0].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R1_PPM, ppm );
+            //dev.nvm.put( NVM_REG_RANGE_R1_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R2:
             p->range[ 1].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R2_PPM, ppm );
+            //dev.nvm.put( NVM_REG_RANGE_R2_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R3:
             p->range[ 2].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R3_PPM, ppm );
+            //dev.nvm.put( NVM_REG_RANGE_R3_PPM, ppm );
             break;
         default:
             break;
@@ -468,8 +448,8 @@ dev_cl420_set_units(                    dev_cl420_t *       p,  cl420_units_t   
    {                          
      p->range[i].units = units;
    }
-
-	dev.nvm.put( NVM_REG_RANGE_UNITS, units );
+  
+   //dev.nvm.put( NVM_REG_RANGE_UNITS, units );
 }
 
 void convert_flt_to_int_fract (float flt, int32_t *integ, int32_t *fract)

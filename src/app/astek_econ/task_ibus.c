@@ -1478,6 +1478,7 @@ task_ibus(                      const   void *          argument )
                 //set_sensor_status(dev.sens->link_err);
                 dev.sens->cal.zero.raw.i32  = dev.sens->meas.raw;
                 dev_zero_update( &dev );
+                log_write_event(&dev.log, LOG_SOURCE_SENSOR, LOG_SENSOR_EVENT_ZERO_CALIBRATION);                
                 break;
 
             case OS_USER_TAG_CAL1_UPDATE:
@@ -1490,6 +1491,7 @@ task_ibus(                      const   void *          argument )
                 //set_sensor_status(dev.sens->link_err);
                 dev.sens->cal.span.raw.i32  = dev.sens->meas.raw;
                 dev_span_update( &dev );              
+                log_write_event(&dev.log, LOG_SOURCE_SENSOR, LOG_SENSOR_EVENT_SPAN_CALIBRATION);                 
                 break;
 
             case OS_USER_TAG_CAL1_FACTORY_UPDATE:
@@ -1523,6 +1525,7 @@ task_ibus(                      const   void *          argument )
                 //dev.sens->link_err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0D00, 16, dev.sens->cal_back.zero.raw );
                 //set_sensor_status(dev.sens->link_err);
                 dev_zero_restore(&dev, 0xACDC);
+                log_write_event(&dev.log, LOG_SOURCE_SENSOR, LOG_SENSOR_EVENT_ZERO_CALIBRATION_RESTORE);                
                 break;
 
             case OS_USER_TAG_CAL1_RESTORE:
@@ -1539,6 +1542,7 @@ task_ibus(                      const   void *          argument )
                 //dev.sens->link_err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0D10, 16, dev.sens->cal_back.span.raw );
                 //set_sensor_status(dev.sens->link_err);
                 dev_span_restore(&dev, 0xACDC);
+                log_write_event(&dev.log, LOG_SOURCE_SENSOR, LOG_SENSOR_EVENT_SPAN_CALIBRATION_RESTORE);                
                 break;
 
             case OS_USER_TAG_CAL0_FACTORY_RESTORE:

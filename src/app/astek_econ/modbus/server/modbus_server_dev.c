@@ -99,6 +99,7 @@ mdbs_hreg_read(                         const   size_t                  addr,
                                                 uint16_t *              data )
 {
         mdbs_err_t      err     = MDBS_ERR_NONE;
+        int32_t     ppm;
 
 
         switch( addr )
@@ -281,11 +282,19 @@ mdbs_hreg_read(                         const   size_t                  addr,
 
 
                 case MDBS_TERM_HREG_SENS_OXGN_PPM_HI:
-                        *data   = dev.sens->meas.ppm.integral >> 16;
+                        ppm = dev.sens->meas.ppm.integral;
+                        if (ppm < 0)
+                          *data = 0;
+                        else
+                          *data   = dev.sens->meas.ppm.integral >> 16;
                         break;
 
                 case MDBS_TERM_HREG_SENS_OXGN_PPM_LO:
-                        *data   = dev.sens->meas.ppm.integral & 0xFFFF;
+                        ppm = dev.sens->meas.ppm.integral;
+                        if (ppm < 0)
+                          *data = 0;
+                        else
+                          *data   = dev.sens->meas.ppm.integral & 0xFFFF;
                         break;
 
                 case MDBS_TERM_HREG_SENS_TEMP_DIGC_HI:

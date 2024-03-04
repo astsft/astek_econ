@@ -134,7 +134,6 @@ init_dialog(                                            WM_HWIN         hWin )
     TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
     WM_BringToBottom( hItem );
 
-    //hItem   = RADIO_CreateEx(  75, 50, 160, 250, hWin, WM_CF_SHOW, 0, GUI_ID_RADIO0, DEV_RANGE_IDX_MAX, 60 );
     hItem   = RADIO_CreateEx(  75, 60, 98, 450, hWin, WM_CF_SHOW, 0, GUI_ID_RADIO0, DEV_RANGE_IDX_MAX, 85 );
     hItem   = WM_GetDialogItem( hWin, GUI_ID_RADIO0 );
     RADIO_SetBkColor(       hItem,  GUI_TRANSPARENT                         );
@@ -196,6 +195,9 @@ init_dialog(                                            WM_HWIN         hWin )
     //
     // FOOTER AREA
     //
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_DUMMY );
+    BUTTON_SetFocusable(    hItem, 1                                        );    
+    
     hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_CANCEL );
     BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_CANCEL )       );
     BUTTON_SetFocusable(    hItem, 0                                        );
@@ -239,6 +241,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
                         }
+                        else
+                        {
+                                WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
+                        }
                         break;
 
                 case GUI_KEY_RIGHT:
@@ -262,6 +268,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
                         }
                         else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON3 ) ) )
+                        {
+                                WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
+                        }
+                        else
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
                         }
@@ -290,6 +300,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                                         RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ), range_idx );
                                 }
                         }
+                        else
+                        {
+                                WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
+                        }                        
                         //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
                         //{
                         //        if( range_units > 0 )
@@ -328,6 +342,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                                         RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ), range_idx );
                                 }
                         }
+                        else
+                        {
+                                WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
+                        }                         
                         //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
                         //{
                         //        if( range_units < CL420_UNITS_MAX-1 )

@@ -15,6 +15,7 @@
 #include <time.h>
 #include "l10n\l10n.h"
 
+#define DEV_CONF_CAL_RESTORE_KEY        0xACDC
 
 /*******************************************************************************
 *
@@ -25,7 +26,6 @@
 typedef enum    dev_dspl_mode_e
 {
     DEV_DSPL_MODE_PERCENTS      = 0,
-    //DEV_DSPL_MODE_PPM,
     DEV_DSPL_MODE_MAX,
 } dev_dspl_mode_t;
 

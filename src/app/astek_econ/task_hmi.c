@@ -83,24 +83,7 @@ task_hmi_cal_restore(           const   int             idx )
       xQueueSend( que_ibus_hndl, &queue_data, NULL );
     }
 }
-/*
-void
-task_hmi_cal_factory_settings_update( const int         idx )
-{
-    os_user_tag_t   tag;
 
-    switch( idx )
-    {
-        case 3:     tag = OS_USER_TAG_CAL1_FACTORY_UPDATE;  break;
-        case 2:     tag = OS_USER_TAG_CAL0_FACTORY_UPDATE;  break;
-        case 1:     tag = OS_USER_TAG_CAL1_UPDATE;          break;
-        case 0:     tag = OS_USER_TAG_CAL0_UPDATE;          break;
-        default:    tag = OS_USER_TAG_CAL0_UPDATE;          break;
-    }
-
-    xQueueSend( que_ibus_hndl, &tag, NULL );
-}
-*/
 /*******************************************************************************
 * KEYBOARD
 *******************************************************************************/
