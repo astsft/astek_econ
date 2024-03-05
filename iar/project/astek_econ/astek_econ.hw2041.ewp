@@ -1790,7 +1790,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>1</hasPrio>
+                <hasPrio>240</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1798,7 +1798,7 @@
             <name>BUILDACTION</name>
             <archiveVersion>1</archiveVersion>
             <data>
-                <prebuild></prebuild>
+                <prebuild>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\genversion_commit.bat</prebuild>
                 <postbuild>$PROJ_DIR$\..\..\..\src\app\modify.bat</postbuild>
             </data>
         </settings>
