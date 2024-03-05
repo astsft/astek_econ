@@ -48,4 +48,4 @@ $newfilename = "$filename1" + "_$commit" + "_$datatime.hex"
 "New filename $newfilename"
 
 Rename-Item $script_path\..\..\iar\project\hex\$filename -NewName $newfilename
-
+Copy-Item -Path $script_path\..\..\iar\project\hex\$newfilename -Destination $script_path\..\..\
