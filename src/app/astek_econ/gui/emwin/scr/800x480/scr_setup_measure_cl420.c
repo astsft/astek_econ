@@ -361,7 +361,7 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                         break;              
                     
                 case GUI_KEY_ESCAPE:
-                    scr_switch( SCR_IDX_SETUP_MEASURE, GUI_ID_BUTTON_CL420 );
+                    scr_switch( SCR_IDX_SETUP, GUI_ID_BUTTON_RANGE );
                     beep_play( BEEP_SHRT );
                     break;
                 case GUI_KEY_ENTER:
