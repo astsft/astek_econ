@@ -20,7 +20,7 @@
 
 #define CONFIG_LOG_DATA_SIZE            64
 
-#define CONFIG_FIRMWARE_ID              "ECON.1.0"
+#define CONFIG_FIRMWARE_ID              "astekecon.1.0"
 
 //#define NO_RELAY
 

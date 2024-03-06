@@ -512,7 +512,7 @@ scr_show_info( void )
 
     GUI_SetColor(GUI_WHITE);
     GUI_SetTextAlign( GUI_TA_LEFT | GUI_TA_VCENTER );
-    GUI_DispStringAt( "ASTEK ЭКОН",         400, 320 );
+    GUI_DispStringAt( "АСТЕК ЭКОН",         400, 320 );
 
     //GUI_SetColor(GUI_LIGHTGRAY);
     //GUI_SetTextAlign( GUI_TA_RIGHT | GUI_TA_VCENTER );
@@ -528,7 +528,7 @@ scr_show_info( void )
 
     GUI_SetColor(GUI_WHITE);
     GUI_SetTextAlign( GUI_TA_LEFT | GUI_TA_VCENTER );
-    GUI_DispStringAt( "ECON.1.0",        400, 400 );
+    GUI_DispStringAt( "astekecon.1.0",        400, 400 );
 }
 
 static

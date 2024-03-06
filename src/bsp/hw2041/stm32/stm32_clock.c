@@ -19,7 +19,7 @@ stm32_clock_init( void )
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_CRC_CLK_ENABLE();     //Enable CRC to Unlock GUI
-    __HAL_RCC_BKPSRAM_CLK_ENABLE();
+    //__HAL_RCC_BKPSRAM_CLK_ENABLE();
 
     //HAL_PWR_EnableBkUpAccess();
 

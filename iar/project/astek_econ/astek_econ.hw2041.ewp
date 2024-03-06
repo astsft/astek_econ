@@ -1772,7 +1772,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$\..\hex\$PROJ_FNAME$.$CONFIG_NAME$.hex</state>
+                    <state>$PROJ_DIR$\..\..\..\hex\$PROJ_FNAME$.$CONFIG_NAME$.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1790,7 +1790,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>

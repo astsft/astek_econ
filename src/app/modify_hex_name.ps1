@@ -19,9 +19,9 @@ $script_path = $PSScriptRoot
 $app_name = $CharArray[-5]
 "Current app $app_name"
 	
-Remove-Item $script_path\..\..\iar\project\hex\$app_name*release_*
+Remove-Item $script_path\..\..\hex\$app_name*release_*
 
-$filename = Get-ChildItem $script_path\..\..\iar\project\hex\$app_name* -Name
+$filename = Get-ChildItem $script_path\..\..\hex\$app_name* -Name
 "Old filename $filename"
 
 $idx = $filename.IndexOf("release")
@@ -47,5 +47,5 @@ $datatime = $version_str.Substring($version_str.IndexOf('"') + 1, 13)
 $newfilename = "$filename1" + "_$commit" + "_$datatime.hex"
 "New filename $newfilename"
 
-Rename-Item $script_path\..\..\iar\project\hex\$filename -NewName $newfilename
-Copy-Item -Path $script_path\..\..\iar\project\hex\$newfilename -Destination $script_path\..\..\
+Rename-Item $script_path\..\..\hex\$filename -NewName $newfilename
+#Copy-Item -Path $script_path\..\..\iar\project\hex\$newfilename -Destination $script_path\..\..\
