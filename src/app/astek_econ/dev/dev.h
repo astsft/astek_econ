@@ -294,6 +294,7 @@ void    dev_zero_update( dev_t *     p );
 void    dev_span_update( dev_t *     p );
 int     dev_zero_restore( dev_t *     p, const   uint16_t    key );
 int     dev_span_restore( dev_t *     p, const   uint16_t    key );
+void    dev_read_cal (dev_t *     p);
 
 
 dev_range_idx_t     dev_cl420_get_range_idx( dev_cl420_t * );

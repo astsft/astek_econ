@@ -102,14 +102,16 @@ init_dialog(                            const   WM_HWIN         hWin )
     cal_ppm = dev.sens->cal_back.zero.ppm.i32;
     //pi      = cal_ppm / 10000;
     //pf      = (cal_ppm % 10000) / 100;
-    tstmp   = dev.sens->cal_back.zero.timestamp.u32;
-    ts      = (time_t) tstmp;
-	cur     = gmtime( &ts );
-    y       = cur->tm_year + 1900;
-    m       = cur->tm_mon + 1;
-    d       = cur->tm_mday;
+    //tstmp   = dev.sens->cal_back.zero.timestamp.u32;
+    //ts      = (time_t) tstmp;
+	//cur     = gmtime( &ts );
+    //y       = cur->tm_year + 1900;
+    //m       = cur->tm_mon + 1;
+    //d       = cur->tm_mday;
 	//snprintf( str, sizeof(str), "% 4d.%02d%%    %02d.%02d.%02d", pi, pf, y, m, d );
-	snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	//snprintf( str, sizeof(str), "% 8d PPM ", cal_ppm);    
+        snprintf( str, sizeof(str), "% 4d.%02u %%", cal_ppm / 10000, ( abs(cal_ppm) % 10000) / 100 );        
     TEXT_SetText(           hItem, str                                      );
     WM_BringToTop( hItem );
 
@@ -122,14 +124,17 @@ init_dialog(                            const   WM_HWIN         hWin )
     cal_ppm = dev.sens->cal_back.span.ppm.i32;
     //pi  = cal_ppm / 10000;
     //pf  = (cal_ppm % 10000) / 100;
-    tstmp   = dev.sens->cal_back.span.timestamp.u32;
-    ts  = (time_t) tstmp;
-	cur = gmtime( &ts );
-    y   = cur->tm_year + 1900;
-    m   = cur->tm_mon + 1;
-    d   = cur->tm_mday;
+    //tstmp   = dev.sens->cal_back.span.timestamp.u32;
+    //ts  = (time_t) tstmp;
+	//cur = gmtime( &ts );
+    //y   = cur->tm_year + 1900;
+    //m   = cur->tm_mon + 1;
+    //d   = cur->tm_mday;
 	//snprintf( str, sizeof(str), "% 4d.%02d%%    %02d.%02d.%02d", pi, pf, y, m, d );
-	snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	//snprintf( str, sizeof(str), "% 8d PPM ", cal_ppm);        
+        snprintf( str, sizeof(str), "% 4d.%02u %%", cal_ppm / 10000, ( abs(cal_ppm) % 10000) / 100 );
+
     TEXT_SetText(           hItem, str                                      );
     WM_BringToTop( hItem );
 

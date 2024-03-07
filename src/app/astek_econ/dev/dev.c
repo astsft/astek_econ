@@ -41,6 +41,9 @@ dev_init(                       dev_t *         p )
     
     log_init(&dev.log);
     log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_START);  
+    
+    dev_read_cal(p);
+    econ_cal_restore(p->sens);
 
     p->cfg.lang = (l10n_lang_t) ( p->nvm.get( NVM_REG_LANGUAGE ) );
 
@@ -338,6 +341,45 @@ dev_span_restore(                       dev_t *     p,
     econ_cal_restore( p->sens );
 
     return( 0 );
+}
+
+void 
+dev_read_cal (dev_t *     p)
+{
+  uint32_t ppm;
+  uint32_t raw;
+  
+  // Read current zero cal value
+  ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+  
+  p->sens->cal.zero.ppm.u32 = ppm;
+  p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
+  p->sens->cal.zero.raw.u32 = raw;
+    
+  // Read current span cal value
+  ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL1_RAW);  
+  
+  p->sens->cal.span.ppm.u32 = ppm;
+  p->sens->cal.span.ppm.i32 = (int32_t)ppm;
+  p->sens->cal.span.raw.u32 = raw;
+  
+  // Read current backup_zero cal value
+  ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW);  
+  
+  p->sens->cal_back.zero.ppm.u32 = ppm;
+  p->sens->cal_back.zero.ppm.i32 = (int32_t)ppm;  
+  p->sens->cal_back.zero.raw.u32 = raw;    
+  
+  // Read current backup_span cal value
+  ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
+  raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);  
+  
+  p->sens->cal_back.span.ppm.u32 = ppm;
+  p->sens->cal_back.span.ppm.i32 = (int32_t)ppm;  
+  p->sens->cal_back.span.raw.u32 = raw;      
 }
 
 /*******************************************************************************

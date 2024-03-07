@@ -43,7 +43,7 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     //{ TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_LABEL,     25, 180, 225,  50, 0, 0x0, 0 },
     //{ TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_VALUE,     25, 230, 225,  70, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,      275,  20, 500, 280, 0, 0x0, 0 },
-    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_POINT,          445, 140,  10,  40, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_POINT,          525, 140,  10,  40, 0, 0x0, 0 },
 
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS0,         368, 140,  80,  40, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS1,         448, 140,  80,  40, 0, 0x0, 0 },

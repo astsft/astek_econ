@@ -33,7 +33,7 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT4,               466, 140, 86,  40, 0, 0x0, 0 },
 //    { TEXT_CreateIndirect,      "", GUI_ID_TEXT5,               552, 140, 86,  40, 0, 0x0, 0 },
 //    { TEXT_CreateIndirect,      "", GUI_ID_TEXT6,               552, 140, 86,  40, 0, 0x0, 0 },
-    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_POINT,          289, 140, 10,  40, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_POINT,          349, 140, 10,  40, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_UNITS,          650, 140, 120, 40, 0, 0x0, 0 },    
 
     { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,           36, 100, 86, 120, 0, 0x0, 0 },
