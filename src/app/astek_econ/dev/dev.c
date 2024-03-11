@@ -159,7 +159,7 @@ dev_init(                       dev_t *         p )
     dev.cloop->error_level = dev.nvm.get( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL ) & 0x000000FF;
     dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
     
-    snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s %s %s %s %s",dev.info.device_str, dev.info.hardware_str, version, firmware_commit, built_date_time);
+    snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);
         
     return( 0 );
 }
