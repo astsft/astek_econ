@@ -1772,7 +1772,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$\..\..\..\hex\$PROJ_FNAME$.$CONFIG_NAME$.hex</state>
+                    <state>$PROJ_DIR$\..\..\..\hex\$PROJ_FNAME$.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>

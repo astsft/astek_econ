@@ -1,8 +1,6 @@
 $commit = git show -s --pretty=format:"%h" HEAD
 $commit
 
-$astek_1023="astek_1023"
-
 $exec_path = Get-Location
 #"Execute location $exec_path"
 
@@ -17,17 +15,17 @@ $script_path = $PSScriptRoot
 
 #$app_name = Split-path $script_path -Leaf
 $app_name = $CharArray[-5]
-"Current app $app_name"
+"Current app $app_name"	
 	
-Remove-Item $script_path\..\..\hex\$app_name*release_*
-
+Remove-Item $script_path\..\..\hex\$app_name*_*.hex	
+	
 $filename = Get-ChildItem $script_path\..\..\hex\$app_name* -Name
 "Old filename $filename"
 
-$idx = $filename.IndexOf("release")
+$idx = $filename.IndexOf("hex")
 #$idx
 
-$filename1 = $filename.Remove($idx + "release".Length)
+$filename1 = $filename.Remove($idx)
 #$filename1
 
 $version_path = "$script_path\$app_name\version\version.c"
@@ -44,7 +42,7 @@ $datatime = $version_str.Substring($version_str.IndexOf('"') + 1, 13)
 #$datatime = "$(Get-Date -Format "MMM-dd-yyyy_HH-mm-ss")"
 #$datatime
 
-$newfilename = "$filename1" + "_$commit" + "_$datatime.hex"
+$newfilename = "$filename1" + "$datatime" + "_$commit.hex"
 "New filename $newfilename"
 
 Rename-Item $script_path\..\..\hex\$filename -NewName $newfilename
