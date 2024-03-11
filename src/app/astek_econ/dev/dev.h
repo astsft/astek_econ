@@ -49,6 +49,14 @@
 #define MEASURE_VALUE_HI_LEVEL_WAR      (1 << 2)
 #define MEASURE_VALUE_LOW_LEVEL_WAR     (1 << 3)
 
+//CALLIBRATION TIMESTAMP ADDR IN BACKUP SRAM
+#define CAL0_TIMESTAMP_ADDR             BKPSRAM_BASE
+#define CAL1_TIMESTAMP_ADDR             (CAL0_TIMESTAMP_ADDR + 4)
+#define CAL0_RESTORE_TIMESTAMP_ADDR     (CAL1_TIMESTAMP_ADDR + 4)
+#define CAL1_RESTORE_TIMESTAMP_ADDR     (CAL0_RESTORE_TIMESTAMP_ADDR + 4)
+
+
+
 extern uint32_t range_r0_value_default;
 extern uint32_t range_r1_value_default;
 extern uint32_t range_r2_value_default;

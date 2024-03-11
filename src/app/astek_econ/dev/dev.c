@@ -182,18 +182,28 @@ dev_conf_zero_save(                     dev_t *         p )
 {
   uint32_t ppm;
   uint32_t raw;
+  int32_t timestamp;
   
-    // Read current zero cal value
+  // Read current zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
   raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+  memcpy(&timestamp, (uint32_t*)CAL0_TIMESTAMP_ADDR, sizeof(uint32_t)); 
   
-    // Write current value to backup
+  // Write current value to backup
   dev.nvm.put(NVM_REG_CAL0_RESTORE_PPM, ppm);
   dev.nvm.put(NVM_REG_CAL0_RESTORE_RAW, raw);
+  memcpy((uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));
+  
+  p->sens->cal_back.zero.ppm.u32 = ppm;
+  p->sens->cal_back.zero.ppm.i32 = (int32_t)ppm;  
+  p->sens->cal_back.zero.raw.u32 = raw;   
+  p->sens->cal_back.zero.timestamp.i32 = timestamp;
+  p->sens->cal_back.zero.timestamp.u32 = (uint32_t)timestamp;
   
     // Write new value
   dev.nvm.put(NVM_REG_CAL0_PPM, p->sens->cal.zero.ppm.u32);
   dev.nvm.put(NVM_REG_CAL0_RAW, p->sens->cal.zero.raw.u32);
+  memcpy((uint32_t*)CAL0_TIMESTAMP_ADDR, &(p->sens->cal.zero.timestamp.i32), sizeof (uint32_t));
  
   return( 0 );
 }
@@ -207,19 +217,29 @@ dev_conf_span_save(                     dev_t *         p )
 {
   uint32_t ppm;
   uint32_t raw;
+  int32_t timestamp;
   
     // Read current span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
   raw = dev.nvm.get(NVM_REG_CAL1_RAW);
+  memcpy(&timestamp, (uint32_t*)CAL1_TIMESTAMP_ADDR, sizeof(uint32_t)); 
   
     // Write current value to backup
   dev.nvm.put(NVM_REG_CAL1_RESTORE_PPM, ppm);
   dev.nvm.put(NVM_REG_CAL1_RESTORE_RAW, raw);
+  memcpy((uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));
+  
+  p->sens->cal_back.span.ppm.u32 = ppm;
+  p->sens->cal_back.span.ppm.i32 = (int32_t)ppm;  
+  p->sens->cal_back.span.raw.u32 = raw; 
+  p->sens->cal_back.span.timestamp.i32 = timestamp;
+  p->sens->cal_back.span.timestamp.u32 = (uint32_t)timestamp;  
   
     // Write new value
   dev.nvm.put(NVM_REG_CAL1_PPM, p->sens->cal.span.ppm.u32);
   dev.nvm.put(NVM_REG_CAL1_RAW, p->sens->cal.span.raw.u32);
-
+  memcpy((uint32_t*)CAL1_TIMESTAMP_ADDR, &(p->sens->cal.span.timestamp.i32), sizeof (uint32_t));
+  
   return( 0 );
 }
 
@@ -232,6 +252,7 @@ dev_conf_zero_restore(                  dev_t *     p,
 {
    uint32_t ppm;
    uint32_t raw;
+   int32_t timestamp;
    
    if( key != DEV_CONF_CAL_RESTORE_KEY )
    {
@@ -241,14 +262,18 @@ dev_conf_zero_restore(                  dev_t *     p,
    // Read backup value
    ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
    raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW);
+   memcpy(&timestamp, (uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));   
       
    // Write backup value   
    dev.nvm.put(NVM_REG_CAL0_PPM, ppm);
    dev.nvm.put(NVM_REG_CAL0_RAW, raw);   
+   memcpy((uint32_t*)CAL0_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));   
   
    p->sens->cal.zero.ppm.u32 = ppm;
    p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
    p->sens->cal.zero.raw.u32 = raw;
+   p->sens->cal.zero.timestamp.i32 = timestamp;
+   p->sens->cal.zero.timestamp.u32 = (uint32_t)timestamp;     
    
    return( 0 );
 }
@@ -262,6 +287,7 @@ dev_conf_span_restore(                  dev_t *     p,
 {
    uint32_t ppm;
    uint32_t raw;
+   int32_t timestamp;
    
    if( key != DEV_CONF_CAL_RESTORE_KEY )
    {
@@ -271,14 +297,18 @@ dev_conf_span_restore(                  dev_t *     p,
    // Read backup value
    ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
    raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);
+   memcpy(&timestamp, (uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));    
       
    // Write backup value   
    dev.nvm.put(NVM_REG_CAL1_PPM, ppm);
-   dev.nvm.put(NVM_REG_CAL1_RAW, raw);   
+   dev.nvm.put(NVM_REG_CAL1_RAW, raw); 
+   memcpy((uint32_t*)CAL1_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t)); 
   
    p->sens->cal.span.ppm.u32 = ppm;
    p->sens->cal.span.ppm.i32 = (int32_t)ppm;
    p->sens->cal.span.raw.u32 = raw;
+   p->sens->cal.span.timestamp.i32 = timestamp;
+   p->sens->cal.span.timestamp.u32 = (uint32_t)timestamp; 
 
     return( 0 );
 }
@@ -348,38 +378,51 @@ dev_read_cal (dev_t *     p)
 {
   uint32_t ppm;
   uint32_t raw;
+  int32_t timestamp;
   
   // Read current zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
   raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+  memcpy(&timestamp, (uint32_t*)CAL0_TIMESTAMP_ADDR, sizeof(uint32_t));
   
   p->sens->cal.zero.ppm.u32 = ppm;
   p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
   p->sens->cal.zero.raw.u32 = raw;
+  p->sens->cal.zero.timestamp.i32 = timestamp;
+  p->sens->cal.zero.timestamp.u32 = (uint32_t)timestamp;   
     
   // Read current span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
   raw = dev.nvm.get(NVM_REG_CAL1_RAW);  
+  memcpy(&timestamp, (uint32_t*)CAL1_TIMESTAMP_ADDR, sizeof(uint32_t));  
   
   p->sens->cal.span.ppm.u32 = ppm;
   p->sens->cal.span.ppm.i32 = (int32_t)ppm;
   p->sens->cal.span.raw.u32 = raw;
-  
+  p->sens->cal.span.timestamp.i32 = timestamp;
+  p->sens->cal.span.timestamp.u32 = (uint32_t)timestamp;   
+    
   // Read current backup_zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
-  raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW);  
+  raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW); 
+  memcpy(&timestamp, (uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));
   
   p->sens->cal_back.zero.ppm.u32 = ppm;
   p->sens->cal_back.zero.ppm.i32 = (int32_t)ppm;  
-  p->sens->cal_back.zero.raw.u32 = raw;    
+  p->sens->cal_back.zero.raw.u32 = raw;  
+  p->sens->cal_back.zero.timestamp.i32 = timestamp;
+  p->sens->cal_back.zero.timestamp.u32 = (uint32_t)timestamp; 
   
   // Read current backup_span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
   raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);  
+  memcpy(&timestamp, (uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));
   
   p->sens->cal_back.span.ppm.u32 = ppm;
   p->sens->cal_back.span.ppm.i32 = (int32_t)ppm;  
-  p->sens->cal_back.span.raw.u32 = raw;      
+  p->sens->cal_back.span.raw.u32 = raw;    
+  p->sens->cal_back.span.timestamp.i32 = timestamp;
+  p->sens->cal_back.span.timestamp.u32 = (uint32_t)timestamp; 
 }
 
 /*******************************************************************************

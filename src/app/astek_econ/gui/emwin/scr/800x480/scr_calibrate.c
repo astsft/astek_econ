@@ -42,7 +42,7 @@ init_dialog(                            const   WM_HWIN         hWin )
     WM_HWIN         hItem;
     char            str[ 64];
     time_t          ts;
-    //int             pi, pf, y, m, d;
+    int             pi, pf;
     int             y, m, d;
 	struct tm *     cur;
     int32_t         cal_ppm, tstmp;
@@ -63,18 +63,18 @@ init_dialog(                            const   WM_HWIN         hWin )
     TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
     //cal_ppm = ( (dev.sens->cal.span.ppm_int_hi << 16) | (dev.sens->cal.span.ppm_int_lo & 0xFFFF) );
     cal_ppm = dev.sens->cal.span.ppm.i32;
-    //pi  = cal_ppm / 10000;
-    //pf  = (cal_ppm % 10000) / 100;
-    //tstmp   = (dev.sens->cal.span.timestamp_hi << 16) | (dev.sens->cal.span.timestamp_lo & 0xFFFF);
+    pi  = cal_ppm / 10000;
+    pf  = (cal_ppm % 10000) / 100;
     tstmp   = dev.sens->cal.span.timestamp.i32;
     ts  = (time_t) tstmp;
 	cur = gmtime( &ts );
     y   = cur->tm_year + 1900;
     m   = cur->tm_mon + 1;
     d   = cur->tm_mday;
-	//snprintf( str, sizeof(str), "% 4d.%02d%%    %02d.%02d.%02d", pi, pf, y, m, d );
-	snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	snprintf( str, sizeof(str), "% 4d.%02d%%  %02d.%02d.%02d", pi, pf, y, m, d);
+	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
     //snprintf( str, sizeof(str), "% 8d PPM", ppb / 1000 );
+
     TEXT_SetText(           hItem, str                                      );
     WM_BringToTop( hItem );
 
@@ -86,8 +86,8 @@ init_dialog(                            const   WM_HWIN         hWin )
     TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
     //cal_ppm = ( (dev.sens->cal.zero.ppm_int_hi << 16) | (dev.sens->cal.zero.ppm_int_lo & 0xFFFF) );
     cal_ppm = dev.sens->cal.zero.ppm.i32;
-    //pi      = cal_ppm / 10000;
-    //pf      = (cal_ppm % 10000) / 100;
+    pi      = cal_ppm / 10000;
+    pf      = (cal_ppm % 10000) / 100;
     //tstmp   = (dev.sens->cal.zero.timestamp_hi << 16) | (dev.sens->cal.zero.timestamp_lo & 0xFFFF);
     tstmp   = dev.sens->cal.zero.timestamp.i32;
     ts      = (time_t) tstmp;
@@ -95,8 +95,8 @@ init_dialog(                            const   WM_HWIN         hWin )
     y       = cur->tm_year + 1900;
     m       = cur->tm_mon + 1;
     d       = cur->tm_mday;
-	//snprintf( str, sizeof(str), "% 4d.%02d%%    %02d.%02d.%02d", pi, pf, y, m, d );
-	snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
+	snprintf( str, sizeof(str), "% 4d.%02d%%  %02d.%02d.%02d", pi, pf, y, m, d);
+	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
     TEXT_SetText(           hItem, str                                      );
     WM_BringToTop( hItem );
 

@@ -15,8 +15,8 @@
 
 #include "stm32.h"
 
-#define LOG_START_ADDR  BKPSRAM_BASE
-#define LOG_INDEX_MAX   512
+#define LOG_START_ADDR  (BKPSRAM_BASE + 16)
+#define LOG_INDEX_MAX   510
 
 typedef enum log_source_e
 {
