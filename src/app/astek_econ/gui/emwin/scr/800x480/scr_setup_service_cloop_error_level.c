@@ -178,7 +178,6 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         break;                                        
 
                                 default:
-                                        //beep_play( BEEP_TYPE_ERROR );
                                         break;
                         }
                         break;

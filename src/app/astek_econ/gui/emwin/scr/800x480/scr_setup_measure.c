@@ -102,13 +102,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                         beep_play( BEEP_SHRT );
                         break;
                     case GUI_ID_BUTTON_CL420:
-                        scr_switch( SCR_IDX_SETUP_MEASURE_CL420, GUI_ID_BUTTON_SENSOR );
+                        scr_switch( SCR_IDX_SETUP_MEASURE_CL420, GUI_ID_BUTTON_CL420 );
                         beep_play( BEEP_SHRT );
                         break;
-                    //case GUI_ID_BUTTON_DISCRETE_OUTPUT:
-                    //    scr_switch( SCR_IDX_SETUP_MEASURE_DISCRETE_OUTPUT, GUI_ID_BUTTON_SENSOR );
-                    //    beep_play( BEEP_SHRT );
-                    //    break;
                     case GUI_ID_BUTTON_BACK:
                         scr_switch( SCR_IDX_SETUP, GUI_ID_BUTTON_MEASURE );
                         beep_play( BEEP_SHRT );

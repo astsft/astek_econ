@@ -13,8 +13,6 @@
 
 #define CONFIG_DEVICE_ID                0xDEC0
 #define CONFIG_DEVICE_STR               "astek_econ"
-#define CONFIG_HARDWARE_ID              0x2041
-#define CONFIG_HARDWARE_STR             "hw2041"
 
 #define CONFIG_THLD_LTCH_DELAY_SMPL     4
 

@@ -1,0 +1,3 @@
+[submodule "src/bsp/hw2331_rev1"]
+	path = src/bsp/hw2331_rev1
+	url = git@github.com:astsft/ascon_bsp_hw2331_rev1.git

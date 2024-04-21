@@ -8,7 +8,7 @@
 #include "LCDConf.h"
 #include "scr.h"
 #include "dev\dev.h"
-#include "stm32.h"
+#include "hw_ltdc.h"
 
 
 static  WM_HWIN         hSbar;
@@ -209,11 +209,21 @@ scr_header_label_update(        const   scr_idx_t           idx )
             msg_sbar.Data.v = L10N_STR_ID_CALIBRATION;
             break;     
             
-        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL:
+            msg_sbar.Data.v = L10N_STR_ID_CALIBRATION_CHANNEL_1;
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL:
+            msg_sbar.Data.v = L10N_STR_ID_CALIBRATION_CHANNEL_2;
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:          
             msg_sbar.Data.v = L10N_STR_ID_CLOOP_4MA;
             break;
 
-        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:          
             msg_sbar.Data.v = L10N_STR_ID_CLOOP_20MA;
             break;
                         
@@ -416,11 +426,21 @@ scr_switch(                     const   scr_idx_t       idx,
             break;                  
           
         case SCR_IDX_SETUP_SERVICE_CLOOP_CAL:
-            hWin    = scr_setup_service_cloop_cal();
+            hWin = scr_setup_service_cloop_channel();
             break;          
             
-        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL:
+            hWin    = scr_setup_service_cloop_cal();
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+            hWin    = scr_setup_service_cloop_cal_4_20mA();
+            break;
+
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:          
             hWin    = scr_setup_service_cloop_cal_4_20mA();
             break;
             
@@ -537,7 +557,6 @@ scr_show_welcome( void )
 {
     GUI_MEMDEV_Handle   hMem    = GUI_MEMDEV_Create( 0, 0, XSIZE_PHYS, YSIZE_PHYS );
 
-
     scr_show_info();
     GUI_MEMDEV_Select( hMem );
     GUI_PNG_Draw( astek_logo_800x480_png, sizeof(astek_logo_800x480_png), 0, 0 );
@@ -558,8 +577,8 @@ scr_init( void )
 {
     GUI_Init();
 
-    stm32_ltdc_swap_x( 1 );
-    stm32_ltdc_swap_y( 1 );
+    ltdc_swap_x( 1 );
+    ltdc_swap_y( 1 );
 
 
 //GUI_EnableAlpha(1);

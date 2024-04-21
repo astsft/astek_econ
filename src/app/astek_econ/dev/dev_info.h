@@ -18,7 +18,7 @@ typedef struct  dev_info_s
     uint16_t        hardware_id;
     uint16_t *      serial_num_u16[ 8];
     uint32_t *      serial_num_u32[ 4];
-    char            real_firmware_id[64];
+    char            real_firmware_id[64];           
     char const *    firmware_str;
     char const *    hardware_str;  
     char const *    device_str;  

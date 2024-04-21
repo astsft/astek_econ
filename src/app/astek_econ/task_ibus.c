@@ -16,6 +16,9 @@
 #include "os\os_user.h"
 #include "beep\beep.h"
 #include "app_pipe.h"
+#include "internal_uart.h"
+#include "hw_cl420.h"
+#include "hw_relay.h"
 
 
 /*******************************************************************************
@@ -34,20 +37,17 @@ extern  dev_t                   dev;
 * PRIVATE VARIABLES
 *******************************************************************************/
 #pragma data_alignment = 32
-static  uint16_t    mdbs_sens_raw[ MDBS_RTU_ADU_SIZEOF / 2];
+uint16_t    mdbs_sens_raw[ MDBS_RTU_ADU_SIZEOF / 2];
 
 #pragma data_alignment = 32
-static  uint8_t     mdbs_adu_xmit[ MDBS_RTU_ADU_SIZEOF ];
+uint8_t     mdbs_adu_xmit[ MDBS_RTU_ADU_SIZEOF ];
 
 #pragma data_alignment = 32
-static  uint8_t     mdbs_adu_recv[ MDBS_RTU_ADU_SIZEOF ];
+uint8_t     mdbs_adu_recv[ MDBS_RTU_ADU_SIZEOF ];
 
+static void set_ext_relay_status (int status);
 
-static int mdb_relay1_set_close(void);
-static int mdb_relay2_set_close(void);
-static int mdb_relay1_set_open(void);
-static int mdb_relay2_set_open(void);
-static void set_mdb_relay_status (int status);
+int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, size_t *recv_len, uint8_t *mdbs_resv_buf);
 
 /*******************************************************************************
 * PRIVATE FUNCTIONS - MODBUS
@@ -72,12 +72,12 @@ modbus_client_read(                     const   uint8_t         dev_addr,
     cnt     = modbus_rtu_client_hreg_rqst( mdbs_adu_xmit, dev_addr, reg_addr, regs_cnt );
 
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_adu_xmit, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_xmit_dma( mdbs_adu_xmit, cnt );
+    internal_uart_xmit( mdbs_adu_xmit, cnt );
 
     xQueueReset( que_mdbs_clnt_hndl );
 
     SCB_InvalidateDCache_by_Addr( (uint32_t *) mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_recv_dma( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
+    internal_uart_recv( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
 
     rcvd = xQueueReceive( que_mdbs_clnt_hndl, &queue_data, pdMS_TO_TICKS(500) );
     tag = queue_data.tag;
@@ -89,7 +89,7 @@ modbus_client_read(                     const   uint8_t         dev_addr,
 
     if( tag == OS_USER_TAG_UART4_RECV_TOUT )
     {
-        cnt = MDBS_RTU_ADU_SIZEOF - stm32_uart4_dma_recv_remainder();
+        cnt = MDBS_RTU_ADU_SIZEOF - internal_uart_rx_get_ndtr();
         //TRACE( "rem: %d\n", cnt );
         len = mdbs_rtu_xfer( dev_addr, mdbs_adu_recv, cnt, reg16 );
 
@@ -113,7 +113,7 @@ modbus_client_write(                    const   uint8_t         dev_addr,
                                                 uint16_t *      mdbs_raw )
 {
                 BaseType_t      received;
-
+                os_user_tag_t   sync;
     volatile    size_t          len;
     volatile    uint32_t        rem;
     volatile    uint32_t        cnt;
@@ -123,14 +123,15 @@ modbus_client_write(                    const   uint8_t         dev_addr,
     len = modbus_rtu_client_write_multiple_registers( dev_addr, mdbs_adu_xmit, reg_addr, regs_cnt, mdbs_raw );
 
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_adu_xmit, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_xmit_dma( mdbs_adu_xmit, len );
+    internal_uart_xmit( mdbs_adu_xmit, len );
     
     xQueueReset( que_mdbs_clnt_hndl );
 
     SCB_InvalidateDCache_by_Addr( (uint32_t *) mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_recv_dma( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
+    internal_uart_recv( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
 
     received        =   xQueueReceive( que_mdbs_clnt_hndl, &queue_data, pdMS_TO_TICKS(500)  );
+    sync = queue_data.tag;
 
     if( received == pdFALSE )
     {
@@ -181,12 +182,12 @@ modbus_ascii_client_read( void )
     strncpy( (char *) mdbs_adu_xmit, str, sizeof(str) );
 
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_adu_xmit, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_xmit_dma( mdbs_adu_xmit, sizeof(str) );
+    internal_uart_xmit( mdbs_adu_xmit, sizeof(str) );
 
     xQueueReset( que_mdbs_clnt_hndl );
 
     SCB_InvalidateDCache_by_Addr( (uint32_t *) mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_recv_dma( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
+    internal_uart_recv( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
 
     rcvd = xQueueReceive( que_mdbs_clnt_hndl, &result, pdMS_TO_TICKS(1000) );
 
@@ -197,7 +198,7 @@ modbus_ascii_client_read( void )
 
     if( result.tag == OS_USER_TAG_UART4_RECV_TOUT )
     {
-        cnt = MDBS_RTU_ADU_SIZEOF - stm32_uart4_dma_recv_remainder();
+        cnt = MDBS_RTU_ADU_SIZEOF - internal_uart_rx_get_ndtr();
         //TRACE( "rem: %d\n", cnt );
         //len = mdbs_rtu_xfer( dev_addr, mdbs_adu_recv, cnt, reg16 );
 
@@ -237,7 +238,7 @@ modbus_ascii_client_read( void )
 * @param adu_len - len
 * @param recv_len - receive data len
 */
-static int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, size_t *recv_len, uint8_t *mdbs_resv_buf)
+int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, size_t *recv_len, uint8_t *mdbs_resv_buf)
 { 
     BaseType_t      rcvd;
     
@@ -249,10 +250,10 @@ static int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, siz
     xQueueReset( que_mdbs_clnt_hndl );
     
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_send_buf, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_xmit_dma( mdbs_send_buf, adu_len );
+    internal_uart_xmit( mdbs_send_buf, adu_len );
       
     SCB_InvalidateDCache_by_Addr( (uint32_t *) mdbs_resv_buf, MDBS_RTU_ADU_SIZEOF );
-    stm32_uart4_recv_dma( mdbs_resv_buf, MDBS_RTU_ADU_SIZEOF );
+    internal_uart_recv( mdbs_resv_buf, MDBS_RTU_ADU_SIZEOF );
     
     rcvd = xQueueReceive( que_mdbs_clnt_hndl, &result, pdMS_TO_TICKS(500) );  
     
@@ -263,7 +264,7 @@ static int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, siz
     
     if( result.tag == OS_USER_TAG_UART4_RECV_TOUT )
     {
-        *recv_len = MDBS_RTU_ADU_SIZEOF - stm32_uart4_dma_recv_remainder();
+        *recv_len = MDBS_RTU_ADU_SIZEOF - internal_uart_rx_get_ndtr();
     }
 
     return( 0 );      
@@ -276,100 +277,83 @@ typedef enum
 {
   EXTERNAL_1 = 0x00,
   EXTERNAL_2,
-  PURGE,
-  PROBE
+  EXTERNAL_3,
+  EXTERNAL_4,
+  EXTERNAL_5,
+  EXTERNAL_6,  
 } Outputs_swithes_e;
 
-static void send_cmd_for_mdb_relay1_open (void)
+static void send_cmd_for_relay_open (uint8_t relay_num)
 {
-    //app_pipe_t result;
-    //result.tag    = OS_USER_TAG_RELAY1_OPEN;          
-    //xQueueSendToFront( que_ibus_hndl, &result, NULL );
-    //
-    //osDelay(1);   
-
-    dev.mdb_relay->link_err = mdb_relay1_set_open();
-    set_mdb_relay_status(dev.mdb_relay->link_err);
+    dev.ext_relay->link_err = relay_set_state(relay_num, false);
+    set_ext_relay_status(dev.ext_relay->link_err);
 }
 
-static void send_cmd_for_mdb_relay2_open (void)
+static void send_cmd_for_relay_close (uint8_t relay_num)
 {
-    //app_pipe_t result;
-    //result.tag    = OS_USER_TAG_RELAY2_OPEN;          
-    //xQueueSendToFront( que_ibus_hndl, &result, NULL );
-    //
-    //osDelay(1);   
-    
-    dev.mdb_relay->link_err = mdb_relay2_set_open();
-    set_mdb_relay_status(dev.mdb_relay->link_err);  
-}
-
-static void send_cmd_for_mdb_relay1_close (void)
-{
-    //app_pipe_t result;
-    //result.tag    = OS_USER_TAG_RELAY1_CLOSE;          
-    //xQueueSendToFront( que_ibus_hndl, &result, NULL );
-    //
-    //osDelay(1);   
   
-    dev.mdb_relay->link_err = mdb_relay1_set_close();
-    set_mdb_relay_status(dev.mdb_relay->link_err);   
-}
-
-static void send_cmd_for_mdb_relay2_close (void)
-{
-    //app_pipe_t result;
-    //result.tag    = OS_USER_TAG_RELAY2_CLOSE;          
-    //xQueueSendToFront( que_ibus_hndl, &result, NULL );
-    //
-    //osDelay(1);   
-  
-    dev.mdb_relay->link_err = mdb_relay2_set_close();
-    set_mdb_relay_status(dev.mdb_relay->link_err);
+    dev.ext_relay->link_err = relay_set_state(relay_num, true);
+    set_ext_relay_status(dev.ext_relay->link_err);   
 }
 
 /* Controlling the status of external outputs */
 static void set_external_switch_open (uint8_t external_num)
 {
   switch (external_num) {
-  case EXTERNAL_1:     send_cmd_for_mdb_relay1_open();
+  case EXTERNAL_1:     send_cmd_for_relay_open(EXTERNAL_1);
     break;
-  case EXTERNAL_2:     send_cmd_for_mdb_relay2_open();
+  case EXTERNAL_2:     send_cmd_for_relay_open(EXTERNAL_2);
     break;
+  case EXTERNAL_3:     send_cmd_for_relay_open(EXTERNAL_3);
+    break;
+  case EXTERNAL_4:     send_cmd_for_relay_open(EXTERNAL_4);
+    break;
+  case EXTERNAL_5:     send_cmd_for_relay_open(EXTERNAL_5);
+    break;
+  case EXTERNAL_6:     send_cmd_for_relay_open(EXTERNAL_6);
+    break;    
   }
 }
 
 static void set_external_switch_close (uint8_t external_num)
 {
   switch (external_num) {
-  case EXTERNAL_1:      send_cmd_for_mdb_relay1_close();
+  case EXTERNAL_1:      send_cmd_for_relay_close(EXTERNAL_1);
     break;
-  case EXTERNAL_2:      send_cmd_for_mdb_relay2_close();
+  case EXTERNAL_2:      send_cmd_for_relay_close(EXTERNAL_2);
     break;
+  case EXTERNAL_3:      send_cmd_for_relay_close(EXTERNAL_3);
+    break;
+  case EXTERNAL_4:      send_cmd_for_relay_close(EXTERNAL_4);
+    break;
+  case EXTERNAL_5:      send_cmd_for_relay_close(EXTERNAL_5);
+    break;
+  case EXTERNAL_6:      send_cmd_for_relay_close(EXTERNAL_6);
+    break;    
   }
 }
 
 
 static void relay_threshold_process(uint8_t relay_num)
 {
-  static relay_position_e previous_position[2] = {UNKNOWN_POSITION, UNKNOWN_POSITION};
+  static relay_position_e previous_position[6] = {UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION};
   
   int32_t     meas_ppm = dev.sens->meas.ppm.integral;
-  int32_t     thres_ppm =  (int32_t)dev.mdb_relay->relay[relay_num].ppm.ppm_f;
-  int32_t     hyst_ppm = (int32_t)dev.mdb_relay->relay[relay_num].hyst_ppm.ppm_f;
+  int32_t     thres_ppm =  (int32_t)dev.ext_relay->relay[relay_num].ppm.ppm_f;
+  int32_t     hyst_ppm = (int32_t)dev.ext_relay->relay[relay_num].hyst_ppm.ppm_f;
   
   
-  switch (dev.mdb_relay->relay[relay_num].thld_type)
+  switch (dev.ext_relay->relay[relay_num].thld_type)
   {
   case LOW_LEVEL_THLD_TYPE:
       if (meas_ppm < thres_ppm - hyst_ppm)
       {
-        if (dev.mdb_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
+        if (dev.ext_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
         {
           if (previous_position[relay_num] != SWITCH_OPEN)
           {
             previous_position[relay_num] = SWITCH_OPEN;
-            set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_open(relay_num);
           }
         }
         else 
@@ -377,19 +361,19 @@ static void relay_threshold_process(uint8_t relay_num)
           if (previous_position[relay_num] != SWITCH_CLOSE)
           {
             previous_position[relay_num] = SWITCH_CLOSE;
-            set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_close(relay_num);
           }
         }
       }
       
       if (meas_ppm > thres_ppm + hyst_ppm)
       {
-        if (dev.mdb_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
+        if (dev.ext_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
         {
           if (previous_position[relay_num] != SWITCH_CLOSE)
           {
             previous_position[relay_num] = SWITCH_CLOSE;
-            set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_close(relay_num);
           }
         }
         else
@@ -397,7 +381,7 @@ static void relay_threshold_process(uint8_t relay_num)
           if (previous_position[relay_num] != SWITCH_OPEN)
           {
             previous_position[relay_num] = SWITCH_OPEN;          
-            set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_open(relay_num);
           }
         }
       }
@@ -406,12 +390,12 @@ static void relay_threshold_process(uint8_t relay_num)
   case HI_LEVEL_THLD_TYPE:
       if (meas_ppm > thres_ppm + hyst_ppm)
       {
-        if (dev.mdb_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
+        if (dev.ext_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
         {
           if (previous_position[relay_num] != SWITCH_OPEN)
           {
             previous_position[relay_num] = SWITCH_OPEN; 
-            set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_open(relay_num);
           }
         }
         else
@@ -419,19 +403,19 @@ static void relay_threshold_process(uint8_t relay_num)
           if (previous_position[relay_num] != SWITCH_CLOSE)
           {          
             previous_position[relay_num] = SWITCH_CLOSE;
-            set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_close(relay_num);
           }
         }
       }
     
       if (meas_ppm < thres_ppm - hyst_ppm)
       {        
-        if (dev.mdb_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
+        if (dev.ext_relay->relay[relay_num].relay_state == NORMAL_OPEN_STATE)
         {
           if (previous_position[relay_num] != SWITCH_CLOSE)
           {           
             previous_position[relay_num] = SWITCH_CLOSE;
-            set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_close(relay_num);
           }
         }
         else
@@ -439,7 +423,7 @@ static void relay_threshold_process(uint8_t relay_num)
           if (previous_position[relay_num] != SWITCH_OPEN)
           {          
             previous_position[relay_num] = SWITCH_OPEN; 
-            set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2);
+            set_external_switch_open(relay_num);
           }
         }
       }
@@ -449,9 +433,9 @@ static void relay_threshold_process(uint8_t relay_num)
 
 static void relay_alarm_process(uint8_t relay_num)
 {
-  static uint32_t previous_warning_status[2] = {0x00, 0x00};
-  static uint32_t previous_error_status[2] = {0x00, 0x00};
-  static uint8_t power_on_flag[2] = {1,1};
+  static uint32_t previous_warning_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static uint32_t previous_error_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static uint8_t power_on_flag[6] = {1,1,1,1,1,1};
   
   if (power_on_flag[relay_num])
   {
@@ -462,21 +446,21 @@ static void relay_alarm_process(uint8_t relay_num)
   
   if ((previous_error_status[relay_num] != dev.state.error_status) || (previous_warning_status[relay_num] != dev.state.warnings_status))
   {  
-    switch (dev.mdb_relay->relay[relay_num].relay_state) {
+    switch (dev.ext_relay->relay[relay_num].relay_state) {
     case NORMAL_OPEN_STATE:
         // 1. Check alarm or not
         // 2. set state
         if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
-          set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); 
+          set_external_switch_close(relay_num); 
         else
-          set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); // no error
+          set_external_switch_open(relay_num); // no error
       break;
       
     case NORMAL_CLOSE_STATE:
         if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
-          set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); 
+          set_external_switch_open(relay_num); 
         else 
-          set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); // no error
+          set_external_switch_close(relay_num); // no error
       break;
     }
   }
@@ -488,29 +472,29 @@ static void relay_alarm_process(uint8_t relay_num)
 
 static void relay_not_active_process(uint8_t relay_num)
 {
-  static relay_state_e previous_state[2] = {UNKNOWN_STATE, UNKNOWN_STATE};
+  static relay_state_e previous_state[6] = {UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE};
   
-  if (previous_state[relay_num] != dev.mdb_relay->relay[relay_num].relay_state)
+  if (previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)
   {  
-    switch (dev.mdb_relay->relay[relay_num].relay_state) {
+    switch (dev.ext_relay->relay[relay_num].relay_state) {
     case NORMAL_OPEN_STATE:
-        set_external_switch_open((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); 
+        set_external_switch_open(relay_num); 
       break;
       
     case NORMAL_CLOSE_STATE:
-        set_external_switch_close((relay_num == 0) ? EXTERNAL_1 : EXTERNAL_2); 
+        set_external_switch_close(relay_num); 
       break;
     }
   }
   
-  previous_state[relay_num] = dev.mdb_relay->relay[relay_num].relay_state;
+  previous_state[relay_num] = dev.ext_relay->relay[relay_num].relay_state;
   
 }
 
 static void relay_process (uint8_t relay_num)
 {
   // Relay mode
-  switch (dev.mdb_relay->relay[relay_num].relay_mode) {
+  switch (dev.ext_relay->relay[relay_num].relay_mode) {
   case THRESHOLD_MODE: relay_threshold_process(relay_num);
       break;
       
@@ -537,150 +521,9 @@ static void relays_process(void)
 
 static 
 int
-mdb_relay1_set_open(void)
-{
-    int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint16_t    write_data = 0xFF00;
-                    
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_coil_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                                MODBUS_COIL_MDB_RELAY_1,
-                                                                                write_data);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-    }        
-   
-    return( err );     
-}
-
-static 
-int
-mdb_relay2_set_open(void)
-{
-    int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint16_t    write_data = 0xFF00;
-                    
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_coil_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                                MODBUS_COIL_MDB_RELAY_2,
-                                                                                write_data);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-    }        
-   
-    return( err );     
-}
-
-static 
-int
-mdb_relay1_set_close(void)
-{
-    int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint16_t    write_data = 0x0000;
-                    
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_coil_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                                MODBUS_COIL_MDB_RELAY_1,
-                                                                                write_data);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-    }        
-   
-    return( err );     
-}
-
-static 
-int
-mdb_relay2_set_close(void)
-{
-    int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint16_t    write_data = 0x0000;
-                    
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_coil_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                                MODBUS_COIL_MDB_RELAY_2,
-                                                                                write_data);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-    }        
-   
-    return( err );     
-}
-
-static 
-int
-mdb_relay_init(void)
-{                   
-    int     err = 0;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    
-
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_read_holding_registers_rqst (mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                                0x0000,
-                                                                                32);    
-
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-         
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_MDB_RELAY,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }
-    
-    if( err != 0 )
-    { 
-        return( err );
-    }
-
-
-    taskENTER_CRITICAL();
-      dev.cloop->info.device_id        = mdbs_sens_raw[  0];
-      dev.cloop->info.hardware_id      = mdbs_sens_raw[  1];
-    taskEXIT_CRITICAL();
-
-    return( err );   
+relay_init(void)
+{ 
+  return relay_get_info ();  
 }
 
 static uint32_t get_dev_errors_status (void)
@@ -703,12 +546,13 @@ static void set_cloop_status (int status)
   status == 0 ? (dev.state.error_status &=~ CLOOP_LINK_ERR) : (dev.state.error_status |= CLOOP_LINK_ERR);
 }
 
-static void set_mdb_relay_status (int status)
+static void set_ext_relay_status (int status)
 {
+  
 #ifndef NO_RELAY  
-  status == 0 ? (dev.state.error_status &=~ MDB_RELAY_LINK_ERR) : (dev.state.error_status |= MDB_RELAY_LINK_ERR);
+  status == 0 ? (dev.state.error_status &=~ EXT_RELAY_LINK_ERR) : (dev.state.error_status |= EXT_RELAY_LINK_ERR);
 #else
-  dev.state.error_status &=~ MDB_RELAY_LINK_ERR; 
+  dev.state.error_status &=~ EXT_RELAY_LINK_ERR; 
 #endif
     
 }
@@ -783,7 +627,6 @@ cl420_ch1_update(                       dev_cl420_t *   p,
                                         econ_t *        sens )
 {
     int         err = 0;
-    uint8_t     mdbs_addr   = 0x40;
     int32_t     ppm         = sens->meas.ppm.integral;
     uint32_t    range_ppm   = p->range[ p->range_idx ].ppm;
     if (ppm < 0) ppm = 0;
@@ -792,7 +635,7 @@ cl420_ch1_update(                       dev_cl420_t *   p,
     
     if (p->range[ p->range_idx ].mb_output.uA < MIN_LOW_CURRENT_LEVEL) p->range[ p->range_idx ].mb_output.uA = MIN_LOW_CURRENT_LEVEL; 
   
-    if (p->range[ p->range_idx ].mb_output.uA > MAX_HI_CURRENT_LEVEL) p->range[ p->range_idx ].mb_output.uA = MAX_HI_CURRENT_LEVEL;
+    if (p->range[ p->range_idx ].mb_output.uA > MAX_HI_CURRENT_LEVEL) p->range[ p->range_idx ].mb_output.uA = MAX_HI_CURRENT_LEVEL;     
     
     if (dev.state.error_status)
     {
@@ -800,12 +643,11 @@ cl420_ch1_update(                       dev_cl420_t *   p,
         p->range[ p->range_idx ].mb_output.uA = LOW_ERROR_CURRENT_LEVEL;    
       else
         p->range[ p->range_idx ].mb_output.uA = HI_ERROR_CURRENT_LEVEL;
-    }
+    }     
     
     if (dev.cloop->cloop_state != CLOOP_FREEZ)
     {
-      err = modbus_client_write( mdbs_addr, 0x0804, 4, p->range[ p->range_idx ].mb_output.raw );
-      TRACE("%d\t", err); for(int i = 0; i < 4; i++){TRACE("%04X", *(p->range[ p->range_idx ].mb_output.raw+i));} TRACE("\n");
+      err = cloop_set_uA(1, p->range[ p->range_idx ].mb_output.uA);
       if( err )
       {
           return( err );
@@ -822,7 +664,6 @@ cl420_ch2_update(                       dev_cl420_t *   p )
 {
     cl420_output_t  out;
     int         err;
-    uint8_t     mdbs_addr   = 0x40;
 
     switch( p->range_idx )
     {
@@ -838,8 +679,7 @@ cl420_ch2_update(                       dev_cl420_t *   p )
             break;
     }
 
-    err = modbus_client_write( mdbs_addr, 0x0814, 4, out.raw );
-    TRACE("%d\t", err); for(int i = 0; i < 4; i++){TRACE("%04X", *(p->range[ p->range_idx ].mb_output.raw+i));} TRACE("\n");
+    err = cloop_set_uA(2, out.uA);
     if( err )
     {
         return( err );
@@ -848,337 +688,54 @@ cl420_ch2_update(                       dev_cl420_t *   p )
     return( 0 );
 }
 
-
 static 
 int
-cloop_get_info(void)
-{
-    int     err = 0;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    
-
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_read_holding_registers_rqst (mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                0x0000,
-                                                                                32);    
-
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-         
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }
-    
-    if( err != 0 )
-    { 
-        return( err );
-    }
-
-
-    taskENTER_CRITICAL();
-      dev.cloop->info.device_id        = mdbs_sens_raw[  0];
-      dev.cloop->info.hardware_id      = mdbs_sens_raw[  1];
-    taskEXIT_CRITICAL();
-
-
-    return( err );
-}
-
-static 
-int
-cloop_get_cal(void)
-{
-    int     err = 0;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    
-
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_read_holding_registers_rqst (mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CLOOP_CAL_CHANNEL1_TIMESTAMP_HI,
-                                                                                32);    
-
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-         
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }
-    
-    if( err != 0 )
-    { 
-        return( err );
-    }
-
-
-    taskENTER_CRITICAL();
-      dev.cloop->cal[0].timestamp.u16[ 1]        = mdbs_sens_raw[ 0];
-      dev.cloop->cal[0].timestamp.u16[ 0]        = mdbs_sens_raw[ 1];
-      dev.cloop->cal[0].uA.u16[ 0]               = mdbs_sens_raw[ 8];    
-      dev.cloop->cal[0].raw.u16[ 0]              = mdbs_sens_raw[ 9];    
-      dev.cloop->cal[1].timestamp.u16[ 1]        = mdbs_sens_raw[ 16];
-      dev.cloop->cal[1].timestamp.u16[ 0]        = mdbs_sens_raw[ 17];
-      dev.cloop->cal[1].uA.u16[ 0]               = mdbs_sens_raw[ 24];    
-      dev.cloop->cal[1].raw.u16[ 0]              = mdbs_sens_raw[ 25];    
-    taskEXIT_CRITICAL();
-
-
-    return( err );
-  
-}
-
-static 
-int
-cloop_set_cal_4ma (void)
+cloop_set_cal_4ma (uint8_t channel)
 {
     int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint8_t     send_buf[4] = {0};
-    uint16_t    uA_4 = 4000;
-    
-    send_buf[0] =  uA_4 >> 8;
-    send_buf[1] =  uA_4 & 0x00FF;
-    send_buf[2] =  0x00;
-    send_buf[3] =  0x00;
-        
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_multiple_registers_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CLOOP_CAL_CHANNEL1_4UA_HI,
-                                                                                2,
-                                                                                send_buf);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }       
+
+    err = set_cal_4ma (channel);
    
     return( err );
 }
 
 static 
 int
-cloop_set_cal_20ma (void)
+cloop_set_cal_20ma (uint8_t channel)
 {
     int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    uint8_t     send_buf[4] = {0};
-    uint16_t    uA_20 = 20000;
-    
-    send_buf[0] =  uA_20 >> 8;
-    send_buf[1] =  uA_20 & 0x00FF;
-    send_buf[2] =  0x00;
-    send_buf[3] =  0x00;
-        
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_multiple_registers_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CLOOP_CAL_CHANNEL1_20UA_HI,
-                                                                                2,
-                                                                                send_buf);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }        
+
+    err = set_cal_20ma(channel);
    
     return( err );  
 }
 
 static 
 int
-cloop_set_raw_4mA (void)
+cloop_set_raw_4mA (uint8_t channel)
 {
     int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-                
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_register_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CLOOP_CHANNEL1_CURRENT_RAW_INT_HI,
-                                                                                dev.cloop->cal[0].raw.u16[0]);
     
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }
+    if (channel == 1)
+      err = cloop_set_raw(1, dev.cloop->cal_ch1[0].raw.u16[0]);    
+    else 
+      err = cloop_set_raw(2, dev.cloop->cal_ch2[0].raw.u16[0]);      
    
     return( err );  
 }
 
 static 
 int
-cloop_set_raw_20mA (void)
-{
+cloop_set_raw_20mA (uint8_t channel)
+{ 
     int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-                
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_single_register_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CLOOP_CHANNEL1_CURRENT_RAW_INT_HI,
-                                                                                dev.cloop->cal[1].raw.u16[0]);
     
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }        
-   
+    if (channel == 1)
+      err = cloop_set_raw(1, dev.cloop->cal_ch1[1].raw.u16[0]);
+    else
+      err = cloop_set_raw(2, dev.cloop->cal_ch2[1].raw.u16[0]);      
+                  
     return( err );    
-}
-
-static 
-int
-cloop_set_range (void)
-{
-    int     err;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    
-    uint8_t     send_buf[28] = {0};
-   
-    send_buf[0] =  0;   // fractional
-    send_buf[1] =  0;
-    send_buf[2] =  0;
-    send_buf[3] =  0;
-    send_buf[4] =  dev.cl420.range[0].ppm >> 24;                // integral
-    send_buf[5] =  dev.cl420.range[0].ppm >> 16 & 0x00FF;
-    send_buf[6] =  dev.cl420.range[0].ppm >> 8 & 0x00FF;
-    send_buf[7] =  dev.cl420.range[0].ppm & 0x00FF;
-    send_buf[8] =  0;  // fractional
-    send_buf[9] =  0;
-    send_buf[10] = 0;
-    send_buf[11] = 0;
-    send_buf[12] =  dev.cl420.range[1].ppm >> 24;               // integral
-    send_buf[13] =  dev.cl420.range[1].ppm >> 16 & 0x00FF;
-    send_buf[14] =  dev.cl420.range[1].ppm >> 8 & 0x00FF;
-    send_buf[15] =  dev.cl420.range[1].ppm & 0x00FF;
-    send_buf[16] =  0;  // fractional
-    send_buf[17] =  0;
-    send_buf[18] =  0;
-    send_buf[19] =  0;
-    send_buf[20] =  dev.cl420.range[2].ppm >> 24;               // integral
-    send_buf[21] =  dev.cl420.range[2].ppm >> 16 & 0x00FF;
-    send_buf[22] =  dev.cl420.range[2].ppm >> 8 & 0x00FF;
-    send_buf[23] =  dev.cl420.range[2].ppm & 0x00FF;    
-    send_buf[24] = 0x00;    
-    send_buf[25] = dev.cl420.range_idx;
-    send_buf[26] = 0x00;
-    send_buf[27] = dev.cl420.range[0].units;     
-      
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_write_multiple_registers_rqst(mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CONF_RNG1_PPM_FRC_HI,
-                                                                                14,
-                                                                                send_buf);
-    
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-    
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }        
-   
-    return( err );    
-}
-
-
-static 
-int
-cloop_get_range (void)
-{
-    int     err = 0;
-    size_t      adu_len;
-    size_t      recv_len = 0;
-    
-
-    adu_len = modbus_module.modbus_client->modbus_rtu_client_read_holding_registers_rqst (mdbs_adu_xmit,
-                                                                                CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                                MODBUS_HREG_CONF_RNG1_PPM_FRC_HI,
-                                                                                14);    
-
-    err = modbus_send_receive_data(mdbs_adu_xmit, adu_len, &recv_len, mdbs_adu_recv);
-         
-    if (err == 0)
-    {
-      taskENTER_CRITICAL();
-      err = modbus_module.modbus_client->modbus_rtu_client_response_parse(CFG_MDBS_DEV_ADDR_CLOOP,
-                                                                    mdbs_adu_recv,
-                                                                    recv_len,
-                                                                    mdbs_sens_raw);
-      taskEXIT_CRITICAL();
-    }
-    
-    if( err != 0 )
-    { 
-        return( err );
-    }
-
-
-    taskENTER_CRITICAL();
-      dev.cl420.range[0].ppm  = mdbs_sens_raw[2];
-      dev.cl420.range[0].ppm <<= 16; 
-      dev.cl420.range[0].ppm |= mdbs_sens_raw[3];    
-
-      dev.cl420.range[1].ppm  = mdbs_sens_raw[6];
-      dev.cl420.range[1].ppm <<= 16; 
-      dev.cl420.range[1].ppm |= mdbs_sens_raw[7];    
-            
-      dev.cl420.range[2].ppm  = mdbs_sens_raw[10];
-      dev.cl420.range[2].ppm <<= 16; 
-      dev.cl420.range[2].ppm |= mdbs_sens_raw[11];    
-      
-      dev.cl420.range_idx = mdbs_sens_raw[12];      
-      dev.cl420.range[0].units = mdbs_sens_raw[13]; 
-      dev.cl420.range[1].units = mdbs_sens_raw[13]; 
-      dev.cl420.range[2].units = mdbs_sens_raw[13];
-    taskEXIT_CRITICAL();
-    
-    return( err );  
 }
 
 static 
@@ -1276,11 +833,15 @@ task_ibus_cl420_ch2_update( void )
     }        
 }
 
-void send_cmd_for_cloop_set_raw_4mA (void)
+void send_cmd_for_cloop_set_raw_4mA (uint8_t channel)
 {
     BaseType_t result;
     app_pipe_t queue_data;
-    queue_data.tag    = OS_USER_TAG_CAL_CLOOP_SET_RAW_4MA;        
+    if (channel == 1)
+      queue_data.tag    = OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_4MA;        
+    else
+      queue_data.tag    = OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_4MA;
+      
     result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
  
     if (result != pdTRUE) 
@@ -1292,11 +853,15 @@ void send_cmd_for_cloop_set_raw_4mA (void)
     osDelay(3);   
 }
 
-void send_cmd_for_cloop_set_raw_20mA (void)
+void send_cmd_for_cloop_set_raw_20mA (uint8_t channel)
 {
     BaseType_t result;  
     app_pipe_t queue_data;
-    queue_data.tag    = OS_USER_TAG_CAL_CLOOP_SET_RAW_20MA;          
+    if (channel == 1)
+      queue_data.tag    = OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_20MA;          
+    else
+      queue_data.tag    = OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_20MA;
+    
     result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
 
     if (result != pdTRUE) 
@@ -1308,11 +873,15 @@ void send_cmd_for_cloop_set_raw_20mA (void)
     osDelay(3);   
 }
 
-void send_cmd_for_cloop_4mA_write (void)
+void send_cmd_for_cloop_4mA_write (uint8_t channel)
 {
     BaseType_t result;  
     app_pipe_t queue_data;  
-    queue_data.tag      = OS_USER_TAG_CAL_CLOOP_4MA_WRITE;          
+    if (channel == 1)
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL1_4MA_WRITE;          
+    else 
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL2_4MA_WRITE;
+    
     result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
  
     if (result != pdTRUE) 
@@ -1324,11 +893,15 @@ void send_cmd_for_cloop_4mA_write (void)
     osDelay(3);   
 }
 
-void send_cmd_for_cloop_20mA_write (void)
+void send_cmd_for_cloop_20mA_write (uint8_t channel)
 {
     BaseType_t result;  
     app_pipe_t queue_data;  
-    queue_data.tag      = OS_USER_TAG_CAL_CLOOP_20MA_WRITE;          
+    if (channel == 1)
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL1_20MA_WRITE;          
+    else
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL2_20MA_WRITE;
+    
     result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
  
     if (result != pdTRUE) 
@@ -1400,7 +973,7 @@ task_ibus(                      const   void *          argument )
 
     osDelay( 250 );
 
-    stm32_uart4_init( 9600, 8, 1.0, 'N' );  
+    internal_uart_init( 9600, 8, 1.0, 'N' );  
 
     sens->link_err      = 1;
     set_sensor_status(dev.sens->link_err);
@@ -1409,13 +982,12 @@ task_ibus(                      const   void *          argument )
     
     dev.cloop->link_err = 1;
     set_cloop_status(dev.cloop->link_err);
-    dev.mdb_relay->link_err = 1;
-    set_mdb_relay_status(dev.mdb_relay->link_err);    
+    dev.ext_relay->link_err = 1;
+    set_ext_relay_status(dev.ext_relay->link_err);    
     
-    queue_data.tag = OS_USER_TAG_IBUS_BOARDS_INIT;
-    xQueueSend( que_ibus_hndl, &queue_data, NULL );
-    
-    task_ibus_cl420_ch2_update();
+    cloop_hw_init();
+    relay_hw_init();
+    task_ibus_boards_init();
 
     while( true )
     {
@@ -1428,14 +1000,14 @@ task_ibus(                      const   void *          argument )
         switch( tag )
         {
             case OS_USER_TAG_TMR_1SEC:
-                    stm32_uart4_init( 9600, 8, 1.0, 'N' );
+                    internal_uart_init( 9600, 8, 1.0, 'N' );
                     sens->link_err  = modbus_ascii_client_read();
                     osDelay( 150 );
                     sens->link_err  = modbus_ascii_client_read();
                     set_sensor_status(dev.sens->link_err);
                     osDelay( 150 );
                     
-                    stm32_uart4_init(19200, 8, 1.0, 'N');                    
+                    internal_uart_init(19200, 8, 1.0, 'N');                    
                     dev.cloop->link_err = cl420_ch1_update( dev_cl420, sens );
                     set_cloop_status(dev.cloop->link_err);       
                     
@@ -1444,7 +1016,7 @@ task_ibus(                      const   void *          argument )
                 break;
                 
             case OS_USER_TAG_IBUS_CL420_CH2_UPDATE:
-                stm32_uart4_init(19200, 8, 1.0, 'N');
+                internal_uart_init(19200, 8, 1.0, 'N');
                 dev.cloop->link_err = cl420_ch2_update( dev_cl420 );
                 set_cloop_status(dev.cloop->link_err); 
                 break;
@@ -1452,11 +1024,12 @@ task_ibus(                      const   void *          argument )
             case OS_USER_TAG_IBUS_BOARDS_INIT:
                 //dev.sens->link_err  = sensor_init( sens );      
                 //set_sensor_status(dev.sens->link_err);
-                stm32_uart4_init(19200, 8, 1.0, 'N');
+                internal_uart_init(19200, 8, 1.0, 'N');
                 dev.cloop->link_err = cloop_init();
                 set_cloop_status(dev.cloop->link_err); 
-                dev.mdb_relay->link_err = mdb_relay_init();
-                set_mdb_relay_status(dev.mdb_relay->link_err); 
+                dev.ext_relay->link_err = relay_init();
+                set_ext_relay_status(dev.ext_relay->link_err); 
+                task_ibus_cl420_ch2_update();
                 break;                
 
             case OS_USER_TAG_SENS_CONF_FILTER:
@@ -1556,36 +1129,63 @@ task_ibus(                      const   void *          argument )
                 //set_sensor_status(dev.sens->link_err);
                 break;                      
               
-            case OS_USER_TAG_CAL_CLOOP_4MA_WRITE:
-              stm32_uart4_init(19200, 8, 1.0, 'N');
-              dev.cloop->link_err = cloop_set_cal_4ma();
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL1_4MA_WRITE:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_cal_4ma(1);
               if (dev.cloop->link_err == 0)
                 log_write_event(&dev.log, LOG_SOURCE_CLOOP, LOG_CLOOP_EVENT_CLOOP_CALIBRATION_4MA);
-              set_cloop_status(dev.cloop->link_err);     
+              set_cloop_status(dev.cloop->link_err);                 
               break;
               
-            case OS_USER_TAG_CAL_CLOOP_20MA_WRITE:
-              stm32_uart4_init(19200, 8, 1.0, 'N');
-              dev.cloop->link_err = cloop_set_cal_20ma();
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL2_4MA_WRITE:
+              dev.cloop->link_err = cloop_set_cal_4ma(2);
+              if (dev.cloop->link_err == 0)
+                log_write_event(&dev.log, LOG_SOURCE_CLOOP, LOG_CLOOP_EVENT_CLOOP_CALIBRATION_4MA);
+              set_cloop_status(dev.cloop->link_err);                 
+              break;              
+              
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL1_20MA_WRITE:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_cal_20ma(1);
               if (dev.cloop->link_err == 0)
                 log_write_event(&dev.log, LOG_SOURCE_CLOOP, LOG_CLOOP_EVENT_CLOOP_CALIBRATION_20MA);              
-              set_cloop_status(dev.cloop->link_err);   
+              set_cloop_status(dev.cloop->link_err);                 
               break;
               
-            case OS_USER_TAG_CAL_CLOOP_SET_RAW_4MA:
-              stm32_uart4_init(19200, 8, 1.0, 'N');
-              dev.cloop->link_err = cloop_set_raw_4mA();
-              set_cloop_status(dev.cloop->link_err);  
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL2_20MA_WRITE:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_cal_20ma(2);
+              if (dev.cloop->link_err == 0)
+                log_write_event(&dev.log, LOG_SOURCE_CLOOP, LOG_CLOOP_EVENT_CLOOP_CALIBRATION_20MA);              
+              set_cloop_status(dev.cloop->link_err);                 
+              break;              
+              
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_4MA:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_raw_4mA(1);
+              set_cloop_status(dev.cloop->link_err);                 
               break;
               
-            case OS_USER_TAG_CAL_CLOOP_SET_RAW_20MA:
-              stm32_uart4_init(19200, 8, 1.0, 'N');
-              dev.cloop->link_err = cloop_set_raw_20mA();
-              set_cloop_status(dev.cloop->link_err);  
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_4MA:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_raw_4mA(2);
+              set_cloop_status(dev.cloop->link_err);                 
+              break;              
+              
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_20MA:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_raw_20mA(1);
+              set_cloop_status(dev.cloop->link_err);                 
               break;    
               
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_20MA:
+              internal_uart_init(19200, 8, 1.0, 'N');
+              dev.cloop->link_err = cloop_set_raw_20mA(2);
+              set_cloop_status(dev.cloop->link_err);                 
+              break;                  
+              
             case OS_USER_TAG_CAL_CLOOP_SET_RANGE:
-              stm32_uart4_init(19200, 8, 1.0, 'N');
+              internal_uart_init(19200, 8, 1.0, 'N');
               dev.cloop->link_err = cloop_set_range();  
               set_cloop_status(dev.cloop->link_err);
               break;              
@@ -1594,7 +1194,7 @@ task_ibus(                      const   void *          argument )
                 break;
         }
         
-        stm32_uart4_init(19200, 8, 1.0, 'N');
+        internal_uart_init(19200, 8, 1.0, 'N');
         relays_process();
         
         error_status = get_dev_errors_status();

@@ -354,7 +354,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw2041</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041</state>
@@ -373,6 +373,8 @@
                     <state>$PROJ_DIR$\..\..\..\src\lib\st\STM32F7xx_HAL_Driver\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\dev\log</state>
                     <state>$PROJ_DIR$\..\..\..\src\lib\astsoft\econ</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1455,7 +1457,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw2041</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041</state>
@@ -1475,6 +1477,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\dev\log</state>
                     <state>$PROJ_DIR$\..\..\..\src\lib\astsoft\econ</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1772,7 +1775,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$\..\..\..\hex\$PROJ_FNAME$.hex</state>
+                    <state>$PROJ_DIR$\..\..\..\hex\2041\$PROJ_FNAME$.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1790,7 +1793,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>1</hasPrio>
+                <hasPrio>144</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2352,6 +2355,9 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_cal_4_20mA.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_channel.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_error_level.c</name>
                             </file>
                             <file>
@@ -2449,19 +2455,73 @@
                 </group>
             </group>
             <group>
-                <name>hw2041</name>
+                <name>hw</name>
+                <group>
+                    <name>hw2041</name>
+                    <group>
+                        <name>cl420</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\cl420\hw2316_cl420.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>external_uart</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\external_uart\hw2041_external_uart.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>internal_uart</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\internal_uart\hw2041_internal_uart.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>keyboard</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\keyboard\hw2041_keyboard.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>ltdc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\ltdc\hw2041_ltdc.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>relay</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\realy\hw2041_relay.c</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_hal_msp.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_hal_timebase_tim.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_it.c</name>
+                    </file>
+                </group>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw2041\stm32f7xx_hal_msp.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\external_uart.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw2041\stm32f7xx_hal_timebase_tim.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw_cl420.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw2041\stm32f7xx_it.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw_ltdc.h</name>
                 </file>
-            </group>
-            <group>
-                <name>log</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw_relay.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\internal_uart.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\keyboard.h</name>
+                </file>
             </group>
             <group>
                 <name>modbus</name>
@@ -2509,41 +2569,9 @@
                 </file>
             </group>
             <group>
-                <name>emwin</name>
-                <excluded>
-                    <configuration>debug</configuration>
-                    <configuration>release</configuration>
-                </excluded>
-                <group>
-                    <name>os</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\emwin\os\GUI_X.c</name>
-                        <excluded>
-                            <configuration>debug</configuration>
-                            <configuration>release</configuration>
-                        </excluded>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\emwin\os\GUI_X_FreeRTOS.c</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\emwin\GUIConf.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\emwin\LCDConf.c</name>
-                </file>
-            </group>
-            <group>
                 <name>gt9xx</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\gt9xx\gt9xx_x.c</name>
-                </file>
-            </group>
-            <group>
-                <name>keyboard</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\keyboard\keyboard.c</name>
                 </file>
             </group>
             <group>

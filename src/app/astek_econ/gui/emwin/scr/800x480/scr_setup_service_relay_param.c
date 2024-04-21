@@ -55,11 +55,11 @@ void    scr_cfg_sys_init(                               WM_HWIN         hWin )
         
         switch (dev.gui.scr_idx) {
           case SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM:
-            if (dev.mdb_relay->relay[0].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
+            if (dev.ext_relay->relay[0].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
             break;
           
           case SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM:
-            if (dev.mdb_relay->relay[1].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
+            if (dev.ext_relay->relay[1].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
             break;
         }
 
@@ -92,7 +92,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         break;
 
                                 case GUI_KEY_ESCAPE:
-                                        scr_switch( SCR_IDX_SETUP_SERVICE_RELAY, GUI_ID_BUTTON_SYSTEM );
+                                        scr_switch( SCR_IDX_SETUP_SERVICE_RELAY, (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) ? GUI_ID_BUTTON_RELAY_1 : GUI_ID_BUTTON_RELAY_2  );
                                         beep_play( BEEP_SHRT );
                                         break;
                                         

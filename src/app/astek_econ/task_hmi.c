@@ -15,10 +15,10 @@
 #include "dev\dev.h"
 #include "scr\scr.h"
 #include "beep\beep.h"
-#include "keyboard\keyboard.h"
 #include "touch\touch.h"
 #include "os\os_user.h"
 #include "app_pipe.h"
+#include "keyboard.h"
 
 /*******************************************************************************
 *
@@ -85,55 +85,6 @@ task_hmi_cal_restore(           const   int             idx )
 }
 
 /*******************************************************************************
-* KEYBOARD
-*******************************************************************************/
-/*
-static
-uint8_t
-get_key( void )
-{
-    //uint32_t        offset  =   CFG_SER1_RECV_BLCK_SIZE_OCT - stm32_usart1_dma_recv_remainder();
-    //return( buf_keyb[ offset-1 ] );
-
-
-    static  size_t  tile    = 0;
-            size_t  head    = CFG_SER1_RECV_BLCK_SIZE_OCT - stm32_usart1_dma_recv_remainder();
-
-    if( tile != head )
-    {
-
-    }
-
-    return( buf_keyb[ head-1 ] );
-
-}
-*/
-
-void
-ui_keyb_read(                           int *           key_gui,
-                                        int *           key_pressed )
-{
-    //uint8_t         key = get_key();
-    uint8_t     key = dev.mcu->usart1.rxd;
-
-    //TRACE( "key: %02X\n", key );
-
-    *key_pressed    = (key & 0xC0) == UI_KEY_MODE_RELEASE ? 0 : 1;
-
-    switch( key & 0x3F )
-    {
-        case UI_KEY_CODE_X:             *key_gui = GUI_KEY_ESCAPE;      break;
-        case UI_KEY_CODE_V:             *key_gui = GUI_KEY_ENTER;       break;
-        case UI_KEY_CODE_ARRW_UP:       *key_gui = GUI_KEY_UP;          break;
-        case UI_KEY_CODE_ARRW_DOWN:     *key_gui = GUI_KEY_DOWN;        break;
-        case UI_KEY_CODE_ARRW_LEFT:     *key_gui = GUI_KEY_LEFT;        break;
-        case UI_KEY_CODE_ARRW_RGHT:     *key_gui = GUI_KEY_RIGHT;       break;
-        default:                        *key_gui = 0;                   break;
-    }
-}
-
-
-/*******************************************************************************
 *
 *******************************************************************************/
 void
@@ -156,11 +107,11 @@ task_hmi(                               const   void *          argument )
 
     //keyb_init();
     //keyb_start();
-    osDelay(1000);
-    ui_touch_init();
-    stm32_usart1_init( 115200, 8, 1.0, 'N' );
-    stm32_usart1_recv();
-
+    osDelay(1000); 
+    //ui_touch_init();       
+    ui_keyb_init();
+    ui_keyb_start();
+    
     while( true )
     {
         received    =   xQueueReceive( que_hmi_hndl, &queue_data, pdMS_TO_TICKS(500) );
@@ -171,7 +122,7 @@ task_hmi(                               const   void *          argument )
             switch( tag )
             {
 
-                case OS_USER_TAG_USART1_RECV_IDLE:
+                case OS_USER_TAG_KEYBOARD_RECV_IDLE:
                     //if( ui_keyb_recv() > 0 )
                     {
                         ui_keyb_read( &key_id, &key_pressed );
@@ -187,7 +138,7 @@ task_hmi(                               const   void *          argument )
                     }
                     break;
 
-                case OS_USER_TAG_USART1_RECV_RXNE:
+                case OS_USER_TAG_KEYBOARD_RECV_RXNE:
                     ui_keyb_read( &key_id, &key_pressed );
 
                     if( key_pressed )

@@ -24,7 +24,7 @@ typedef enum log_source_e
   LOG_SOURCE_CLOOP,
   LOG_SOURCE_PID,
   LOG_SOURCE_SYSTEM,
-  LOG_SOURCE_MDB_RELAY,
+  LOG_SOURCE_EXT_RELAY,
   
   LOG_MAX_SOURCE
 } log_source_t;
@@ -71,12 +71,12 @@ typedef enum log_cloop_event_e
   LOG_MAX_LOG_CLOOP_EVENT
 } log_cloop_event_t;
 
-typedef enum log_mdb_relay_event_e
+typedef enum log_ext_relay_event_e
 {
-  LOG_MDB_RELAY_EVENT_LINK_OK = 0,
-  LOG_MDB_RELAY_EVENT_LINK_ERR,
+  LOG_EXT_RELAY_EVENT_LINK_OK = 0,
+  LOG_EXT_RELAY_EVENT_LINK_ERR,
   
-  LOG_MAX_LOG_MDB_RELAY_EVENT
+  LOG_MAX_LOG_EXT_RELAY_EVENT
 } log_mdb_relay_event_t;
 
 typedef enum log_pid_event_e

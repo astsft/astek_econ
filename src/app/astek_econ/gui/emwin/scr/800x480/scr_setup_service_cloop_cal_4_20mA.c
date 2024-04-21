@@ -8,6 +8,7 @@
 #include "scr\scr.h"
 #include "dev\dev.h"
 #include "os\os_user.h"
+#include "hw_cl420.h"
 
 extern  dev_t           dev;
 
@@ -111,9 +112,7 @@ init_dialog(                                            WM_HWIN         hWin )
 static
 void
 dialog_callback(                                WM_MESSAGE *            pMsg )
-{
-        WM_HWIN hClient;
-        
+{        
         int btn_id = 0;
 
         switch( pMsg->MsgId )
@@ -126,30 +125,49 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         {
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] < 0xFFF5) dev.cloop->cal[0].raw.u16[0] += 100;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] < 0xFFF5) coarse_increase_4ma_raw(1);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] < 0xFFF5) dev.cloop->cal[1].raw.u16[0] += 100;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] < 0xFFF5) coarse_increase_4ma_raw(2);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(2);
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] < 0xFFF5) coarse_increase_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] < 0xFFF5) coarse_increase_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                         }
                                         else    // FINE                                        
                                         {
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] < 0xFFFF) dev.cloop->cal[0].raw.u16[0] += 1;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] < 0xFFFF) fine_increase_4ma_raw(1);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] < 0xFFFF) dev.cloop->cal[1].raw.u16[0] += 1;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] < 0xFFFF) fine_increase_4ma_raw(2);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] < 0xFFFF) fine_increase_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] < 0xFFFF) fine_increase_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                         }
                                         beep_play( BEEP_SHRT );
@@ -160,30 +178,50 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         {
                                             switch (dev.gui.scr_idx)
                                             {
-                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                if (dev.cloop->cal[0].raw.u16[0] >= 10) dev.cloop->cal[0].raw.u16[0] -= 100;                                                    
-                                                send_cmd_for_cloop_set_raw_4mA();                            
+                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                if (dev.cloop->cal_ch1[0].raw.u16[0] >= 10) coarse_decrease_4ma_raw(1);                                                    
+                                                send_cmd_for_cloop_set_raw_4mA(1);                            
                                                 break;
                                                 
-                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                if (dev.cloop->cal[1].raw.u16[0] >= 10) dev.cloop->cal[1].raw.u16[0] -= 100;
-                                                send_cmd_for_cloop_set_raw_20mA();
+                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                if (dev.cloop->cal_ch2[0].raw.u16[0] >= 10) coarse_decrease_4ma_raw(2);                                                    
+                                                send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                break;                                                
+                                                
+                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                if (dev.cloop->cal_ch1[1].raw.u16[0] >= 10) coarse_decrease_20ma_raw(1);
+                                                send_cmd_for_cloop_set_raw_20mA(1);
                                                 break;
+                                                
+                                              case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                if (dev.cloop->cal_ch2[1].raw.u16[0] >= 10) coarse_decrease_20ma_raw(2);
+                                                send_cmd_for_cloop_set_raw_20mA(2);
+                                                break;                                                
                                             }                                         
                                         }                                      
                                         else    // FINE         
                                         {
                                              switch (dev.gui.scr_idx)
                                              {
-                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                 if (dev.cloop->cal[0].raw.u16[0] >= 1) dev.cloop->cal[0].raw.u16[0] -= 1;                                                    
-                                                 send_cmd_for_cloop_set_raw_4mA();                            
+                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                 if (dev.cloop->cal_ch1[0].raw.u16[0] >= 1) fine_decrease_4ma_raw(1);                                                    
+                                                 send_cmd_for_cloop_set_raw_4mA(1);                            
                                                  break;
                                                  
-                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                 if (dev.cloop->cal[1].raw.u16[0] >= 1) dev.cloop->cal[1].raw.u16[0] -= 1;
-                                                 send_cmd_for_cloop_set_raw_20mA();
+                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                 if (dev.cloop->cal_ch2[0].raw.u16[0] >= 1) fine_decrease_4ma_raw(2);                                                    
+                                                 send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                 break;                                                 
+                                                 
+                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                 if (dev.cloop->cal_ch1[1].raw.u16[0] >= 1) fine_decrease_20ma_raw(1);
+                                                 send_cmd_for_cloop_set_raw_20mA(1);
                                                  break;
+
+                                               case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                 if (dev.cloop->cal_ch2[1].raw.u16[0] >= 1) fine_decrease_20ma_raw(2);
+                                                 send_cmd_for_cloop_set_raw_20mA(2);
+                                                 break;                                                 
                                              }                                          
                                         }
                                         beep_play( BEEP_SHRT );
@@ -192,19 +230,33 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                 case GUI_KEY_ESCAPE:
                                         switch (dev.gui.scr_idx)
                                         {
-                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:                                                    
-                                            dev.cloop->cal[0].raw.u16[0] = raw_backup;
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:                                                    
+                                            dev.cloop->cal_ch1[0].raw.u16[0] = raw_backup;
                                             btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                             break;
                                             
-                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                            dev.cloop->cal[1].raw.u16[0] = raw_backup;       
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:                                                    
+                                            dev.cloop->cal_ch2[0].raw.u16[0] = raw_backup;
+                                            btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                            break;                                            
+                                            
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                            dev.cloop->cal_ch1[1].raw.u16[0] = raw_backup;       
                                             btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                             break;
+                                            
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                            dev.cloop->cal_ch2[1].raw.u16[0] = raw_backup;       
+                                            btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                            break;                                            
                                         }                     
                                         dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
                                         dev.state.process_status = PROCESS_MEASURE;
-                                        scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, btn_id );
+                                        scr_switch( dev.gui.scr_idx, btn_id );
                                         beep_play( BEEP_SHRT );
                                         break;
 
@@ -241,19 +293,33 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                  case GUI_KEY_ENTER:
                                         switch (dev.gui.scr_idx)
                                         {
-                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:                                                    
-                                            send_cmd_for_cloop_4mA_write();          
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:                                                    
+                                            send_cmd_for_cloop_4mA_write(1);          
                                             btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                             break;
                                             
-                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                            send_cmd_for_cloop_20mA_write();  
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:                                                    
+                                            send_cmd_for_cloop_4mA_write(2);          
+                                            btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;                                            
+                                            break;                                                                                                                              
+                                            
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                            send_cmd_for_cloop_20mA_write(1);  
                                             btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;                                            
                                             break;
+                                            
+                                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                            send_cmd_for_cloop_20mA_write(2);  
+                                            btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                            dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                            break;                                            
                                         }                     
                                         dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
                                         dev.state.process_status = PROCESS_MEASURE;
-                                        scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, btn_id );
+                                        scr_switch( dev.gui.scr_idx, btn_id );
                                         beep_play( BEEP_TYPE_CONFIRM );
                                         break;
 
@@ -301,15 +367,25 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         case GUI_ID_BUTTON_COURSE_UP:
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] < 0xFFF5) dev.cloop->cal[0].raw.u16[0] += 100;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] < 0xFFF5) coarse_increase_4ma_raw(1);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] < 0xFFF5) dev.cloop->cal[1].raw.u16[0] += 100;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] < 0xFFF5) coarse_increase_4ma_raw(2);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] < 0xFFF5) coarse_increase_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] < 0xFFF5) coarse_increase_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                                 beep_play( BEEP_SHRT );
                                                 break;
@@ -317,15 +393,25 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         case GUI_ID_BUTTON_COURSE_DOWN:
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] >= 10) dev.cloop->cal[0].raw.u16[0] -= 100;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] >= 10) coarse_decrease_4ma_raw(1);                                                   
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] >= 10) dev.cloop->cal[1].raw.u16[0] -= 100;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] >= 10) coarse_decrease_4ma_raw(2);                                                   
+                                                    send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] >= 10) coarse_decrease_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] >= 10) coarse_decrease_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                                 beep_play( BEEP_SHRT );
                                                 break;
@@ -333,15 +419,25 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         case GUI_ID_BUTTON_FINE_UP:
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] < 0xFFFF) dev.cloop->cal[0].raw.u16[0] += 1;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] < 0xFFFF) fine_increase_4ma_raw(1);                                                 
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] < 0xFFFF) dev.cloop->cal[1].raw.u16[0] += 1;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] < 0xFFFF) fine_increase_4ma_raw(2);                                                 
+                                                    send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] < 0xFFFF) fine_increase_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] < 0xFFFF) fine_increase_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                                 beep_play( BEEP_SHRT );
                                                 break;
@@ -349,15 +445,25 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         case GUI_ID_BUTTON_FINE_DOWN:
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                                                    if (dev.cloop->cal[0].raw.u16[0] >= 1) dev.cloop->cal[0].raw.u16[0] -= 1;                                                    
-                                                    send_cmd_for_cloop_set_raw_4mA();                            
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                                                    if (dev.cloop->cal_ch1[0].raw.u16[0] >= 1) fine_decrease_4ma_raw(1);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(1);                            
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    if (dev.cloop->cal[1].raw.u16[0] >= 1) dev.cloop->cal[1].raw.u16[0] -= 1;
-                                                    send_cmd_for_cloop_set_raw_20mA();
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                                                    if (dev.cloop->cal_ch2[0].raw.u16[0] >= 1) fine_decrease_4ma_raw(2);                                                    
+                                                    send_cmd_for_cloop_set_raw_4mA(2);                            
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    if (dev.cloop->cal_ch1[1].raw.u16[0] >= 1) fine_decrease_20ma_raw(1);
+                                                    send_cmd_for_cloop_set_raw_20mA(1);
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    if (dev.cloop->cal_ch2[1].raw.u16[0] >= 1) fine_decrease_20ma_raw(2);
+                                                    send_cmd_for_cloop_set_raw_20mA(2);
+                                                    break;                                                    
                                                 }
                                                 beep_play( BEEP_SHRT );
                                                 break;                                                
@@ -366,38 +472,66 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         case GUI_ID_BUTTON_DUMMY:     
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:                                                    
-                                                    send_cmd_for_cloop_4mA_write();    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:                                                    
+                                                    send_cmd_for_cloop_4mA_write(1);    
                                                     btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    send_cmd_for_cloop_20mA_write(); 
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:                                                    
+                                                    send_cmd_for_cloop_4mA_write(2);    
+                                                    btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    send_cmd_for_cloop_20mA_write(1); 
                                                     btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    send_cmd_for_cloop_20mA_write(2); 
+                                                    btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                                    break;                                                    
                                                 }                     
                                                 dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
                                                 dev.state.process_status = PROCESS_MEASURE;
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, btn_id );
+                                                scr_switch( dev.gui.scr_idx, btn_id );
                                                 beep_play( BEEP_TYPE_CONFIRM );
                                                 break;
 
                                         case GUI_ID_BUTTON_CANCEL:
                                                 switch (dev.gui.scr_idx)
                                                 {
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:                                                    
-                                                    dev.cloop->cal[0].raw.u16[0] = raw_backup;
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:                                                    
+                                                    dev.cloop->cal_ch1[0].raw.u16[0] = raw_backup;
                                                     btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                                     break;
                                                     
-                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                                                    dev.cloop->cal[1].raw.u16[0] = raw_backup; 
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:                                                    
+                                                    dev.cloop->cal_ch2[0].raw.u16[0] = raw_backup;
+                                                    btn_id = GUI_ID_BUTTON_CLOOP_4MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                                    break;                                                    
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                                                    dev.cloop->cal_ch1[1].raw.u16[0] = raw_backup; 
                                                     btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
                                                     break;
+                                                    
+                                                  case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                                                    dev.cloop->cal_ch2[1].raw.u16[0] = raw_backup; 
+                                                    btn_id = GUI_ID_BUTTON_CLOOP_20MA;
+                                                    dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                                    break;                                                    
                                                 }                     
                                                 dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
                                                 dev.state.process_status = PROCESS_MEASURE;
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, btn_id );
+                                                scr_switch( dev.gui.scr_idx, btn_id );
                                                 beep_play( BEEP_SHRT );
                                                 break;                                                
 
@@ -416,15 +550,25 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                         
                         switch (dev.gui.scr_idx)
                         {
-                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA:
-                            raw_backup = dev.cloop->cal[0].raw.u16[0];
-                            send_cmd_for_cloop_set_raw_4mA();                            
+                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA:
+                            raw_backup = dev.cloop->cal_ch1[0].raw.u16[0];
+                            send_cmd_for_cloop_set_raw_4mA(1);                            
                             break;
                             
-                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA:
-                            raw_backup = dev.cloop->cal[1].raw.u16[0];
-                            send_cmd_for_cloop_set_raw_20mA();
+                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA:
+                            raw_backup = dev.cloop->cal_ch2[0].raw.u16[0];
+                            send_cmd_for_cloop_set_raw_4mA(2);                            
+                            break;                            
+                            
+                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA:
+                            raw_backup = dev.cloop->cal_ch1[1].raw.u16[0];
+                            send_cmd_for_cloop_set_raw_20mA(1);
                             break;
+                            
+                          case   SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:
+                            raw_backup = dev.cloop->cal_ch2[1].raw.u16[0];
+                            send_cmd_for_cloop_set_raw_20mA(2);
+                            break;                            
                         }
                                               
                         //WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON_SYSTEM ) );

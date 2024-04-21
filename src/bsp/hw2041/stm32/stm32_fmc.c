@@ -165,15 +165,6 @@ init( void )
         timing.SelfRefreshTime          =  4;
         timing.WriteRecoveryTime        =  3;
 
-/*
-        timing.ExitSelfRefreshDelay     =  6;
-        timing.LoadToActiveDelay        =  3;
-        timing.RCDDelay                 =  3;
-        timing.RowCycleDelay            =  6;
-        timing.RPDelay                  =  3;
-        timing.SelfRefreshTime          =  4;
-        timing.WriteRecoveryTime        =  4;
-*/
     if( HAL_SDRAM_Init( &hsdram1, &timing ) != HAL_OK )
     {
         return( -1 );

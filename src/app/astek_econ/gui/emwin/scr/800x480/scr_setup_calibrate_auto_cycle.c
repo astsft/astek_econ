@@ -247,7 +247,6 @@ void
 dialog_callback(                                WM_MESSAGE *    pMsg )
 {
     WM_HWIN         hItem;
-    int             idx;
     int             day, hour;
 
 

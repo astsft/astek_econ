@@ -62,7 +62,6 @@ static  const   char *          symb[]  = { "0", "1", "2", "3", "4", "5", "6", "
 
 static  uint32_t                ppm;
 static  listwheel_idx_t         listwheel_idx;
-static  WM_HWIN                 hWheel;
 
 
 /*******************************************************************************
@@ -239,9 +238,6 @@ listwheel_set_focus(                    const   WM_HWIN                 hWin,
                         TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText4, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText5, CONFIG_UI_COLOR_WHEEL_UNSEL );
-                        hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
                         listwheel_idx   = idx;
                         break;
 
@@ -250,9 +246,6 @@ listwheel_set_focus(                    const   WM_HWIN                 hWin,
                         TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_SEL   );
                         TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText4, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText5, CONFIG_UI_COLOR_WHEEL_UNSEL );
-                        hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 );
                         listwheel_idx   = idx;
                         break;
 
@@ -261,9 +254,6 @@ listwheel_set_focus(                    const   WM_HWIN                 hWin,
                         TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_SEL   );
                         TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText4, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText5, CONFIG_UI_COLOR_WHEEL_UNSEL );
-                        hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 );
                         listwheel_idx   = idx;
                         break;
 
@@ -272,9 +262,6 @@ listwheel_set_focus(                    const   WM_HWIN                 hWin,
                         TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
                         TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_SEL   );
-//                        TEXT_SetBkColor( hText4, CONFIG_UI_COLOR_WHEEL_UNSEL );
-//                        TEXT_SetBkColor( hText5, CONFIG_UI_COLOR_WHEEL_UNSEL );
-                        hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 );
                         listwheel_idx   = idx;
                         break;
 
@@ -426,14 +413,11 @@ static
 void
 dialog_callback(                                WM_MESSAGE *            pMsg )
 {
-    WM_HWIN                 hItem;
-    int                     pos;
     dev_range_idx_t         range_idx;
 
     switch( pMsg->MsgId )
     {
         case WM_KEY:
-            hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 );
             switch( ((WM_KEY_INFO*) (pMsg->Data.p) )->Key )
             {
                 case GUI_KEY_UP:

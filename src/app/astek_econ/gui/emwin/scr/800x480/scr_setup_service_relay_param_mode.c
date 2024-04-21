@@ -52,8 +52,8 @@ void    init_dialog(                            WM_HWIN                 hWin )
         list    = l10n_relay_mode_list_get(dev.cfg.lang);              
         gui_init_listwheel( hWin, GUI_ID_LISTWHEEL0, 50, list, countof );
 
-        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) mode = dev.mdb_relay->relay[0].relay_mode;
-        else mode = dev.mdb_relay->relay[1].relay_mode;
+        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) mode = dev.ext_relay->relay[0].relay_mode;
+        else mode = dev.ext_relay->relay[1].relay_mode;
         
         LISTWHEEL_SetPos(       hItem, mode );
         LISTWHEEL_SetSel(       hItem, mode );
@@ -186,19 +186,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                                 mode    = LISTWHEEL_GetPos( hItem );
                                                 if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                                 {
-                                                  dev.mdb_relay->relay[0].relay_mode  = (relay_mode_e) mode;
+                                                  dev.ext_relay->relay[0].relay_mode  = (relay_mode_e) mode;
                                                   config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
                                                   config &= 0xFF00FFFF;
-                                                  config |= dev.mdb_relay->relay[0].relay_mode << 16;
+                                                  config |= dev.ext_relay->relay[0].relay_mode << 16;
                                                   dev.nvm.put( NVM_REG_RELAY1_MODE_STATE_TYPE, config ); 
                                                   scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_MODE );
                                                 }
                                                 else
                                                 {
-                                                  dev.mdb_relay->relay[1].relay_mode  = (relay_mode_e) mode;
+                                                  dev.ext_relay->relay[1].relay_mode  = (relay_mode_e) mode;
                                                   config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
                                                   config &= 0xFF00FFFF;
-                                                  config |= dev.mdb_relay->relay[1].relay_mode << 16;
+                                                  config |= dev.ext_relay->relay[1].relay_mode << 16;
                                                   dev.nvm.put( NVM_REG_RELAY2_MODE_STATE_TYPE, config ); 
                                                   scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_MODE );
                                                 }

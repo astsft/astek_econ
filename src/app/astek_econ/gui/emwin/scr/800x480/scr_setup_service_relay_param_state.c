@@ -61,8 +61,8 @@ init_dialog(                                            WM_HWIN         hWin )
         RADIO_SetText( hRadio_0, l10n_str_get( dev.cfg.lang, L10N_STR_ID_RELAY_STATE_NC ), 1 );
         WM_SetFocus( WM_GetDialogItem(hWin, GUI_ID_RADIO0 ) );
         
-        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) value = dev.mdb_relay->relay[0].relay_state;
-        else value = dev.mdb_relay->relay[1].relay_state;
+        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) value = dev.ext_relay->relay[0].relay_state;
+        else value = dev.ext_relay->relay[1].relay_state;
         RADIO_SetValue( hRadio_0,  value );
 
         //
@@ -123,19 +123,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                             relay_state = (relay_state_e) RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0));                                                                                    
                                             if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                             {
-                                              dev.mdb_relay->relay[0].relay_state = relay_state;
+                                              dev.ext_relay->relay[0].relay_state = relay_state;
                                               config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
                                               config &= 0xFFFF00FF;
-                                              config |= dev.mdb_relay->relay[0].relay_state << 8;      
+                                              config |= dev.ext_relay->relay[0].relay_state << 8;      
                                               dev.nvm.put(NVM_REG_RELAY1_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }
                                             else
                                             {
-                                              dev.mdb_relay->relay[1].relay_state = relay_state;
+                                              dev.ext_relay->relay[1].relay_state = relay_state;
                                               config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
                                               config &= 0xFFFF00FF;
-                                              config |= dev.mdb_relay->relay[1].relay_state << 8;      
+                                              config |= dev.ext_relay->relay[1].relay_state << 8;      
                                               dev.nvm.put(NVM_REG_RELAY2_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }                                  
@@ -168,19 +168,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                             relay_state = (relay_state_e) RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0));                                                                                    
                                             if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                             {
-                                              dev.mdb_relay->relay[0].relay_state = relay_state;
+                                              dev.ext_relay->relay[0].relay_state = relay_state;
                                               config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
                                               config &= 0xFFFF00FF;
-                                              config |= dev.mdb_relay->relay[0].relay_state << 8;      
+                                              config |= dev.ext_relay->relay[0].relay_state << 8;      
                                               dev.nvm.put(NVM_REG_RELAY1_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }
                                             else
                                             {
-                                              dev.mdb_relay->relay[1].relay_state = relay_state;
+                                              dev.ext_relay->relay[1].relay_state = relay_state;
                                               config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
                                               config &= 0xFFFF00FF;
-                                              config |= dev.mdb_relay->relay[1].relay_state << 8;      
+                                              config |= dev.ext_relay->relay[1].relay_state << 8;      
                                               dev.nvm.put(NVM_REG_RELAY2_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }

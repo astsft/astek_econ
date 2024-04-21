@@ -76,7 +76,10 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                         break;
 
                                 case GUI_KEY_ESCAPE:
-                                        scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CLOOP_CAL );
+                                        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL)
+                                          scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, GUI_ID_BUTTON_CLOOP_CHANNEL_1 );
+                                        else
+                                          scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, GUI_ID_BUTTON_CLOOP_CHANNEL_2 );
                                         beep_play( BEEP_SHRT );
                                         break;
 
@@ -93,21 +96,38 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                 switch( Id )
                                 {
                                         case GUI_ID_BUTTON_CLOOP_4MA:
-                                                dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA;
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL)
+                                                  dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA;
+                                                else 
+                                                  dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA;
+                                                
                                                 if (dev.safe.user.password.u32 != 0)  scr_switch( SCR_IDX_SETUP_SYSTEM_PASSWORD, GUI_ID_BUTTON_DUMMY );                                                
-                                                else scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_4MA, GUI_ID_BUTTON_DUMMY );
+                                                else if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA)
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_4MA, GUI_ID_BUTTON_DUMMY );
+                                                else 
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA, GUI_ID_BUTTON_DUMMY );
                                                 beep_play( BEEP_SHRT );
                                                 break;
 
                                         case GUI_ID_BUTTON_CLOOP_20MA:
-                                                dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA;
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL)
+                                                  dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA;
+                                                else 
+                                                  dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA;
+
                                                 if (dev.safe.user.password.u32 != 0)  scr_switch( SCR_IDX_SETUP_SYSTEM_PASSWORD, GUI_ID_BUTTON_DUMMY );
-                                                else scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_20MA, GUI_ID_BUTTON_DUMMY );
+                                                else if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA)
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA, GUI_ID_BUTTON_DUMMY );
+                                                else 
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA, GUI_ID_BUTTON_DUMMY );
                                                 beep_play( BEEP_SHRT );
                                                 break;
 
                                         case GUI_ID_BUTTON_BACK:
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CLOOP_CAL );
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL)
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, GUI_ID_BUTTON_CLOOP_CHANNEL_1 );
+                                                else
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CAL, GUI_ID_BUTTON_CLOOP_CHANNEL_2 );
                                                 beep_play( BEEP_SHRT );
                                                 break;
 

@@ -77,10 +77,10 @@ void log_prepare_data (log_data_t *data, log_source_t source, uint8_t event)
       }
       break;
       
-    case LOG_SOURCE_MDB_RELAY:
+    case LOG_SOURCE_EXT_RELAY:
       switch (data->event)
       {
-      case LOG_MDB_RELAY_EVENT_LINK_ERR:
+      case LOG_EXT_RELAY_EVENT_LINK_ERR:
           data->event_type = LOG_TYPE_ERROR;
           break;
           

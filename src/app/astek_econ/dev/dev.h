@@ -41,7 +41,7 @@
 #define PID_TEMP_TOO_LOW_ERR    (1 << 5)
 #define PID_TEMP_TOO_HI_ERR	(1 << 6)
 #define STARTUP_ERR	        (1 << 7)
-#define MDB_RELAY_LINK_ERR	(1 << 8)
+#define EXT_RELAY_LINK_ERR	(1 << 8)
 
 // WARNINGS YELLOW
 #define PID_TEMP_NOT_IN_RANGE_HI_WAR    (1 << 0)
@@ -180,7 +180,8 @@ typedef enum cloop_state_e
 typedef struct  dev_cloop_s
 {
     cloop_info_t            info;
-    cloop_cal_t             cal[ 2];    
+    cloop_cal_t             cal_ch1[2];
+    cloop_cal_t             cal_ch2[2];    
     uint16_t                value_uA;
     uint16_t                range_uA;
     current_error_level_t   error_level;
@@ -250,14 +251,14 @@ typedef struct mdb_relay_info_s
   uint16_t device_id;
   uint16_t hardware_id;
   uint16_t serial_num[8]; 
-} mdb_relay_info_t;
+} ext_relay_info_t;
 
 typedef struct  dev_mdb_relay_s
 {
-    mdb_relay_info_t        info;
+    ext_relay_info_t        info;
     int                     link_err;
-    dev_relay_t             relay[2];
-} dev_mdb_relay_t;
+    dev_relay_t             relay[6];
+} dev_ext_relay_t;
 
 /*******************************************************************************
 * STATE
@@ -287,7 +288,7 @@ typedef struct  dev_s
     dev_thld_idx_t              thld_idx;
     log_t                       log;
     void    (* factory_reset)       (dev_cfg_t *);
-    dev_mdb_relay_t *           mdb_relay;
+    dev_ext_relay_t *           ext_relay;
     dev_state_t                 state;
     dev_cloop_t *               cloop;
 } dev_t;

@@ -14,12 +14,12 @@ stm32_clock_init( void )
     RCC_OscInitTypeDef              osc     = {0};
     RCC_ClkInitTypeDef              clk     = {0};
     RCC_PeriphCLKInitTypeDef        pck     = {0};
-
+    
+    HAL_Init();
 
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_CRC_CLK_ENABLE();     //Enable CRC to Unlock GUI
-    //__HAL_RCC_BKPSRAM_CLK_ENABLE();
 
     //HAL_PWR_EnableBkUpAccess();
 

@@ -105,9 +105,10 @@ gt9xx_checksum( const uint8_t * data, size_t size );
 *******************************************************************************/
 extern  int     gt9xx_x_init( void );
 extern  void    gt9xx_x_enable( const bool );
-//extern  uint8_t gt9xx_x_xfer( uint8_t );
 extern  int     gt9xx_x_write( uint16_t reg, uint8_t* buf, uint8_t len );
 extern  int     gt9xx_x_read( uint16_t reg, uint8_t* buf, uint8_t len );
 
+void gt9xx_x_i2c_ev_isr( void );
+void gt9xx_x_i2c_er_isr( void );
 
 #endif	//GT9XX_H

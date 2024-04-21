@@ -3,5 +3,8 @@
     <project>
         <path>$WS_DIR$\project\astek_econ\astek_econ.hw2041.ewp</path>
     </project>
+    <project>
+        <path>$WS_DIR$\project\astek_econ\astek_econ.hw2331.ewp</path>
+    </project>
     <batchBuild />
 </workspace>

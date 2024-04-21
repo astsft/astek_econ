@@ -63,45 +63,6 @@ button_text_update(                             WM_HWIN                 hItem,
             break;
     }
 
-    //if(         units  == CL420_UNITS_PERCENT )
-    //{
-    //    switch( idx )
-    //    {
-    //        case DEV_RANGE_IDX_R1:
-    //            snprintf( str, nmax, "%3.4f% %", (float) ppm / 10000 );
-    //            break;
-    //        case DEV_RANGE_IDX_R2:
-    //            snprintf( str, nmax, "%3.4f% %", (float) ppm / 10000 );
-    //            break;
-    //        case DEV_RANGE_IDX_R3:
-    //            snprintf( str, nmax, "%3.4f% %", (float) ppm / 10000 );
-    //            break;
-    //        default:
-    //            snprintf( str, nmax, l10n_str_get( dev.cfg.lang, L10N_STR_ID_AUTO ) );
-    //            break;
-    //    }
-    //}
-    //else if(    units  == CL420_UNITS_PPM )
-    //{
-    //            switch( idx )
-    //            {
-    //                    case DEV_RANGE_IDX_R1:
-    //                            snprintf( str, nmax, "%d PPM", ppm );
-    //                            break;
-    //
-    //                    case DEV_RANGE_IDX_R2:
-    //                            snprintf( str, nmax, "%d PPM", ppm );
-    //                            break;
-    //
-    //                    case DEV_RANGE_IDX_R3:
-    //                            snprintf( str, nmax, "%d PPM", ppm );
-    //                            break;
-    //
-    //                    default:
-    //                            snprintf( str, nmax, l10n_str_get( dev.cfg.lang, L10N_STR_ID_AUTO ) );
-    //                            break;
-    //            }
-    //}
     BUTTON_SetText(         hItem, str );
 }
 
@@ -149,39 +110,19 @@ init_dialog(                                            WM_HWIN         hWin )
     BUTTON_SetFont(         hItem, &GUI_FontTahoma30                        );
     BUTTON_SetTextAlign(    hItem, GUI_TA_HCENTER | GUI_TA_VCENTER          );
     BUTTON_SetFocusable(    hItem, 1                                        );
-    //range_get_str( str, sizeof(str), &(dev.cl420.range[ DEV_RANGE_IDX_R1 ]) );
-    //BUTTON_SetText(         hItem, str );
     button_text_update(     hItem, DEV_RANGE_IDX_R1, range_units );
 
     hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON2 );
     BUTTON_SetFont(         hItem, &GUI_FontTahoma30                        );
     BUTTON_SetTextAlign(    hItem, GUI_TA_HCENTER | GUI_TA_VCENTER          );
     BUTTON_SetFocusable(    hItem, 1                                        );
-    //range_get_str( str, sizeof(str), &(dev.cl420.range[ DEV_RANGE_IDX_R2 ]) );
-    //BUTTON_SetText(         hItem, str );
     button_text_update(     hItem, DEV_RANGE_IDX_R2, range_units );    
 
     hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON3 );
     BUTTON_SetFont(         hItem, &GUI_FontTahoma30                        );
     BUTTON_SetTextAlign(    hItem, GUI_TA_HCENTER | GUI_TA_VCENTER          );
     BUTTON_SetFocusable(    hItem, 1                                        );
-    //range_get_str( str, sizeof(str), &(dev.cl420.range[ DEV_RANGE_IDX_R3 ]) );
-    //BUTTON_SetText(         hItem, str );
     button_text_update(     hItem, DEV_RANGE_IDX_R3, range_units );    
-
-    //switch( dev.cl420.range_idx )
-    //{
-    //    case DEV_RANGE_IDX_R3:
-    //        RADIO_SetValue( WM_GetDialogItem( hWin, GUI_ID_RADIO0 ), 2 );
-    //        break;
-    //    case DEV_RANGE_IDX_R2:
-    //        RADIO_SetValue( WM_GetDialogItem( hWin, GUI_ID_RADIO0 ), 1 );
-    //        break;
-    //    case DEV_RANGE_IDX_R1:
-    //    default:
-    //        RADIO_SetValue( WM_GetDialogItem( hWin, GUI_ID_RADIO0 ), 0 );
-    //        break;
-    //}
     
     //hItem   = RADIO_CreateEx( 650, 60, 100, 200, hWin, WM_CF_SHOW, 0, GUI_ID_RADIO1, CL420_UNITS_MAX, 60 );
     //RADIO_SetBkColor(       hItem,  GUI_TRANSPARENT                         );
@@ -224,11 +165,6 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                                 RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ), range_idx );
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ) );
                         }
-                        //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
-                        //{
-                        //        RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ), range_units );
-                        //        WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ) );
-                        //}
                         else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ) ) )
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );

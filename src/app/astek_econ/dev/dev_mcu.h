@@ -20,13 +20,19 @@ typedef struct  dev_mcu_s
         size_t          rcvd;
         uint8_t         rxd;
     } usart1;
-
-
+    
     struct
     {
         size_t          rx_idle_cnt;
-        bool            rx_idle_flag;
-    } usart2;
+        size_t          rcvd;
+        uint8_t         rxd;
+    } usart2;    
+
+    //struct
+    //{
+    //    size_t          rx_idle_cnt;
+    //    bool            rx_idle_flag;
+    //} usart2;
 
     struct
     {

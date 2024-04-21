@@ -8,6 +8,7 @@ $exec_path = Get-Location
 #$exec_path_array
 
 $Inputstring ="$exec_path"
+"Exec path $exec_path"	
 $CharArray =$InputString.Split("\")
 
 $script_path = $PSScriptRoot
@@ -16,10 +17,13 @@ $script_path = $PSScriptRoot
 #$app_name = Split-path $script_path -Leaf
 $app_name = $CharArray[-5]
 "Current app $app_name"	
+
+$hw_name = $CharArray[-3].Substring($CharArray[-3].IndexOf('.') + 3, 4)
+"Current HW $hw_name"
 	
-Remove-Item $script_path\..\..\hex\$app_name*_*.hex	
+Remove-Item $script_path\..\..\hex\$hw_name\$app_name*_*.hex	
 	
-$filename = Get-ChildItem $script_path\..\..\hex\$app_name* -Name
+$filename = Get-ChildItem $script_path\..\..\hex\$hw_name\$app_name* -Name
 "Old filename $filename"
 
 $idx = $filename.IndexOf("hex")
@@ -45,5 +49,5 @@ $datatime = $version_str.Substring($version_str.IndexOf('"') + 1, 13)
 $newfilename = "$filename1" + "$datatime" + "_$commit.hex"
 "New filename $newfilename"
 
-Rename-Item $script_path\..\..\hex\$filename -NewName $newfilename
+Rename-Item $script_path\..\..\hex\$hw_name\$filename -NewName $newfilename
 #Copy-Item -Path $script_path\..\..\iar\project\hex\$newfilename -Destination $script_path\..\..\

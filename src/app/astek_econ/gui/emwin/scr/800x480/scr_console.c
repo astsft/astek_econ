@@ -137,14 +137,14 @@ add_event_string (char * event_string, log_source_t source, uint8_t event)
       }
       break;
       
-    case LOG_SOURCE_MDB_RELAY:
+    case LOG_SOURCE_EXT_RELAY:
       switch (event)
       {
-      case LOG_MDB_RELAY_EVENT_LINK_OK:
+      case LOG_EXT_RELAY_EVENT_LINK_OK:
           snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_MDB_RELAY ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_LINK_OK ));        
           break;        
         
-      case LOG_MDB_RELAY_EVENT_LINK_ERR:
+      case LOG_EXT_RELAY_EVENT_LINK_ERR:
           snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_MDB_RELAY ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_LINK_ERROR ));        
           break;
           
@@ -332,8 +332,6 @@ static
 void
 dialog_callback(                        WM_MESSAGE *            pMsg )
 {
-  WM_KEY_INFO *key_info;
-  key_info = (WM_KEY_INFO*) (pMsg->Data.p);
     switch( pMsg->MsgId )
     {
         case WM_KEY:

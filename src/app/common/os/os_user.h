@@ -36,12 +36,18 @@ typedef enum    sys_sync_e
     OS_USER_TAG_RELAY2_OPEN,
     OS_USER_TAG_RELAY1_CLOSE,
     OS_USER_TAG_RELAY2_CLOSE,
-    OS_USER_TAG_CAL_CLOOP_4MA_WRITE,   
-    OS_USER_TAG_CAL_CLOOP_20MA_WRITE,   
-    OS_USER_TAG_CAL_CLOOP_SET_RAW_4MA,
-    OS_USER_TAG_CAL_CLOOP_SET_RAW_20MA,
+    OS_USER_TAG_CAL_CLOOP_CHANNEL1_4MA_WRITE,   
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_4MA_WRITE,
+    OS_USER_TAG_CAL_CLOOP_CHANNEL1_20MA_WRITE, 
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_20MA_WRITE,     
+    OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_4MA,
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_4MA,    
+    OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_20MA,
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_20MA,    
     OS_USER_TAG_IBUS_BOARDS_INIT,
     OS_USER_TAG_CAL_CLOOP_SET_RANGE,
+    OS_USER_TAG_KEYBOARD_RECV_IDLE,
+    OS_USER_TAG_KEYBOARD_RECV_RXNE
     //OS_USER_TAG_CL_SENS,
     //OS_USER_TAG_THLD_1_ON,
     //OS_USER_TAG_THLD_1_OFF,
@@ -49,10 +55,10 @@ typedef enum    sys_sync_e
     //OS_USER_TAG_THLD_2_OFF,
 } os_user_tag_t;
 
-void send_cmd_for_cloop_set_raw_4mA (void);
-void send_cmd_for_cloop_set_raw_20mA (void);
-void send_cmd_for_cloop_4mA_write (void);
-void send_cmd_for_cloop_20mA_write (void);
+void send_cmd_for_cloop_set_raw_4mA (uint8_t channel);
+void send_cmd_for_cloop_set_raw_20mA (uint8_t channel);
+void send_cmd_for_cloop_4mA_write (uint8_t channel);
+void send_cmd_for_cloop_20mA_write (uint8_t channel);
 void send_cmd_for_cloop_write_range (void);
 
 

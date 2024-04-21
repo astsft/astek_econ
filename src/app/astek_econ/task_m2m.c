@@ -13,6 +13,7 @@
 #include "stm32.h"
 #include "modbus.h"
 #include "os\os_user.h"
+#include "external_uart.h"
 
 
 /*******************************************************************************
@@ -65,12 +66,12 @@ task_m2m(                               const   void *          argument )
 
     osDelay( 1000 );
 
-    stm32_uart7_config_baudrate( 19200 );
-    stm32_uart7_init();
+    external_uart_config_baudrate( 19200 );
+    external_uart_init();
 
     osDelay( 1 );
 
-    stm32_uart7_recv_dma( modbus_adu, MDBS_RTU_ADU_SIZEOF );
+    external_uart_recv( modbus_adu, MDBS_RTU_ADU_SIZEOF );
 
     while( true )
     {
@@ -84,9 +85,9 @@ task_m2m(                               const   void *          argument )
                 case OS_USER_TAG_UART7_RECV:
                     len     = mdbs_rtu_slave(   MDBS_DEV_ADDR,
                                                 modbus_adu,
-                                                MDBS_RTU_ADU_SIZEOF - stm32_uart7_dma_rx_get_ndtr() );
+                                                MDBS_RTU_ADU_SIZEOF - external_uart_rx_get_ndtr() );
 
-                    stm32_uart7_xmit_dma( modbus_adu, len );
+                    external_uart_xmit( modbus_adu, len );
                     //osDelay( 100 );
                     break;
 
@@ -94,7 +95,7 @@ task_m2m(                               const   void *          argument )
                     break;
             }
 
-            stm32_uart7_recv_dma( modbus_adu, MDBS_RTU_ADU_SIZEOF );
+            external_uart_recv( modbus_adu, MDBS_RTU_ADU_SIZEOF );
         }
     }
 }

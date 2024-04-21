@@ -48,7 +48,7 @@ dev_init(                       dev_t *         p )
     p->cfg.lang = (l10n_lang_t) ( p->nvm.get( NVM_REG_LANGUAGE ) );
 
     p->cfg.launch_timestamp = p->mcu->rtc.get_timestamp();
-    //p->nvm.put( NVM_REG_LAUNCH_TIMESTAMP, p->cfg.launch_timestamp );
+    p->nvm.put( NVM_REG_LAUNCH_TIMESTAMP, p->cfg.launch_timestamp );
 
     p->cfg.cal_auto_start_timestamp = p->nvm.get( NVM_REG_CAL_AUTO_START_TIMESTAMP );
     p->cfg.cal_auto_cycle_hours     = p->nvm.get( NVM_REG_CAL_AUTO_CYCLE_HOURS );
@@ -59,16 +59,16 @@ dev_init(                       dev_t *         p )
     //dev.log.buf_size    = CONFIG_LOG_DATA_SIZE;
     //dev.log.head        = 0;
 
-    //p->cl420.range_idx              = (dev_range_idx_t) (p->nvm.get( NVM_REG_RANGE_IDX ));
-    //p->cl420.range[ 0].ppm          = p->nvm.get( NVM_REG_RANGE_R1_PPM );
-    //p->cl420.range[ 1].ppm          = p->nvm.get( NVM_REG_RANGE_R2_PPM );
-    //p->cl420.range[ 2].ppm          = p->nvm.get( NVM_REG_RANGE_R3_PPM );
-    //for (int i = 0; i < 3; i++)
-    //{
-    //  p->cl420.range[ 0].units      = p->nvm.get( NVM_REG_RANGE_UNITS );
-    //}
+    p->cl420.range_idx              = (dev_range_idx_t) (p->nvm.get( NVM_REG_RANGE_IDX ));
+    p->cl420.range[ 0].ppm          = p->nvm.get( NVM_REG_RANGE_R1_PPM );
+    p->cl420.range[ 1].ppm          = p->nvm.get( NVM_REG_RANGE_R2_PPM );
+    p->cl420.range[ 2].ppm          = p->nvm.get( NVM_REG_RANGE_R3_PPM );
+    for (int i = 0; i < 3; i++)
+    {
+      p->cl420.range[ 0].units      = p->nvm.get( NVM_REG_RANGE_UNITS );
+    }
     
-    if (dev.cl420.range_idx > 2)
+    if (dev.cl420.range_idx >= 2)
     {
       dev_cl420_set_range_idx(&p->cl420, range_idx_default);
     }
@@ -81,86 +81,86 @@ dev_init(                       dev_t *         p )
       }
     }    
     
-   p->mdb_relay->relay[0].relay_mode = (dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x00FF0000 ) >> 16;
-   p->mdb_relay->relay[0].relay_state = (dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x0000FF00 ) >> 8;
-   p->mdb_relay->relay[0].thld_type = dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x000000FF ;
-   p->mdb_relay->relay[0].ppm.ppm_f = dev.nvm.get(NVM_REG_RELAY1_THRESHOLD);
-   p->mdb_relay->relay[0].hyst_ppm.ppm_f = p->mdb_relay->relay[0].ppm.ppm_f * 5 / 100;    
+   p->ext_relay->relay[0].relay_mode = (dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x00FF0000 ) >> 16;
+   p->ext_relay->relay[0].relay_state = (dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x0000FF00 ) >> 8;
+   p->ext_relay->relay[0].thld_type = dev.nvm.get(NVM_REG_RELAY1_MODE_STATE_TYPE) & 0x000000FF ;
+   p->ext_relay->relay[0].ppm.ppm_f = dev.nvm.get(NVM_REG_RELAY1_THRESHOLD);
+   p->ext_relay->relay[0].hyst_ppm.ppm_f = p->ext_relay->relay[0].ppm.ppm_f * 5 / 100;    
    
-   p->mdb_relay->relay[1].relay_mode = (dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x00FF0000 ) >> 16;
-   p->mdb_relay->relay[1].relay_state = (dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x0000FF00 ) >> 8;
-   p->mdb_relay->relay[1].thld_type = dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x000000FF ;
-   p->mdb_relay->relay[1].ppm.ppm_f = dev.nvm.get(NVM_REG_RELAY2_THRESHOLD);
-   p->mdb_relay->relay[1].hyst_ppm.ppm_f = p->mdb_relay->relay[1].ppm.ppm_f * 5 / 100;
+   p->ext_relay->relay[1].relay_mode = (dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x00FF0000 ) >> 16;
+   p->ext_relay->relay[1].relay_state = (dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x0000FF00 ) >> 8;
+   p->ext_relay->relay[1].thld_type = dev.nvm.get(NVM_REG_RELAY2_MODE_STATE_TYPE) & 0x000000FF ;
+   p->ext_relay->relay[1].ppm.ppm_f = dev.nvm.get(NVM_REG_RELAY2_THRESHOLD);
+   p->ext_relay->relay[1].hyst_ppm.ppm_f = p->ext_relay->relay[1].ppm.ppm_f * 5 / 100;
    
-   if ((p->mdb_relay->relay[0].relay_mode != THRESHOLD_MODE) && (p->mdb_relay->relay[0].relay_mode != ERROR_MODE) && (p->mdb_relay->relay[0].relay_mode != NOT_ACTIVE_MODE))
+   if ((p->ext_relay->relay[0].relay_mode != THRESHOLD_MODE) && (p->ext_relay->relay[0].relay_mode != ERROR_MODE) && (p->ext_relay->relay[0].relay_mode != NOT_ACTIVE_MODE))
    {
-     p->mdb_relay->relay[0].relay_mode = relay1_default_mode;
+     p->ext_relay->relay[0].relay_mode = relay1_default_mode;
      config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
      config &= 0xFF00FFFF;
-     config |= p->mdb_relay->relay[0].relay_mode << 16;
+     config |= p->ext_relay->relay[0].relay_mode << 16;
      dev.nvm.put( NVM_REG_RELAY1_MODE_STATE_TYPE, config );        
    }
-   if (p->mdb_relay->relay[0].relay_state != NORMAL_OPEN_STATE && p->mdb_relay->relay[0].relay_state != NORMAL_CLOSE_STATE)
+   if (p->ext_relay->relay[0].relay_state != NORMAL_OPEN_STATE && p->ext_relay->relay[0].relay_state != NORMAL_CLOSE_STATE)
    {
-     p->mdb_relay->relay[0].relay_state = relay1_default_state;
+     p->ext_relay->relay[0].relay_state = relay1_default_state;
      config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
      config &= 0xFFFF00FF;
-     config |= p->mdb_relay->relay[0].relay_state << 8;      
+     config |= p->ext_relay->relay[0].relay_state << 8;      
      dev.nvm.put(NVM_REG_RELAY1_MODE_STATE_TYPE, config);
    }
-   if (p->mdb_relay->relay[0].thld_type != LOW_LEVEL_THLD_TYPE && p->mdb_relay->relay[0].thld_type != HI_LEVEL_THLD_TYPE)
+   if (p->ext_relay->relay[0].thld_type != LOW_LEVEL_THLD_TYPE && p->ext_relay->relay[0].thld_type != HI_LEVEL_THLD_TYPE)
    {
-     p->mdb_relay->relay[0].thld_type = relay1_default_type;
+     p->ext_relay->relay[0].thld_type = relay1_default_type;
      config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
      config &= 0xFFFFFF00;
-     config |= p->mdb_relay->relay[0].thld_type;            
+     config |= p->ext_relay->relay[0].thld_type;            
      dev.nvm.put(NVM_REG_RELAY1_MODE_STATE_TYPE, config);
    }
-   if (p->mdb_relay->relay[0].ppm.ppm_f > 999999 ||  p->mdb_relay->relay[0].ppm.ppm_f < 0)
+   if (p->ext_relay->relay[0].ppm.ppm_f > 999999 ||  p->ext_relay->relay[0].ppm.ppm_f < 0)
    {
-     p->mdb_relay->relay[0].ppm.ppm_f = relay1_default_thld;
-     dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, p->mdb_relay->relay[0].ppm.ppm_f );
+     p->ext_relay->relay[0].ppm.ppm_f = relay1_default_thld;
+     dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, (uint32_t)(p->ext_relay->relay[0].ppm.ppm_f) );
    }
-   p->mdb_relay->relay[0].hyst_ppm.ppm_f = p->mdb_relay->relay[0].ppm.ppm_f * 5 / 100;
+   p->ext_relay->relay[0].hyst_ppm.ppm_f = p->ext_relay->relay[0].ppm.ppm_f * 5 / 100;
    
    
-   if ((p->mdb_relay->relay[1].relay_mode != THRESHOLD_MODE) && (p->mdb_relay->relay[1].relay_mode != ERROR_MODE) && (p->mdb_relay->relay[1].relay_mode != NOT_ACTIVE_MODE))
+   if ((p->ext_relay->relay[1].relay_mode != THRESHOLD_MODE) && (p->ext_relay->relay[1].relay_mode != ERROR_MODE) && (p->ext_relay->relay[1].relay_mode != NOT_ACTIVE_MODE))
    {
-     p->mdb_relay->relay[1].relay_mode = relay2_default_mode;
+     p->ext_relay->relay[1].relay_mode = relay2_default_mode;
      config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
      config &= 0xFF00FFFF;
-     config |= p->mdb_relay->relay[1].relay_mode << 16;
+     config |= p->ext_relay->relay[1].relay_mode << 16;
      dev.nvm.put( NVM_REG_RELAY2_MODE_STATE_TYPE, config );        
    }
-   if (p->mdb_relay->relay[1].relay_state != NORMAL_OPEN_STATE && p->mdb_relay->relay[1].relay_state != NORMAL_CLOSE_STATE)
+   if (p->ext_relay->relay[1].relay_state != NORMAL_OPEN_STATE && p->ext_relay->relay[1].relay_state != NORMAL_CLOSE_STATE)
    {
-     p->mdb_relay->relay[1].relay_state = relay2_default_state;
+     p->ext_relay->relay[1].relay_state = relay2_default_state;
      config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
      config &= 0xFFFF00FF;
-     config |= p->mdb_relay->relay[1].relay_state << 8;      
+     config |= p->ext_relay->relay[1].relay_state << 8;      
      dev.nvm.put(NVM_REG_RELAY2_MODE_STATE_TYPE, config);
    }
-   if (p->mdb_relay->relay[1].thld_type != LOW_LEVEL_THLD_TYPE && p->mdb_relay->relay[1].thld_type != HI_LEVEL_THLD_TYPE)
+   if (p->ext_relay->relay[1].thld_type != LOW_LEVEL_THLD_TYPE && p->ext_relay->relay[1].thld_type != HI_LEVEL_THLD_TYPE)
    {
-     p->mdb_relay->relay[1].thld_type = relay2_default_type;
+     p->ext_relay->relay[1].thld_type = relay2_default_type;
      config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
      config &= 0xFFFFFF00;
-     config |= p->mdb_relay->relay[1].thld_type;            
+     config |= p->ext_relay->relay[1].thld_type;            
      dev.nvm.put(NVM_REG_RELAY2_MODE_STATE_TYPE, config);
    }
-   if (p->mdb_relay->relay[1].ppm.ppm_f > 999999 ||  p->mdb_relay->relay[1].ppm.ppm_f < 0)
+   if (p->ext_relay->relay[1].ppm.ppm_f > 999999 ||  p->ext_relay->relay[1].ppm.ppm_f < 0)
    {
-     p->mdb_relay->relay[1].ppm.ppm_f = relay2_default_thld;
-     dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, p->mdb_relay->relay[1].ppm.ppm_f );
+     p->ext_relay->relay[1].ppm.ppm_f = relay2_default_thld;
+     dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, (uint32_t)(p->ext_relay->relay[1].ppm.ppm_f) );
    }
-   p->mdb_relay->relay[1].hyst_ppm.ppm_f = p->mdb_relay->relay[1].ppm.ppm_f * 5 / 100;
+   p->ext_relay->relay[1].hyst_ppm.ppm_f = p->ext_relay->relay[1].ppm.ppm_f * 5 / 100;
     
     dev.cloop->error_level = dev.nvm.get( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL ) & 0x000000FF;
     dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
     
-    snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);
-        
+    snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);    
+    
     return( 0 );
 }
 
@@ -322,7 +322,7 @@ dev_zero_update(                        dev_t *     p )
     p->sens->cal.zero.raw.u32   = p->sens->meas.raw;
     dev_conf_zero_save( p );
     econ_cal_restore( p->sens );
-    TRACE( "\ndev_zero_update: %d\n", p->sens->cal.zero.ppm.i32 );
+    //TRACE( "\ndev_zero_update: %d\n", p->sens->cal.zero.ppm.i32 );
 }
 
 /**
@@ -334,7 +334,7 @@ dev_span_update(                        dev_t *     p )
     p->sens->cal.span.raw.u32   = p->sens->meas.raw;
     dev_conf_span_save( p );
     econ_cal_restore( p->sens );
-    TRACE( "\ndev_span_update: %d\n", p->sens->cal.span.ppm.i32 );
+    //TRACE( "\ndev_span_update: %d\n", p->sens->cal.span.ppm.i32 );
 }
 
 int
@@ -343,7 +343,7 @@ dev_zero_restore(                       dev_t *     p,
 {
     int     err = dev_conf_zero_restore( p, key );
 
-    TRACE( "\ndev_zero_restore: %d\terr: %d\n", p->sens->cal.zero.ppm.i32, err );
+    //TRACE( "\ndev_zero_restore: %d\terr: %d\n", p->sens->cal.zero.ppm.i32, err );
 
     if( err )
     {
@@ -361,7 +361,7 @@ dev_span_restore(                       dev_t *     p,
 {
     int     err = dev_conf_span_restore( p, key );
 
-    TRACE( "\ndev_span_restore: %d\terr: %d\n", p->sens->cal.span.ppm.i32, err );
+    //TRACE( "\ndev_span_restore: %d\terr: %d\n", p->sens->cal.span.ppm.i32, err );
 
     if( err )
     {
@@ -451,7 +451,7 @@ dev_cl420_set_range_idx(                dev_cl420_t *       p,
     if( idx < DEV_RANGE_IDX_MAX )
     {
         p->range_idx  = idx;
-        //dev.nvm.put( NVM_REG_RANGE_IDX, idx );        
+        dev.nvm.put( NVM_REG_RANGE_IDX, idx );        
     }
     
      send_cmd_for_cloop_write_range(); 
@@ -470,15 +470,15 @@ dev_cl420_set_range(                    dev_cl420_t *       p,
     {
         case DEV_RANGE_IDX_R1:
             p->range[ 0].ppm    = ppm;
-            //dev.nvm.put( NVM_REG_RANGE_R1_PPM, ppm );
+            dev.nvm.put( NVM_REG_RANGE_R1_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R2:
             p->range[ 1].ppm    = ppm;
-            //dev.nvm.put( NVM_REG_RANGE_R2_PPM, ppm );
+            dev.nvm.put( NVM_REG_RANGE_R2_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R3:
             p->range[ 2].ppm    = ppm;
-            //dev.nvm.put( NVM_REG_RANGE_R3_PPM, ppm );
+            dev.nvm.put( NVM_REG_RANGE_R3_PPM, ppm );
             break;
         default:
             break;
@@ -533,8 +533,8 @@ dev_cl420_set_units(                    dev_cl420_t *       p,  cl420_units_t   
    {                          
      p->range[i].units = units;
    }
-  
-   //dev.nvm.put( NVM_REG_RANGE_UNITS, units );
+
+	dev.nvm.put( NVM_REG_RANGE_UNITS, units );
 }
 
 void convert_flt_to_int_fract (float flt, int32_t *integ, int32_t *fract)
@@ -617,14 +617,14 @@ void    dev_find_and_write_error_warnings (log_t * log, uint32_t previous_error_
       log_write_event(log, LOG_SOURCE_CLOOP, LOG_CLOOP_EVENT_LINK_OK);    
   }
   
- //----------------- MDB_RELAY ERRORS ------------------------------------------------  
+ //----------------- EXT_RELAY ERRORS ------------------------------------------------  
 #ifndef NO_RELAY  
-  if ((previous_error_status & MDB_RELAY_LINK_ERR) != (error_status & MDB_RELAY_LINK_ERR))
+  if ((previous_error_status & EXT_RELAY_LINK_ERR) != (error_status & EXT_RELAY_LINK_ERR))
   {
-    if (error_status & MDB_RELAY_LINK_ERR)
-      log_write_event(log, LOG_SOURCE_MDB_RELAY, LOG_MDB_RELAY_EVENT_LINK_ERR);
+    if (error_status & EXT_RELAY_LINK_ERR)
+      log_write_event(log, LOG_SOURCE_EXT_RELAY, LOG_EXT_RELAY_EVENT_LINK_ERR);
     else
-      log_write_event(log, LOG_SOURCE_MDB_RELAY, LOG_MDB_RELAY_EVENT_LINK_OK);    
+      log_write_event(log, LOG_SOURCE_EXT_RELAY, LOG_EXT_RELAY_EVENT_LINK_OK);    
   }  
 #endif
   

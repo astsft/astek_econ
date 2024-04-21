@@ -18,7 +18,6 @@ extern  dev_t           dev;
 static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0, 80, 800, 400, 0, 0x0, 0 },
-    //{ TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,  25, 960, 350, 0, 0x0, 0 },
 
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RELAY_1,    100,  64, 600,  64, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RELAY_2,    100, 192, 600,  64, 0, 0x0, 0 },
