@@ -4,6 +4,7 @@
 
 #define CONFIG_ASBACK_CL420_CAL_A_DEFAULT   1.0f
 #define CONFIG_ASBACK_CL420_CAL_B_DEFAULT   1.0f
+#define CL_PWM_PERIOD           0x0FFF
 
 extern  dev_t                   dev;
 
@@ -46,7 +47,7 @@ static          asback_cl420_t          asback_cl420_ch2        =
 
 int cloop_hw_init (void)
 {
-  asback_cl420_init();
+  asback_cl420_init( CL_PWM_PERIOD );
   
   return 0;
 }

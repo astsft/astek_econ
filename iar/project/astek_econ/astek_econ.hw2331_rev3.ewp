@@ -354,12 +354,12 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041\mt48lc1</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\mt48lc1</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32</state>
                     <state>$PROJ_DIR$\..\..\..\src\emwin\inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\mcu\iar</state>
                     <state>$PROJ_DIR$\..\..\..\src\lib\arm\CMSIS\Core\Include</state>
@@ -375,6 +375,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\lib\astsoft\econ</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -672,7 +673,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>astek_econ.hw2041.hex</state>
+                    <state>astek_econ.hw2331.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1457,12 +1458,11 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041\mt48lc1</state>
-                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32</state>
                     <state>$PROJ_DIR$\..\..\..\src\emwin\inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\mcu\iar</state>
                     <state>$PROJ_DIR$\..\..\..\src\lib\arm\CMSIS\Core\Include</state>
@@ -1478,6 +1478,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\lib\astsoft\econ</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1775,7 +1776,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$\..\..\..\hex\2041\$PROJ_FNAME$.hex</state>
+                    <state>$PROJ_DIR$\..\..\..\hex\2331_rev3\$PROJ_FNAME$.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1793,7 +1794,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>96</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2457,51 +2458,45 @@
             <group>
                 <name>hw</name>
                 <group>
-                    <name>hw2041</name>
+                    <name>hw2331</name>
                     <group>
                         <name>cl420</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\cl420\hw2316_cl420.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\cl420\hw2331_cl420.c</name>
                         </file>
                     </group>
                     <group>
                         <name>external_uart</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\external_uart\hw2041_external_uart.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\external_uart\hw2331_external_uart.c</name>
                         </file>
                     </group>
                     <group>
                         <name>internal_uart</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\internal_uart\hw2041_internal_uart.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\internal_uart\hw2331_internal_uart.c</name>
                         </file>
                     </group>
                     <group>
                         <name>keyboard</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\keyboard\hw2041_keyboard.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\keyboard\hw2331_keyboard.c</name>
                         </file>
                     </group>
                     <group>
                         <name>ltdc</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\ltdc\hw2041_ltdc.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\ltdc\hw2331_ltdc.c</name>
                         </file>
                     </group>
                     <group>
                         <name>relay</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\realy\hw2041_relay.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\realy\hw2331_relay.c</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_hal_msp.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_hal_timebase_tim.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2041\stm32f7xx_it.c</name>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\stm32f7xx_it.c</name>
                     </file>
                 </group>
                 <file>
@@ -2561,62 +2556,80 @@
     <group>
         <name>bsp</name>
         <group>
-            <name>hw2041</name>
+            <name>asback</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback\asback.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback\asback_cl420.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback\asback_relay.c</name>
+            </file>
+        </group>
+        <group>
+            <name>hw2331</name>
             <group>
                 <name>beep</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\beep\beep.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\beep\beep.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\beep\beep.h</name>
                 </file>
             </group>
             <group>
                 <name>gt9xx</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\gt9xx\gt9xx_x.c</name>
-                </file>
-            </group>
-            <group>
-                <name>mt48lc</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\mt48lc\mt48lc4m32b2.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\gt9xx\gt9xx_x.c</name>
                 </file>
             </group>
             <group>
                 <name>stm32</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_clock.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_core.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_clock.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_device_uid.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_fmc.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_fmc.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_lcd.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_ltdc.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_ltdc.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_mpu.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_mpu.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_reset.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_reset.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_rtc.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_rtc.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_tim5.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_sdram.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_uart4.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_spi2.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_uart7.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_tim2_beep.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2041\stm32\stm32_usart1.c</name>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_tim4.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_uart4.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_usart1.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_usart2.c</name>
                 </file>
             </group>
         </group>

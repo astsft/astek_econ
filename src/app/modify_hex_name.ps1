@@ -12,16 +12,18 @@ $Inputstring ="$exec_path"
 $CharArray =$InputString.Split("\")
 
 $script_path = $PSScriptRoot
-#"Current location $script_path"
+"Current location $script_path"
 
 #$app_name = Split-path $script_path -Leaf
 $app_name = $CharArray[-5]
 "Current app $app_name"	
 
-$hw_name = $CharArray[-3].Substring($CharArray[-3].IndexOf('.') + 3, 4)
+$CharArray2 = $CharArray[-3].Split(".")
+
+$hw_name = $CharArray2[-1].Substring(2)
 "Current HW $hw_name"
 	
-Remove-Item $script_path\..\..\hex\$hw_name\$app_name*_*.hex	
+Remove-Item $script_path\..\..\hex\$hw_name\$app_name.*$hw_name.*.hex	
 	
 $filename = Get-ChildItem $script_path\..\..\hex\$hw_name\$app_name* -Name
 "Old filename $filename"
