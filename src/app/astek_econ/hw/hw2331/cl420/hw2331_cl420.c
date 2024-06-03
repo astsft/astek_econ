@@ -4,7 +4,7 @@
 
 #define CONFIG_ASBACK_CL420_CAL_A_DEFAULT   1.0f
 #define CONFIG_ASBACK_CL420_CAL_B_DEFAULT   1.0f
-#define CL_PWM_PERIOD           0x0FFF
+#define CL_PWM_PERIOD                       0x0FFF
 
 extern  dev_t                   dev;
 
@@ -47,7 +47,7 @@ static          asback_cl420_t          asback_cl420_ch2        =
 
 int cloop_hw_init (void)
 {
-  asback_cl420_init( CL_PWM_PERIOD );
+  asback_cl420_init(CL_PWM_PERIOD);
   
   return 0;
 }
@@ -80,18 +80,18 @@ int cloop_get_cal(void)
   dev.cloop->cal_ch2[1].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH2_CAL1_RAW);      
   
   // channel 1
-  asback_cl420_ch2.cal->uA[0] = dev.cloop->cal_ch1[0].uA.i32;
-  asback_cl420_ch2.cal->raw[0] = dev.cloop->cal_ch1[0].raw.i32;
-  asback_cl420_ch2.cal->uA[1] = dev.cloop->cal_ch1[1].uA.i32;
-  asback_cl420_ch2.cal->raw[1] = dev.cloop->cal_ch1[1].raw.i32;     
-  asback_cl420_cal_restore(&asback_cl420_ch2);
+  asback_cl420_ch1.cal->uA[0] = dev.cloop->cal_ch1[0].uA.i32;
+  asback_cl420_ch1.cal->raw[0] = dev.cloop->cal_ch1[0].raw.i32;
+  asback_cl420_ch1.cal->uA[1] = dev.cloop->cal_ch1[1].uA.i32;
+  asback_cl420_ch1.cal->raw[1] = dev.cloop->cal_ch1[1].raw.i32;     
+  asback_cl420_cal_restore(&asback_cl420_ch1);
   
   // channel 2
-  asback_cl420_ch1.cal->uA[0] = dev.cloop->cal_ch2[0].uA.i32;
-  asback_cl420_ch1.cal->raw[0] = dev.cloop->cal_ch2[0].raw.i32;
-  asback_cl420_ch1.cal->uA[1] = dev.cloop->cal_ch2[1].uA.i32;
-  asback_cl420_ch1.cal->raw[1] = dev.cloop->cal_ch2[1].raw.i32;     
-  asback_cl420_cal_restore(&asback_cl420_ch1);  
+  asback_cl420_ch2.cal->uA[0] = dev.cloop->cal_ch2[0].uA.i32;
+  asback_cl420_ch2.cal->raw[0] = dev.cloop->cal_ch2[0].raw.i32;
+  asback_cl420_ch2.cal->uA[1] = dev.cloop->cal_ch2[1].uA.i32;
+  asback_cl420_ch2.cal->raw[1] = dev.cloop->cal_ch2[1].raw.i32;     
+  asback_cl420_cal_restore(&asback_cl420_ch2);  
   
   return 0;
 }
@@ -125,11 +125,11 @@ int cloop_set_raw(uint8_t ch, uint32_t raw)
 {
   if (ch == 1)
   {
-    asback_cl420_set_raw( &asback_cl420_ch2, raw );
+    asback_cl420_set_raw( &asback_cl420_ch1, raw );
   }
   else
   {
-    asback_cl420_set_raw( &asback_cl420_ch1, raw );
+    asback_cl420_set_raw( &asback_cl420_ch2, raw );
   }
   
   return 0;
@@ -139,11 +139,11 @@ int cloop_get_raw(uint8_t ch, uint32_t* current_raw)
 {
   if (ch == 1)
   {
-    *current_raw = asback_cl420_get_raw( &asback_cl420_ch2 );
+    *current_raw = asback_cl420_get_raw( &asback_cl420_ch1 );
   }
   else
   {
-    *current_raw = asback_cl420_get_raw( &asback_cl420_ch1 );
+    *current_raw = asback_cl420_get_raw( &asback_cl420_ch2 );
   }
   
   return 0;
@@ -153,11 +153,11 @@ int cloop_set_uA(uint8_t ch, uint32_t uA)
 {
   if (ch == 1)
   {
-    asback_cl420_set_uA( &asback_cl420_ch2, uA );
+    asback_cl420_set_uA( &asback_cl420_ch1, uA );
   }
   else
   {
-    asback_cl420_set_uA( &asback_cl420_ch1, uA );
+    asback_cl420_set_uA( &asback_cl420_ch2, uA );
   }
   
   return 0;
@@ -167,11 +167,11 @@ int cloop_get_uA(uint8_t ch, uint32_t *uA)
 {
   if (ch == 1)
   {
-    *uA = asback_cl420_get_uA( &asback_cl420_ch2 );
+    *uA = asback_cl420_get_uA( &asback_cl420_ch1 );
   }
   else
   {
-    *uA = asback_cl420_get_uA( &asback_cl420_ch1 );
+    *uA = asback_cl420_get_uA( &asback_cl420_ch2 );
   }
   
   return 0;
@@ -187,18 +187,18 @@ int set_cal_4ma(uint8_t ch)
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_UA, 4000);
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_RAW, current_raw);
-    asback_cl420_ch2.cal->uA[0] = 4000;
-    asback_cl420_ch2.cal->raw[0] = current_raw;
-    asback_cl420_cal_restore(&asback_cl420_ch2);
+    asback_cl420_ch1.cal->uA[0] = 4000;
+    asback_cl420_ch1.cal->raw[0] = current_raw;
+    asback_cl420_cal_restore(&asback_cl420_ch1);
   }
   else 
   {
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_UA, 4000);
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_RAW, current_raw);
-    asback_cl420_ch1.cal->uA[0] = 4000;
-    asback_cl420_ch1.cal->raw[0] = current_raw;    
-    asback_cl420_cal_restore(&asback_cl420_ch1);   
+    asback_cl420_ch2.cal->uA[0] = 4000;
+    asback_cl420_ch2.cal->raw[0] = current_raw;    
+    asback_cl420_cal_restore(&asback_cl420_ch2);   
   }
   
   return 0;
@@ -214,18 +214,18 @@ int set_cal_20ma(uint8_t ch)
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_UA, 20000);
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_RAW, current_raw);
-    asback_cl420_ch2.cal->uA[1] = 20000;
-    asback_cl420_ch2.cal->raw[1] = current_raw;    
-    asback_cl420_cal_restore(&asback_cl420_ch2);
+    asback_cl420_ch1.cal->uA[1] = 20000;
+    asback_cl420_ch1.cal->raw[1] = current_raw;    
+    asback_cl420_cal_restore(&asback_cl420_ch1);
   }
   else 
   {
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_UA, 20000);
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_RAW, current_raw);
-    asback_cl420_ch1.cal->uA[1] = 20000;
-    asback_cl420_ch1.cal->raw[1] = current_raw;        
-    asback_cl420_cal_restore(&asback_cl420_ch1);
+    asback_cl420_ch2.cal->uA[1] = 20000;
+    asback_cl420_ch2.cal->raw[1] = current_raw;        
+    asback_cl420_cal_restore(&asback_cl420_ch2);
   }
   
   return 0;
