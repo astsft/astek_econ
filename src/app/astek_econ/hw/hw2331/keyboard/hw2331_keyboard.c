@@ -12,7 +12,8 @@
 
 extern  dev_t           dev;
 extern  QueueHandle_t           que_hmi_hndl;
-uint8_t keyboard_buf[1];
+uint8_t keyboard_buf[5];
+volatile uint8_t first_int_keyboard = 1;
 
 void ui_keyb_init(void)
 {
@@ -25,11 +26,10 @@ void ui_keyb_start(void)
 }
 
 void
-ui_keyb_read(                           int *           key_gui,
+ui_keyb_read(                           uint8_t key,
+                                        int *           key_gui,
                                         int *           key_pressed )
 {
-    uint8_t     key = dev.mcu->usart2.rxd;
-
     *key_pressed    = (key & 0xC0) == UI_KEY_MODE_RELEASE ? 0 : 1;
 
     switch( key & 0x3F )
@@ -44,18 +44,40 @@ ui_keyb_read(                           int *           key_gui,
     }
 }
 
+uint32_t keyb_rx_get_ndtr( void )
+{
+  return stm32_usart2_dma_recv_remainder();
+}
+
 /*******************************************************************************
 * USART2 - KEYBOARD
 *******************************************************************************/
 void
 stm32_usart2_idle_hook( void )
 {
-    TRACE("stm32_usart2_idle_hook\n");
-    dev.mcu->usart2.rxd = keyboard_buf[0];
     app_pipe_t result;
-    result.tag    = OS_USER_TAG_KEYBOARD_RECV_IDLE;  
+    int i = 0;
+    
+    TRACE("stm32_usart2_idle_hook\n");
+    
+    //Calc number of receive data
+    uint8_t cnt = sizeof (keyboard_buf) - keyb_rx_get_ndtr();
+    
+    if (!first_int_keyboard)
+    {
+      while (cnt)
+      {        
+        result.data = &keyboard_buf[i];    
+        result.tag    = OS_USER_TAG_KEYBOARD_RECV_IDLE;  
 
-    xQueueSendFromISR( que_hmi_hndl, &result, NULL );    
+        xQueueSendFromISR( que_hmi_hndl, &result, NULL );    
+        
+        cnt --;
+        i++;
+      }
+    }
+    else 
+      first_int_keyboard = 0;
     
     stm32_usart2_recv_dma(keyboard_buf, sizeof(keyboard_buf));
 }

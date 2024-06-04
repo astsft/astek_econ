@@ -27,7 +27,7 @@
 
 void    ui_keyb_init( void );
 void    ui_keyb_start( void );
-void    ui_keyb_read( int * key_id, int * key_pressed );
-
+void    ui_keyb_read( uint8_t key, int * key_id, int * key_pressed );
+uint32_t keyb_rx_get_ndtr( void );
 
 #endif	//UI_KEYB_H

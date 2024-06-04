@@ -67,17 +67,37 @@ int cloop_get_cal(void)
 {
   dev.cloop->cal_ch1[0].timestamp.i32 = dev.nvm.get(NVM_REG_CL420_CH1_CAL0_TIMESTAMP);
   dev.cloop->cal_ch1[0].uA.i32        = dev.nvm.get(NVM_REG_CL420_CH1_CAL0_UA);
-  dev.cloop->cal_ch1[0].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH1_CAL0_RAW);    
+  dev.cloop->cal_ch1[0].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH1_CAL0_RAW);  
+  if (dev.cloop->cal_ch1[0].raw.i32 >= 0x1000)
+  {
+    dev.cloop->cal_ch1[0].raw.i32 = 0;
+    dev.nvm.put(NVM_REG_CL420_CH1_CAL0_RAW, 0);
+  }
   dev.cloop->cal_ch1[1].timestamp.i32 = dev.nvm.get(NVM_REG_CL420_CH1_CAL1_TIMESTAMP);
   dev.cloop->cal_ch1[1].uA.i32        = dev.nvm.get(NVM_REG_CL420_CH1_CAL1_UA);
   dev.cloop->cal_ch1[1].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH1_CAL1_RAW);    
+  if (dev.cloop->cal_ch1[1].raw.i32 >= 0x1000)
+  {
+    dev.cloop->cal_ch1[1].raw.i32 = 0;
+    dev.nvm.put(NVM_REG_CL420_CH1_CAL1_RAW, 0);
+  }  
   
   dev.cloop->cal_ch2[0].timestamp.i32 = dev.nvm.get(NVM_REG_CL420_CH2_CAL0_TIMESTAMP);
   dev.cloop->cal_ch2[0].uA.i32        = dev.nvm.get(NVM_REG_CL420_CH2_CAL0_UA);
   dev.cloop->cal_ch2[0].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH2_CAL0_RAW);    
+  if (dev.cloop->cal_ch2[0].raw.i32 >= 0x1000)
+  {
+    dev.cloop->cal_ch2[0].raw.i32 = 0;
+    dev.nvm.put(NVM_REG_CL420_CH2_CAL0_RAW, 0);
+  }  
   dev.cloop->cal_ch2[1].timestamp.i32 = dev.nvm.get(NVM_REG_CL420_CH2_CAL1_TIMESTAMP);
   dev.cloop->cal_ch2[1].uA.i32        = dev.nvm.get(NVM_REG_CL420_CH2_CAL1_UA);
   dev.cloop->cal_ch2[1].raw.i32       = dev.nvm.get(NVM_REG_CL420_CH2_CAL1_RAW);      
+  if (dev.cloop->cal_ch2[1].raw.i32 >= 0x1000)
+  {
+    dev.cloop->cal_ch2[1].raw.i32 = 0;
+    dev.nvm.put(NVM_REG_CL420_CH2_CAL0_RAW, 0);
+  }  
   
   // channel 1
   asback_cl420_ch1.cal->uA[0] = dev.cloop->cal_ch1[0].uA.i32;
@@ -179,20 +199,22 @@ int cloop_get_uA(uint8_t ch, uint32_t *uA)
 
 int set_cal_4ma(uint8_t ch)
 {
-  uint32_t current_raw;
-  cloop_get_raw(ch, &current_raw);
+  uint32_t current_raw; 
+
   
   if (ch == 1)
   {
+    current_raw = dev.cloop->cal_ch1[0].raw.u16[0];
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_UA, 4000);
     dev.nvm.put(NVM_REG_CL420_CH1_CAL0_RAW, current_raw);
-    asback_cl420_ch1.cal->uA[0] = 4000;
+    asback_cl420_ch1.cal->uA[0] = 4000;    
     asback_cl420_ch1.cal->raw[0] = current_raw;
     asback_cl420_cal_restore(&asback_cl420_ch1);
   }
   else 
   {
+    current_raw = dev.cloop->cal_ch2[0].raw.u16[0];
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_UA, 4000);
     dev.nvm.put(NVM_REG_CL420_CH2_CAL0_RAW, current_raw);
@@ -207,10 +229,10 @@ int set_cal_4ma(uint8_t ch)
 int set_cal_20ma(uint8_t ch)
 {
   uint32_t current_raw;
-  cloop_get_raw(ch, &current_raw);
   
   if (ch == 1)
   {
+    current_raw = dev.cloop->cal_ch1[1].raw.u16[0];
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_UA, 20000);
     dev.nvm.put(NVM_REG_CL420_CH1_CAL1_RAW, current_raw);
@@ -220,6 +242,7 @@ int set_cal_20ma(uint8_t ch)
   }
   else 
   {
+    current_raw = dev.cloop->cal_ch2[1].raw.u16[0];
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_TIMESTAMP,  dev.mcu->rtc.get_timestamp());
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_UA, 20000);
     dev.nvm.put(NVM_REG_CL420_CH2_CAL1_RAW, current_raw);
@@ -235,11 +258,11 @@ int coarse_increase_4ma_raw(uint8_t ch)
 {
   if (ch == 1)
   {
-    dev.cloop->cal_ch1[0].raw.u16[0] += 2;
+    dev.cloop->cal_ch1[0].raw.u16[0] += 10;
   }
   else
   {
-    dev.cloop->cal_ch2[0].raw.u16[0] += 2;
+    dev.cloop->cal_ch2[0].raw.u16[0] += 10;
   }
   
   return 0;
@@ -263,11 +286,11 @@ int coarse_increase_20ma_raw(uint8_t ch)
 {
   if (ch == 1)
   {
-    dev.cloop->cal_ch1[1].raw.u16[0] += 2;
+    dev.cloop->cal_ch1[1].raw.u16[0] += 10;
   }
   else
   {
-    dev.cloop->cal_ch2[1].raw.u16[0] += 2;
+    dev.cloop->cal_ch2[1].raw.u16[0] += 10;
   }  
   
   return 0;
@@ -291,11 +314,11 @@ int coarse_decrease_4ma_raw(uint8_t ch)
 {
   if (ch == 1)
   {
-    dev.cloop->cal_ch1[0].raw.u16[0] -= 2;
+    dev.cloop->cal_ch1[0].raw.u16[0] -= 10;
   }
   else
   {
-    dev.cloop->cal_ch2[0].raw.u16[0] -= 2;
+    dev.cloop->cal_ch2[0].raw.u16[0] -= 10;
   }  
   
   return 0;
@@ -319,11 +342,11 @@ int coarse_decrease_20ma_raw(uint8_t ch)
 {
   if (ch == 1)
   {
-    dev.cloop->cal_ch1[1].raw.u16[0] -= 2;
+    dev.cloop->cal_ch1[1].raw.u16[0] -= 10;
   }
   else
   {
-    dev.cloop->cal_ch2[1].raw.u16[0] -= 2;
+    dev.cloop->cal_ch2[1].raw.u16[0] -= 10;
   }
   
   return 0;

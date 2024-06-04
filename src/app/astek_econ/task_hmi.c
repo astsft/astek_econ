@@ -83,6 +83,26 @@ task_hmi_cal_restore(           const   int             idx )
       xQueueSend( que_ibus_hndl, &queue_data, NULL );
     }
 }
+/*
+void
+task_hmi_cal_factory_settings_update( const int         idx )
+{
+    os_user_tag_t   tag;
+
+    switch( idx )
+    {
+        case 3:     tag = OS_USER_TAG_CAL1_FACTORY_UPDATE;  break;
+        case 2:     tag = OS_USER_TAG_CAL0_FACTORY_UPDATE;  break;
+        case 1:     tag = OS_USER_TAG_CAL1_UPDATE;          break;
+        case 0:     tag = OS_USER_TAG_CAL0_UPDATE;          break;
+        default:    tag = OS_USER_TAG_CAL0_UPDATE;          break;
+    }
+
+    xQueueSend( que_ibus_hndl, &tag, NULL );
+}
+*/
+
+
 
 /*******************************************************************************
 *
@@ -92,6 +112,7 @@ task_hmi(                               const   void *          argument )
 {
     bool            received;
     os_user_tag_t   tag;
+    uint8_t *key;
     int             key_id, key_pressed;
     app_pipe_t      queue_data;
 
@@ -116,6 +137,7 @@ task_hmi(                               const   void *          argument )
     {
         received    =   xQueueReceive( que_hmi_hndl, &queue_data, pdMS_TO_TICKS(500) );
         tag = queue_data.tag;
+        key = queue_data.data;
 
         if( received )
         {
@@ -125,7 +147,7 @@ task_hmi(                               const   void *          argument )
                 case OS_USER_TAG_KEYBOARD_RECV_IDLE:
                     //if( ui_keyb_recv() > 0 )
                     {
-                        ui_keyb_read( &key_id, &key_pressed );
+                        ui_keyb_read(*key, &key_id, &key_pressed );
 
                         if( key_pressed )
                         {
@@ -139,7 +161,7 @@ task_hmi(                               const   void *          argument )
                     break;
 
                 case OS_USER_TAG_KEYBOARD_RECV_RXNE:
-                    ui_keyb_read( &key_id, &key_pressed );
+                    ui_keyb_read(*key, &key_id, &key_pressed );
 
                     if( key_pressed )
                     {

@@ -35,10 +35,6 @@ dev_init(                       dev_t *         p )
 {
     uint32_t config = 0;
     
-    p->cfg.starts_count     = p->nvm.get( NVM_REG_STARTS_COUNTER );
-    p->cfg.starts_count++;
-    p->nvm.put( NVM_REG_STARTS_COUNTER, p->cfg.starts_count );
-    
     log_init(&dev.log);
     log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_START);  
     
@@ -46,13 +42,8 @@ dev_init(                       dev_t *         p )
     econ_cal_restore(p->sens);
 
     p->cfg.lang = (l10n_lang_t) ( p->nvm.get( NVM_REG_LANGUAGE ) );
-
-    p->cfg.launch_timestamp = p->mcu->rtc.get_timestamp();
-    p->nvm.put( NVM_REG_LAUNCH_TIMESTAMP, p->cfg.launch_timestamp );
-
-    p->cfg.cal_auto_start_timestamp = p->nvm.get( NVM_REG_CAL_AUTO_START_TIMESTAMP );
-    p->cfg.cal_auto_cycle_hours     = p->nvm.get( NVM_REG_CAL_AUTO_CYCLE_HOURS );
-    p->cfg.cal_auto_flow_seconds    = p->nvm.get( NVM_REG_CAL_AUTO_FLOW_SECONDS );
+    if (p->cfg.lang >= L10N_LANG_MAX)
+      p->cfg.lang = L10N_LANG_RUSSIAN;
 
     p->cfg.display_mode             = DEV_DSPL_MODE_PERCENTS;
     //dev.log.buf         = log_buf;

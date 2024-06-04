@@ -14,8 +14,8 @@
 
 typedef enum    l10n_lang_e
 {
-    L10N_LANG_RUSSIAN           = 0,
-    L10N_LANG_ENGLISH,           
+    L10N_LANG_ENGLISH           = 0,
+    L10N_LANG_RUSSIAN,
     L10N_LANG_MAX,
 } l10n_lang_t;
 

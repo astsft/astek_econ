@@ -25,14 +25,15 @@ void ui_keyb_start(void)
 }
 
 void
-ui_keyb_read(                           int *           key_gui,
+ui_keyb_read(                           uint8_t key,
+                                        int *           key_gui,
                                         int *           key_pressed )
 {
-    uint8_t     key = dev.mcu->usart1.rxd;
+    uint8_t     key_temp = dev.mcu->usart1.rxd;
 
-    *key_pressed    = (key & 0xC0) == UI_KEY_MODE_RELEASE ? 0 : 1;
+    *key_pressed    = (key_temp & 0xC0) == UI_KEY_MODE_RELEASE ? 0 : 1;
 
-    switch( key & 0x3F )
+    switch( key_temp & 0x3F )
     {
         case UI_KEY_CODE_X:             *key_gui = GUI_KEY_ESCAPE;      break;
         case UI_KEY_CODE_V:             *key_gui = GUI_KEY_ENTER;       break;
