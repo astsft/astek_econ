@@ -7,7 +7,7 @@
 
 #include "scr\scr.h"
 #include "dev\dev.h"
-
+#include "os\os_user.h"
 
 extern  dev_t           dev;
 
@@ -388,7 +388,7 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
                         if( password.u32 == dev.safe.master.password.u32 )
                         {
                             dev.safe.user.password.u32   = 0;
-                            dev.nvm.put( NVM_REG_PASSWORD, dev.safe.user.password.u32 );
+                            send_cmd_for_nvm_write_param(NVM_REG_PASSWORD, dev.safe.user.password.u32);
                             scr_switch( SCR_IDX_SETUP_SERVICE_RESET_PASSWORD_SUCCESS, GUI_ID_BUTTON_DUMMY );
                             beep_play( BEEP_TYPE_CONFIRM );
                         }

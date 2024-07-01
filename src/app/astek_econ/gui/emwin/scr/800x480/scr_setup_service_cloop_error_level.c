@@ -8,7 +8,7 @@
 #include "DIALOG.h"
 #include "scr\scr.h"
 #include "dev\dev.h"
-
+#include "os\os_user.h"
 
 /*******************************************************************************
 * GLOBAL VARIBLES
@@ -121,11 +121,8 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                             break;
                                           case 1:   dev.cloop->error_level = HI_ERROR_LEVEL;
                                             break;                                                
-                                        }                                                  
-                                        cloop_config = dev.nvm.get( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL);
-                                        cloop_config &= 0xFFFFFF00;
-                                        cloop_config |= dev.cloop->error_level;
-                                        dev.nvm.put( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL, cloop_config);
+                                        }                                                                                                                               
+                                        send_cmd_for_nvm_write_param(NVM_REG_RANGE_ERR_LEVEL, dev.cloop->error_level);
                                         scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CURRENT_LOOP);                                 
                                         beep_play( BEEP_TYPE_CONFIRM );                                 
                                         break;
@@ -160,10 +157,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                               case 1:   dev.cloop->error_level = HI_ERROR_LEVEL;
                                                 break;                                                
                                             }                                                  
-                                            cloop_config = dev.nvm.get( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL);
-                                            cloop_config &= 0xFFFFFF00;
-                                            cloop_config |= dev.cloop->error_level;
-                                            dev.nvm.put( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL, cloop_config);
+                                            send_cmd_for_nvm_write_param(NVM_REG_RANGE_ERR_LEVEL, dev.cloop->error_level);
                                             scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CURRENT_LOOP);
                                             
                                             beep_play( BEEP_TYPE_CONFIRM );

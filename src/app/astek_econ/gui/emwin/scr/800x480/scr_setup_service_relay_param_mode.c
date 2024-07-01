@@ -8,7 +8,7 @@
 #include "DIALOG.h"
 #include "scr\scr.h"
 #include "dev\dev.h"
-
+#include "os\os_user.h"
 
 /*******************************************************************************
 * GLOBAL VARIBLES
@@ -187,19 +187,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                                 if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                                 {
                                                   dev.ext_relay->relay[0].relay_mode  = (relay_mode_e) mode;
-                                                  config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
-                                                  config &= 0xFF00FFFF;
-                                                  config |= dev.ext_relay->relay[0].relay_mode << 16;
-                                                  dev.nvm.put( NVM_REG_RELAY1_MODE_STATE_TYPE, config ); 
+                                                  config =  dev.ext_relay->relay[0].relay_mode << 16;
+                                                  config |= dev.ext_relay->relay[0].relay_state << 8;
+                                                  config |= dev.ext_relay->relay[0].thld_type;
+                                                  send_cmd_for_nvm_write_param(NVM_REG_RELAY1_MODE_STATE_TYPE, config);
                                                   scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_MODE );
                                                 }
                                                 else
                                                 {
                                                   dev.ext_relay->relay[1].relay_mode  = (relay_mode_e) mode;
-                                                  config = dev.nvm.get( NVM_REG_RELAY2_MODE_STATE_TYPE );
-                                                  config &= 0xFF00FFFF;
-                                                  config |= dev.ext_relay->relay[1].relay_mode << 16;
-                                                  dev.nvm.put( NVM_REG_RELAY2_MODE_STATE_TYPE, config ); 
+                                                  config =  dev.ext_relay->relay[1].relay_mode << 16;
+                                                  config |= dev.ext_relay->relay[1].relay_state << 8;
+                                                  config |= dev.ext_relay->relay[1].thld_type;                                                  
+                                                  send_cmd_for_nvm_write_param( NVM_REG_RELAY2_MODE_STATE_TYPE, config ); 
                                                   scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_MODE );
                                                 }
                                                 beep_play( BEEP_TYPE_CONFIRM );

@@ -52,6 +52,8 @@ typedef	struct	app_pipe_s
         os_user_tag_t           tag;
         void *                  data;
         size_t                  cnt;
+        uint32_t                param_data;
+        uint32_t                param_id;
 } app_pipe_t;
 
 

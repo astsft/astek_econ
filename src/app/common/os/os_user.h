@@ -47,7 +47,8 @@ typedef enum    sys_sync_e
     OS_USER_TAG_IBUS_BOARDS_INIT,
     OS_USER_TAG_CAL_CLOOP_SET_RANGE,
     OS_USER_TAG_KEYBOARD_RECV_IDLE,
-    OS_USER_TAG_KEYBOARD_RECV_RXNE
+    OS_USER_TAG_KEYBOARD_RECV_RXNE,
+    OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH,
     //OS_USER_TAG_CL_SENS,
     //OS_USER_TAG_THLD_1_ON,
     //OS_USER_TAG_THLD_1_OFF,
@@ -60,6 +61,7 @@ void send_cmd_for_cloop_set_raw_20mA (uint8_t channel);
 void send_cmd_for_cloop_4mA_write (uint8_t channel);
 void send_cmd_for_cloop_20mA_write (uint8_t channel);
 void send_cmd_for_cloop_write_range (void);
+void send_cmd_for_nvm_write_param (const uint32_t param_id, const uint32_t param_value);
 
 
 #endif //OS_USER_H

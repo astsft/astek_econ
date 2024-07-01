@@ -576,6 +576,11 @@ void
 scr_init( void )
 {
     GUI_Init();
+    
+    ltdc_reset_swap(0);
+    GUI_Delay(500);
+    ltdc_reset_swap(1); 
+    GUI_Delay(500);
 
     ltdc_swap_x( 1 );
     ltdc_swap_y( 1 );

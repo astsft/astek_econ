@@ -17,6 +17,9 @@
 #include "hw_config.h"
 #include "modbus.h"
 
+#ifdef EXT_FLASH
+  #include "hw2331_ext_flash.h"
+#endif
 
 /*******************************************************************************
 *
@@ -53,8 +56,13 @@ dev_t           dev =
 {
     .sens                       = &sens,
     .factory_reset              = dev_factory_reset,
+#ifdef EXT_FLASH    
+    .nvm.put                    = flash_write_param,
+    .nvm.get                    = flash_read_param,       
+#else 
     .nvm.put                    = stm32_rtc_bckp_put,
     .nvm.get                    = stm32_rtc_bckp_get,
+#endif
     .safe.master.password.u08   = {0x00,0x00,0x00,0x00,},
     .mcu                        = &dev_mcu,
 
@@ -109,8 +117,10 @@ main( void )
     stm32_rtc_init();
     stm32_fmc_init(); 
     
-    dev_init( &dev );
-
+#ifdef EXT_FLASH
+    stm32_spi2_init();
+#endif
+    
     osThreadStaticDef( START,    task_start,    osPriorityNormal,    0, configMINIMAL_STACK_SIZE,  task_stck_start,   &tcb_start   );
     task_hndl_start =   osThreadCreate( osThread( START ), NULL );
 

@@ -17,8 +17,13 @@
 #include "beep\beep.h"
 #include "app_pipe.h"
 #include "internal_uart.h"
+#include "hw_config.h"
 #include "hw_cl420.h"
 #include "hw_relay.h"
+
+#ifdef EXT_FLASH
+  #include "hw2331_ext_flash.h"
+#endif
 
 
 /*******************************************************************************
@@ -435,6 +440,7 @@ static void relay_alarm_process(uint8_t relay_num)
 {
   static uint32_t previous_warning_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   static uint32_t previous_error_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static uint32_t previous_state[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  
   static uint8_t power_on_flag[6] = {1,1,1,1,1,1};
   
   if (power_on_flag[relay_num])
@@ -442,9 +448,10 @@ static void relay_alarm_process(uint8_t relay_num)
     previous_error_status[relay_num] = ~dev.state.error_status;
     previous_warning_status[relay_num] = ~dev.state.warnings_status;
     power_on_flag[relay_num] = 0;
+    previous_state[relay_num] = dev.ext_relay->relay[relay_num].relay_state;
   }
   
-  if ((previous_error_status[relay_num] != dev.state.error_status) || (previous_warning_status[relay_num] != dev.state.warnings_status))
+  if ((previous_error_status[relay_num] != dev.state.error_status) || (previous_warning_status[relay_num] != dev.state.warnings_status) || previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)
   {  
     switch (dev.ext_relay->relay[relay_num].relay_state) {
     case NORMAL_OPEN_STATE:
@@ -467,6 +474,7 @@ static void relay_alarm_process(uint8_t relay_num)
   
   previous_warning_status[relay_num] = dev.state.warnings_status;
   previous_error_status[relay_num] = dev.state.error_status;
+  previous_state[relay_num] = dev.ext_relay->relay[relay_num].relay_state;
 
 }
 
@@ -929,6 +937,28 @@ void send_cmd_for_cloop_write_range (void)
     osDelay(3);           
 }
 
+void send_cmd_for_nvm_write_param (const uint32_t param_id, const uint32_t param_value)
+{
+#ifdef EXT_FLASH
+    BaseType_t result;  
+    app_pipe_t queue_data;  
+    queue_data.tag      = OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH; 
+    queue_data.param_id = param_id;
+    queue_data.param_data = param_value;
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);              
+#else
+    dev.nvm.put( param_id, param_value);    
+#endif  
+}
+
 /*******************************************************************************
 *
 *******************************************************************************/
@@ -941,6 +971,14 @@ vTimerCallback1SecExpired(              TimerHandle_t           xTimer )
     xQueueSend( que_ibus_hndl, &result, NULL );
 }
 
+#ifdef EXT_FLASH
+
+static void write_data_to_ext_flash(const uint32_t param_id, const uint32_t param_value)
+{
+  flash_write_param(param_id, param_value);
+}
+
+#endif
 
 /*******************************************************************************
 *
@@ -959,7 +997,8 @@ task_ibus(                      const   void *          argument )
     econ_t *        sens        = dev.sens;
     dev_cl420_t *   dev_cl420   = &(dev.cl420);
 
-
+    dev_init( &dev );
+    
     (void) argument;
 
     tmr_1sec_hndl   = xTimerCreateStatic(   "TMR1SEC",                      //const char * const pcTimerName,
@@ -1188,7 +1227,13 @@ task_ibus(                      const   void *          argument )
               internal_uart_init(19200, 8, 1.0, 'N');
               dev.cloop->link_err = cloop_set_range();  
               set_cloop_status(dev.cloop->link_err);
-              break;              
+              break;   
+              
+#ifdef EXT_FLASH
+            case OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH:
+              write_data_to_ext_flash(queue_data.param_id, queue_data.param_data);
+              break;
+#endif              
 
             default:
                 break;
