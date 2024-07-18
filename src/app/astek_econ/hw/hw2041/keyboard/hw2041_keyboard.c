@@ -63,6 +63,7 @@ stm32_usart1_rxne_hook( void )
 {
     app_pipe_t result;
     result.tag    = OS_USER_TAG_KEYBOARD_RECV_RXNE; 
+    result.data = NULL;
     
     dev.mcu->usart1.rxd = LL_USART_ReceiveData8( USART1 );
 
