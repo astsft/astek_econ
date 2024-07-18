@@ -95,7 +95,14 @@ task_hmi(                               const   void *          argument )
     os_user_tag_t   tag;
     uint8_t *key;
     int             key_id, key_pressed;
-    app_pipe_t      queue_data;
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };
 
 
     #ifdef NDEBUG
