@@ -35,6 +35,12 @@ dev_init(                       dev_t *         p )
 {
     uint32_t config = 0;
     
+    int year = dev.mcu->rtc.get_year() + 1970;
+    if (year < 2000)
+    {
+      dev.mcu->rtc.set_date(2000 - 1970, 0, 0);
+    }    
+    
     log_init(&dev.log);
     log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_START);  
     
