@@ -2624,6 +2624,12 @@
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_lcd.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_touch_int.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_i2c1.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_ltdc.c</name>
                 </file>
                 <file>
