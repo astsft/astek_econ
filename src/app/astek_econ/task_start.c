@@ -13,7 +13,7 @@
 /*******************************************************************************
 * PRIVATE CONSTANTS
 *******************************************************************************/
-#define TASK_STACK_SIZE_IBUS    1024
+#define TASK_STACK_SIZE_IBUS    5120
 #define TASK_STACK_SIZE_M2M     1024
 #define TASK_STACK_SIZE_HMI     4096
 

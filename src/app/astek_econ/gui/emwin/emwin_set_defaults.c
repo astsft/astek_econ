@@ -86,8 +86,8 @@ gui_set_defaults_standart( void )
     BUTTON_SetSkinFlexProps(&button, BUTTON_SKINFLEX_PI_FOCUSED );
 
     BUTTON_SetDefaultTextColor(     GUI_GRAY,       BUTTON_CI_DISABLED      );
-    BUTTON_SetDefaultTextColor(     GUI_BLUE,       BUTTON_CI_PRESSED       );
-    BUTTON_SetDefaultTextColor(     GUI_BLUE,       BUTTON_CI_UNPRESSED     );
+    BUTTON_SetDefaultTextColor(     GUI_WHITE,       BUTTON_CI_PRESSED       );
+    BUTTON_SetDefaultTextColor(     GUI_WHITE,       BUTTON_CI_UNPRESSED     );
 
     BUTTON_SetDefaultTextAlign(     GUI_TA_HCENTER | GUI_TA_VCENTER         );
     BUTTON_SetDefaultFont( &GUI_FontTahoma30 );

@@ -10,3 +10,8 @@ void ltdc_swap_y(uint8_t swap_flag)
 {
   stm32_ltdc_swap_y( swap_flag );
 }
+
+void ltdc_reset_swap(uint8_t swap_flag)
+{
+
+}

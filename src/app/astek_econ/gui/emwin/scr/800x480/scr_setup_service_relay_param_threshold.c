@@ -8,7 +8,7 @@
 #include "DIALOG.h"
 #include "scr\scr.h"
 #include "dev\dev.h"
-
+#include "os\os_user.h"
 #include "main.h"
 
 
@@ -429,12 +429,12 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                           dev.ext_relay->relay[0].ppm.ppm_f = level;                                 
                           dev.ext_relay->relay[0].hyst_ppm.ppm_f = (level * 5) / 100;
                           if (dev.ext_relay->relay[0].ppm.ppm_f == 0 && dev.ext_relay->relay[0].hyst_ppm.ppm_f == 0) dev.ext_relay->relay[0].hyst_ppm.ppm_f = 0.1;
-                          convert_flt_to_int_fract(dev.ext_relay->relay[0].ppm.ppm_f, &dev.ext_relay->relay[0].ppm.integral.i32, &dev.ext_relay->relay[0].ppm.fractional.i32);                          
-                          relay_config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
-                          relay_config &= 0xFFFFFF00;
+                          convert_flt_to_int_fract(dev.ext_relay->relay[0].ppm.ppm_f, &dev.ext_relay->relay[0].ppm.integral.i32, &dev.ext_relay->relay[0].ppm.fractional.i32);                                                    
+                          relay_config =  dev.ext_relay->relay[0].relay_mode << 16;
+                          relay_config |= dev.ext_relay->relay[0].relay_state << 8;
                           relay_config |= dev.ext_relay->relay[0].thld_type;
-                          dev.nvm.put( NVM_REG_RELAY1_MODE_STATE_TYPE, relay_config );                         
-                          dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, dev.ext_relay->relay[0].ppm.ppm_f );
+                          send_cmd_for_nvm_write_param(NVM_REG_RELAY1_MODE_STATE_TYPE, relay_config);                           
+                          send_cmd_for_nvm_write_param(NVM_REG_RELAY1_THRESHOLD, (uint32_t)dev.ext_relay->relay[0].ppm.ppm_f);
                         }
                         else
                         {
@@ -442,12 +442,12 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                           dev.ext_relay->relay[1].ppm.ppm_f = level;                                 
                           dev.ext_relay->relay[1].hyst_ppm.ppm_f = (level * 5) / 100;
                           if (dev.ext_relay->relay[1].ppm.ppm_f == 0 && dev.ext_relay->relay[1].hyst_ppm.ppm_f == 0) dev.ext_relay->relay[1].hyst_ppm.ppm_f = 0.1;
-                          convert_flt_to_int_fract(dev.ext_relay->relay[1].ppm.ppm_f, &dev.ext_relay->relay[1].ppm.integral.i32, &dev.ext_relay->relay[1].ppm.fractional.i32);                          
-                          relay_config = dev.nvm.get( NVM_REG_RELAY1_MODE_STATE_TYPE );
-                          relay_config &= 0xFFFFFF00;
+                          convert_flt_to_int_fract(dev.ext_relay->relay[1].ppm.ppm_f, &dev.ext_relay->relay[1].ppm.integral.i32, &dev.ext_relay->relay[1].ppm.fractional.i32);                                                   
+                          relay_config =  dev.ext_relay->relay[1].relay_mode << 16;
+                          relay_config |= dev.ext_relay->relay[1].relay_state << 8;
                           relay_config |= dev.ext_relay->relay[1].thld_type;
-                          dev.nvm.put( NVM_REG_RELAY2_MODE_STATE_TYPE, relay_config );                         
-                          dev.nvm.put( NVM_REG_RELAY2_THRESHOLD, dev.ext_relay->relay[1].ppm.ppm_f );                       
+                          send_cmd_for_nvm_write_param(NVM_REG_RELAY2_MODE_STATE_TYPE, relay_config); 
+                          send_cmd_for_nvm_write_param(NVM_REG_RELAY2_THRESHOLD, (uint32_t)dev.ext_relay->relay[1].ppm.ppm_f);
                         }
                                                                        
                         if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_THRESHOLD );

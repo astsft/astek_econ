@@ -10,7 +10,7 @@
 
 
 #define SDRAM_BASE                      0xC0000000
-#define GUI_MEMORY_COUNTOF              (16*1024*1024)
+#define GUI_MEMORY_COUNTOF              (8*1024*1024)
 
 
 #pragma data_alignment=32

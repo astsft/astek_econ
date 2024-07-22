@@ -354,7 +354,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3</state>
@@ -376,6 +376,8 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1458,7 +1460,7 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\config\emwin</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin</state>
-                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\modbus</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\common\</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3</state>
@@ -1479,6 +1481,8 @@
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\version\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2458,45 +2462,57 @@
             <group>
                 <name>hw</name>
                 <group>
-                    <name>hw2331</name>
+                    <name>hw2331r2</name>
                     <group>
                         <name>cl420</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\cl420\hw2331_cl420.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\cl420\hw2331_cl420.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>external_flash</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash\hw2331_ext_flash.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash\hw2331_ext_flash.h</name>
                         </file>
                     </group>
                     <group>
                         <name>external_uart</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\external_uart\hw2331_external_uart.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_uart\hw2331_external_uart.c</name>
                         </file>
                     </group>
                     <group>
                         <name>internal_uart</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\internal_uart\hw2331_internal_uart.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\internal_uart\hw2331_internal_uart.c</name>
                         </file>
                     </group>
                     <group>
                         <name>keyboard</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\keyboard\hw2331_keyboard.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\keyboard\hw2331_keyboard.c</name>
                         </file>
                     </group>
                     <group>
                         <name>ltdc</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\ltdc\hw2331_ltdc.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\ltdc\hw2331_ltdc.c</name>
                         </file>
                     </group>
                     <group>
                         <name>relay</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\realy\hw2331_relay.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\realy\hw2331_relay.c</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331\stm32f7xx_it.c</name>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\hw_config.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\stm32f7xx_it.c</name>
                     </file>
                 </group>
                 <file>
@@ -2579,6 +2595,15 @@
                 </file>
             </group>
             <group>
+                <name>ext_flash</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Src\flash_spi.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Inc\flash_spi.h</name>
+                </file>
+            </group>
+            <group>
                 <name>gt9xx</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\gt9xx\gt9xx_x.c</name>
@@ -2597,6 +2622,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_lcd.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_touch_int.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_i2c1.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_ltdc.c</name>

@@ -7,7 +7,7 @@
 
 #include "scr\scr.h"
 #include "dev\dev.h"
-
+#include "os\os_user.h"
 
 extern  dev_t           dev;
 
@@ -172,7 +172,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                         {
                             dev.cfg.lang    = (l10n_lang_t) lang;
                         }
-                        dev.nvm.put( NVM_REG_LANGUAGE, lang );
+                        send_cmd_for_nvm_write_param(NVM_REG_LANGUAGE, lang);
                         scr_switch( SCR_IDX_SETUP_SYSTEM, GUI_ID_BUTTON_LANGUAGE );
                         beep_play( BEEP_TYPE_CONFIRM );
                     }

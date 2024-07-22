@@ -42,8 +42,11 @@ dev_init(                       dev_t *         p )
     econ_cal_restore(p->sens);
 
     p->cfg.lang = (l10n_lang_t) ( p->nvm.get( NVM_REG_LANGUAGE ) );
-    if (p->cfg.lang >= L10N_LANG_MAX)
+    if( p->cfg.lang >= L10N_LANG_MAX )
+    {
       p->cfg.lang = L10N_LANG_RUSSIAN;
+      p->nvm.put( NVM_REG_LANGUAGE, L10N_LANG_RUSSIAN );
+    }
 
     p->cfg.display_mode             = DEV_DSPL_MODE_PERCENTS;
     //dev.log.buf         = log_buf;
@@ -143,11 +146,11 @@ dev_init(                       dev_t *         p )
    if (p->ext_relay->relay[1].ppm.ppm_f > 999999 ||  p->ext_relay->relay[1].ppm.ppm_f < 0)
    {
      p->ext_relay->relay[1].ppm.ppm_f = relay2_default_thld;
-     dev.nvm.put( NVM_REG_RELAY1_THRESHOLD, (uint32_t)(p->ext_relay->relay[1].ppm.ppm_f) );
+     dev.nvm.put( NVM_REG_RELAY2_THRESHOLD, (uint32_t)(p->ext_relay->relay[1].ppm.ppm_f) );
    }
    p->ext_relay->relay[1].hyst_ppm.ppm_f = p->ext_relay->relay[1].ppm.ppm_f * 5 / 100;
     
-    dev.cloop->error_level = dev.nvm.get( NVM_REG_RANGE_IDX_UNITS_ERR_LEVEL ) & 0x000000FF;
+    dev.cloop->error_level = dev.nvm.get( NVM_REG_RANGE_ERR_LEVEL );
     dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
     
     snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);    
@@ -178,12 +181,20 @@ dev_conf_zero_save(                     dev_t *         p )
   // Read current zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
   raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL0_TIMESTAMP);
+#else
   memcpy(&timestamp, (uint32_t*)CAL0_TIMESTAMP_ADDR, sizeof(uint32_t)); 
+#endif
   
   // Write current value to backup
   dev.nvm.put(NVM_REG_CAL0_RESTORE_PPM, ppm);
   dev.nvm.put(NVM_REG_CAL0_RESTORE_RAW, raw);
+#ifdef EXT_FLASH
+  dev.nvm.put(NVM_REG_CAL0_RESTORE_TIMESTAMP, timestamp);  
+#else  
   memcpy((uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));
+#endif
   
   p->sens->cal_back.zero.ppm.u32 = ppm;
   p->sens->cal_back.zero.ppm.i32 = (int32_t)ppm;  
@@ -194,7 +205,11 @@ dev_conf_zero_save(                     dev_t *         p )
     // Write new value
   dev.nvm.put(NVM_REG_CAL0_PPM, p->sens->cal.zero.ppm.u32);
   dev.nvm.put(NVM_REG_CAL0_RAW, p->sens->cal.zero.raw.u32);
+#ifdef EXT_FLASH
+  dev.nvm.put(NVM_REG_CAL0_TIMESTAMP, p->sens->cal.zero.timestamp.i32);    
+#else  
   memcpy((uint32_t*)CAL0_TIMESTAMP_ADDR, &(p->sens->cal.zero.timestamp.i32), sizeof (uint32_t));
+#endif
  
   return( 0 );
 }
@@ -213,12 +228,20 @@ dev_conf_span_save(                     dev_t *         p )
     // Read current span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
   raw = dev.nvm.get(NVM_REG_CAL1_RAW);
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL1_TIMESTAMP);  
+#else  
   memcpy(&timestamp, (uint32_t*)CAL1_TIMESTAMP_ADDR, sizeof(uint32_t)); 
+#endif  
   
     // Write current value to backup
   dev.nvm.put(NVM_REG_CAL1_RESTORE_PPM, ppm);
   dev.nvm.put(NVM_REG_CAL1_RESTORE_RAW, raw);
+#ifdef EXT_FLASH
+  dev.nvm.put(NVM_REG_CAL1_RESTORE_TIMESTAMP, timestamp);
+#else  
   memcpy((uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));
+#endif  
   
   p->sens->cal_back.span.ppm.u32 = ppm;
   p->sens->cal_back.span.ppm.i32 = (int32_t)ppm;  
@@ -229,7 +252,11 @@ dev_conf_span_save(                     dev_t *         p )
     // Write new value
   dev.nvm.put(NVM_REG_CAL1_PPM, p->sens->cal.span.ppm.u32);
   dev.nvm.put(NVM_REG_CAL1_RAW, p->sens->cal.span.raw.u32);
+#ifdef EXT_FLASH
+  dev.nvm.put(NVM_REG_CAL1_TIMESTAMP, p->sens->cal.span.timestamp.i32);  
+#else  
   memcpy((uint32_t*)CAL1_TIMESTAMP_ADDR, &(p->sens->cal.span.timestamp.i32), sizeof (uint32_t));
+#endif  
   
   return( 0 );
 }
@@ -253,12 +280,20 @@ dev_conf_zero_restore(                  dev_t *     p,
    // Read backup value
    ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
    raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW);
+#ifdef EXT_FLASH
+   timestamp =  dev.nvm.get(NVM_REG_CAL0_RESTORE_TIMESTAMP);
+#else   
    memcpy(&timestamp, (uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));   
+#endif   
       
    // Write backup value   
    dev.nvm.put(NVM_REG_CAL0_PPM, ppm);
-   dev.nvm.put(NVM_REG_CAL0_RAW, raw);   
+   dev.nvm.put(NVM_REG_CAL0_RAW, raw); 
+#ifdef EXT_FLASH
+   dev.nvm.put(NVM_REG_CAL0_TIMESTAMP, timestamp);    
+#else   
    memcpy((uint32_t*)CAL0_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t));   
+#endif   
   
    p->sens->cal.zero.ppm.u32 = ppm;
    p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
@@ -288,12 +323,20 @@ dev_conf_span_restore(                  dev_t *     p,
    // Read backup value
    ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
    raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);
+#ifdef EXT_FLASH
+   timestamp = dev.nvm.get(NVM_REG_CAL1_RESTORE_TIMESTAMP);
+#else   
    memcpy(&timestamp, (uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));    
+#endif   
       
    // Write backup value   
    dev.nvm.put(NVM_REG_CAL1_PPM, ppm);
-   dev.nvm.put(NVM_REG_CAL1_RAW, raw); 
+   dev.nvm.put(NVM_REG_CAL1_RAW, raw);
+#ifdef EXT_FLASH
+   dev.nvm.put(NVM_REG_CAL1_TIMESTAMP, timestamp);
+#else   
    memcpy((uint32_t*)CAL1_TIMESTAMP_ADDR, &timestamp, sizeof (uint32_t)); 
+#endif   
   
    p->sens->cal.span.ppm.u32 = ppm;
    p->sens->cal.span.ppm.i32 = (int32_t)ppm;
@@ -374,7 +417,11 @@ dev_read_cal (dev_t *     p)
   // Read current zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_PPM);
   raw = dev.nvm.get(NVM_REG_CAL0_RAW);
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL0_TIMESTAMP);
+#else  
   memcpy(&timestamp, (uint32_t*)CAL0_TIMESTAMP_ADDR, sizeof(uint32_t));
+#endif  
   
   p->sens->cal.zero.ppm.u32 = ppm;
   p->sens->cal.zero.ppm.i32 = (int32_t)ppm;
@@ -384,8 +431,12 @@ dev_read_cal (dev_t *     p)
     
   // Read current span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_PPM);
-  raw = dev.nvm.get(NVM_REG_CAL1_RAW);  
+  raw = dev.nvm.get(NVM_REG_CAL1_RAW); 
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL1_TIMESTAMP);
+#else  
   memcpy(&timestamp, (uint32_t*)CAL1_TIMESTAMP_ADDR, sizeof(uint32_t));  
+#endif  
   
   p->sens->cal.span.ppm.u32 = ppm;
   p->sens->cal.span.ppm.i32 = (int32_t)ppm;
@@ -396,7 +447,11 @@ dev_read_cal (dev_t *     p)
   // Read current backup_zero cal value
   ppm = dev.nvm.get(NVM_REG_CAL0_RESTORE_PPM);
   raw = dev.nvm.get(NVM_REG_CAL0_RESTORE_RAW); 
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL0_RESTORE_TIMESTAMP); 
+#else  
   memcpy(&timestamp, (uint32_t*)CAL0_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));
+#endif  
   
   p->sens->cal_back.zero.ppm.u32 = ppm;
   p->sens->cal_back.zero.ppm.i32 = (int32_t)ppm;  
@@ -407,7 +462,11 @@ dev_read_cal (dev_t *     p)
   // Read current backup_span cal value
   ppm = dev.nvm.get(NVM_REG_CAL1_RESTORE_PPM);
   raw = dev.nvm.get(NVM_REG_CAL1_RESTORE_RAW);  
+#ifdef EXT_FLASH
+  timestamp = dev.nvm.get(NVM_REG_CAL1_RESTORE_TIMESTAMP);  
+#else  
   memcpy(&timestamp, (uint32_t*)CAL1_RESTORE_TIMESTAMP_ADDR, sizeof(uint32_t));
+#endif  
   
   p->sens->cal_back.span.ppm.u32 = ppm;
   p->sens->cal_back.span.ppm.i32 = (int32_t)ppm;  
@@ -442,10 +501,9 @@ dev_cl420_set_range_idx(                dev_cl420_t *       p,
     if( idx < DEV_RANGE_IDX_MAX )
     {
         p->range_idx  = idx;
-        dev.nvm.put( NVM_REG_RANGE_IDX, idx );        
     }
     
-     send_cmd_for_cloop_write_range(); 
+     send_cmd_for_cloop_write_range();
 }
 
 /**
@@ -456,20 +514,17 @@ dev_cl420_set_range_idx(                dev_cl420_t *       p,
 void
 dev_cl420_set_range(                    dev_cl420_t *       p,
                                         uint32_t            ppm )
-{
+{    
     switch( p->range_idx )
     {
         case DEV_RANGE_IDX_R1:
             p->range[ 0].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R1_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R2:
             p->range[ 1].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R2_PPM, ppm );
             break;
         case DEV_RANGE_IDX_R3:
             p->range[ 2].ppm    = ppm;
-            dev.nvm.put( NVM_REG_RANGE_R3_PPM, ppm );
             break;
         default:
             break;
@@ -525,7 +580,7 @@ dev_cl420_set_units(                    dev_cl420_t *       p,  cl420_units_t   
      p->range[i].units = units;
    }
 
-	dev.nvm.put( NVM_REG_RANGE_UNITS, units );
+   send_cmd_for_nvm_write_param(NVM_REG_RANGE_UNITS, units);
 }
 
 void convert_flt_to_int_fract (float flt, int32_t *integ, int32_t *fract)
