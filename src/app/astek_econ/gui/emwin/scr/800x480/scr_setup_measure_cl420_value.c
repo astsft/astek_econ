@@ -85,7 +85,7 @@ init_listwheel(                                         WM_HWIN         hWin,
         LISTWHEEL_SetRBorder(   hWin,  20                                       );
         LISTWHEEL_SetTextAlign( hWin,  GUI_TA_HCENTER | GUI_TA_VCENTER          );
         LISTWHEEL_SetTextColor( hWin,  LISTWHEEL_CI_UNSEL,     GUI_GRAY         );
-        LISTWHEEL_SetTextColor( hWin,  LISTWHEEL_CI_SEL,       GUI_BLUE         );
+        LISTWHEEL_SetTextColor( hWin,  LISTWHEEL_CI_SEL,       GUI_WHITE         );
 
         for( int i = 0; i < list_countof; i++ )
         {

@@ -99,7 +99,7 @@ init_dialog(                                            WM_HWIN         hWin )
     hItem   = WM_GetDialogItem( hWin, GUI_ID_RADIO0 );
     RADIO_SetBkColor(       hItem,  GUI_TRANSPARENT                         );
     RADIO_SetFont(          hItem,  &GUI_FontTahoma30                       );
-    RADIO_SetTextColor( hItem, GUI_BLUE                                );
+    RADIO_SetTextColor( hItem, GUI_WHITE                                );
     RADIO_SetText( hItem, " R1:  ", 0 );
     RADIO_SetText( hItem, " R2:  ", 1 );
     RADIO_SetText( hItem, " R3:  ", 2 );

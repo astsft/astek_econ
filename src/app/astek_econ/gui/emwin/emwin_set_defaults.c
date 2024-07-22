@@ -95,7 +95,7 @@ gui_set_defaults_standart( void )
     // CHECKBOX
     CHECKBOX_SetDefaultFont(  &GUI_FontTahoma30 );
     CHECKBOX_SetDefaultAlign( GUI_TA_HCENTER | GUI_TA_VCENTER );
-    CHECKBOX_SetDefaultTextColor( GUI_BLUE );
+    CHECKBOX_SetDefaultTextColor( GUI_WHITE );
     CHECKBOX_SetDefaultFocusColor( GUI_GRAY );
 
     CHECKBOX_SetDefaultImage( &_abmXL[0], CHECKBOX_BI_INACTIV_CHECKED       );
@@ -212,7 +212,7 @@ gui_set_defaults_neon( void )
     // CHECKBOX ////////////////////////////////////////////////////////////////
     CHECKBOX_SetDefaultFont(  &GUI_FontTahoma30 );
     CHECKBOX_SetDefaultAlign( GUI_TA_HCENTER | GUI_TA_VCENTER );
-    CHECKBOX_SetDefaultTextColor( GUI_BLUE );
+    CHECKBOX_SetDefaultTextColor( GUI_WHITE );
     CHECKBOX_SetDefaultFocusColor( GUI_GRAY );
 
     CHECKBOX_SetDefaultImage( &_abmXL[0], CHECKBOX_BI_INACTIV_CHECKED       );

@@ -53,7 +53,7 @@ init_dialog(                                            WM_HWIN         hWin )
         hRadio_0   = RADIO_CreateEx(  350, 80, 125, 240, hWin, WM_CF_SHOW, 0, GUI_ID_RADIO0, 2, 120 );
         RADIO_SetBkColor(       hRadio_0,  GUI_TRANSPARENT                         );
         RADIO_SetFont(          hRadio_0,  &GUI_FontTahoma30                       );
-        RADIO_SetTextColor( hRadio_0, GUI_BLUE                                );
+        RADIO_SetTextColor( hRadio_0, GUI_WHITE                                );
         RADIO_SetFocusColor( hRadio_0, GUI_BLACK                                     ); 
         RADIO_SetText( hRadio_0, l10n_str_get( dev.cfg.lang, L10N_STR_ID_CLOOP_3MA ) , 0 );
         RADIO_SetText( hRadio_0, l10n_str_get( dev.cfg.lang, L10N_STR_ID_CLOOP_22MA ) , 1 );

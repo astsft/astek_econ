@@ -107,23 +107,18 @@ update( WM_HWIN         hWin )
 {
     WM_HWIN     hItem;
     char        str[64];
-    //int32_t     ppb         = (dev.sens->meas.ppb_hi << 16) | (dev.sens->meas.ppb_lo & 0xFFFF);
-    //uint32_t    adc_raw     = (dev.sens->meas.adc_raw_hi << 16) | (dev.sens->meas.adc_raw_lo & 0xFFFF);
+
     int32_t     ppm     = dev.sens->meas.ppm.integral;
     uint32_t    adc_raw = dev.sens->meas.raw;
 
     hItem   = WM_GetDialogItem( hWin, GUI_ID_PROGBAR0 );
-    //PROGBAR_SetValue( hItem, adc_raw >> 8 );
     PROGBAR_SetValue( hItem, ppm / 10000 );    
 
-    //snprintf( str, sizeof(str), "%i\0", ppm );
     snprintf( str, sizeof(str), "%4d.%02u", ppm / 10000, ( abs(ppm) % 10000) / 100 );
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_MEAS_LABEL );
     TEXT_SetText( hItem, str );
 
-    //snprintf( str, sizeof(str), "%3.2f\0", dev.sens->temp_digc.f32 );
-    snprintf( str, sizeof(str), "% 3d.%01d", dev.sens->meas.digc.integral, dev.sens->meas.digc.fractional );
-    //snprintf( str, sizeof(str), "% 3d.%01d", dev.sens->meas.temp_digc.i, dev.sens->meas.temp_digc.f );
+    snprintf( str, sizeof(str), "% 3d.%01d", dev.sens->meas.digc.integral, (dev.sens->meas.digc.fractional *10 + 5) / 100 );
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT1 );
     TEXT_SetText( hItem, str );
 

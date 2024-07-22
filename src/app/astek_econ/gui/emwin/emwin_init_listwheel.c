@@ -26,8 +26,8 @@ gui_init_listwheel(                     WM_HWIN         hWin,
 
     LISTWHEEL_SetFont(      hItem,  &GUI_FontTahoma30                        );
     LISTWHEEL_SetTextAlign( hItem,  GUI_TA_HCENTER | GUI_TA_VCENTER          );
-    LISTWHEEL_SetTextColor( hItem,  LISTWHEEL_CI_UNSEL,     GUI_BLUE         );
-    LISTWHEEL_SetTextColor( hItem,  LISTWHEEL_CI_SEL,       GUI_BLUE         );
+    LISTWHEEL_SetTextColor( hItem,  LISTWHEEL_CI_UNSEL,     GUI_WHITE         );
+    LISTWHEEL_SetTextColor( hItem,  LISTWHEEL_CI_SEL,       GUI_WHITE         );
     LISTWHEEL_SetBkColor(   hItem,  LISTWHEEL_CI_UNSEL,     GUI_TRANSPARENT  );
     LISTWHEEL_SetBkColor(   hItem,  LISTWHEEL_CI_SEL,       GUI_TRANSPARENT  );
 
