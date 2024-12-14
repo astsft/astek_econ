@@ -13,8 +13,14 @@
 #include <stdbool.h>
 #include <string.h>
 
-
+#define TOUCH_GT9xx_I2C_ADDRESS       0xBA
+#define TOUCH_GT9xx_I2C_ADDRESS_ALT   0x28
 #define GT9XX_CONFIG_SIZE       (0x8100 - 0x8047)       //185
+
+extern uint8_t gt9xx_i2c_addr;
+
+extern uint8_t gt911_cfg_data[ GT9XX_CONFIG_SIZE ];
+extern uint8_t gt911_cfg_data_rotate180[ GT9XX_CONFIG_SIZE ];
 
 
 typedef enum    gt9xx_reg_e
@@ -94,10 +100,13 @@ int
 gt9xx_read( uint16_t reg, uint8_t* buf, uint8_t len );
 */
 int
-gt9xx_config_upload( uint8_t * data );
+gt9xx_config_upload( uint8_t addr, uint8_t * data );
 
 int
 gt9xx_checksum( const uint8_t * data, size_t size );
+
+int
+gt9xx_reverseXY(uint8_t addr, uint8_t reverse_byte);
 
 
 /*******************************************************************************
@@ -105,8 +114,8 @@ gt9xx_checksum( const uint8_t * data, size_t size );
 *******************************************************************************/
 extern  int     gt9xx_x_init( void );
 extern  void    gt9xx_x_enable( const bool );
-extern  int     gt9xx_x_write( uint16_t reg, uint8_t* buf, uint8_t len );
-extern  int     gt9xx_x_read( uint16_t reg, uint8_t* buf, uint8_t len );
+extern  int     gt9xx_x_write( uint8_t addr, uint16_t reg, uint8_t* buf, uint8_t len );
+extern  int     gt9xx_x_read( uint8_t addr, uint16_t reg, uint8_t* buf, uint8_t len );
 
 void gt9xx_x_i2c_ev_isr( void );
 void gt9xx_x_i2c_er_isr( void );

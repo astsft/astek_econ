@@ -137,7 +137,7 @@ gui_set_defaults_standart( void )
     radio.aColorButton[ 0]  = GUI_GRAY;             //Outer color of button frame.
     radio.aColorButton[ 1]  = GUI_GRAY;             //Middle color of button frame.
     radio.aColorButton[ 2]  = GUI_DARKGRAY;         //Inner color of button frame.
-    radio.aColorButton[ 3]  = GUI_DARKBLUE;         //Inner color of button.
+    radio.aColorButton[ 3]  = GUI_WHITE;         //Inner color of button.
     radio.ButtonSize        = 26;                   //Size of the button in pixels.
     RADIO_SetSkinFlexProps( &radio, RADIO_SKINFLEX_PI_PRESSED );
 

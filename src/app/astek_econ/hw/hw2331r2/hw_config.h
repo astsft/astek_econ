@@ -13,4 +13,6 @@
 
 #define EXT_FLASH
 
+#define REVERSE_TOUCH_BYTE              0xFD
+
 #endif	//_HW2331_CONFIG_H_

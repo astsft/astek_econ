@@ -27,8 +27,8 @@ extern QueueHandle_t            que_hmi_hndl;
 * PROTOTYPES
 *******************************************************************************/
 int     gt9xx_x_init( void );
-int     gt9xx_x_write( uint16_t reg, uint8_t* buf, uint8_t len );
-int     gt9xx_x_read( uint16_t reg, uint8_t* buf, uint8_t len );
+int     gt9xx_x_write(uint8_t addr, uint16_t reg, uint8_t* buf, uint8_t len );
+int     gt9xx_x_read(uint8_t addr, uint16_t reg, uint8_t* buf, uint8_t len );
 void    gt9xx_x_i2c_ev_isr( void );
 void    gt9xx_x_i2c_er_isr( void );
 
@@ -144,7 +144,8 @@ gt9xx_x_init( void )
  * @brief
  */
 int
-gt9xx_x_write(                                  uint16_t        reg,
+gt9xx_x_write(                                  uint8_t         addr,
+                                                uint16_t        reg,
                                                 uint8_t *       buf,
                                                 uint8_t         len )
 {
@@ -188,7 +189,8 @@ gt9xx_x_write(                                  uint16_t        reg,
  * @brief
  */
 int
-gt9xx_x_read(                                   uint16_t        reg,
+gt9xx_x_read(                                   uint8_t         addr,
+                                                uint16_t        reg,
                                                 uint8_t *       buf,
                                                 uint8_t         len )
 {
