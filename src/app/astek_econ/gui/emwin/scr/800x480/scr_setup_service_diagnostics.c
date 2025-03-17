@@ -35,7 +35,10 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 
     { TEXT_CreateIndirect,      "",         GUI_ID_TEXT_RAW_VALUE,      400,  32, 200,  32, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      " RAW",     GUI_ID_TEXT_RAW_LABEL,      600,  32, 100,  32, 0, 0x0, 0 },
-    
+
+    { TEXT_CreateIndirect,      "",         GUI_ID_TEXT2,               400,  64, 200,  32, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      " T RAW",   GUI_ID_TEXT3,               600,  64, 100,  32, 0, 0x0, 0 },
+        
     { TEXT_CreateIndirect,      "",         GUI_ID_TEXT_REAL_FW_VER,    50,  270, 896,  32, 0, 0x0, 0 },
 
     { BUTTON_CreateIndirect,    "",         GUI_ID_BUTTON_BACK,           0, 320, 800,  80, 0, 0x0, 0 },
@@ -74,21 +77,18 @@ void    init_dialog(                                    WM_HWIN         hWin )
     scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_MEAS_VALUE ) );
     scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT1           ) );
     scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_DIGC       ) );
-    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT2           ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_PRES_VALUE ) );
-    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT3           ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_MCU_DIGC   ) );
-    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT4           ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_MCU_VDDA   ) );
 
     scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT_RAW_VALUE  ) );
     scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_RAW_LABEL  ) );
-    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT_DEC_VALUE  ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_DEC_LABEL  ) );
-    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT_mV_VALUE   ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_mV_LABEL   ) );
     scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_REAL_FW_VER ) );
+    
+    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT2  ) );
+    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT3  ) );        
+
+    
     TEXT_SetText( WM_GetDialogItem( hWin, GUI_ID_TEXT_REAL_FW_VER ), dev.info.real_firmware_id );    
+    
+   
 
     ////////////////////////////////////////////////////////////////////////////
     // FOOTER AREA
@@ -147,6 +147,10 @@ update( WM_HWIN         hWin )
     snprintf( str, sizeof(str), "%d\0", dev.sens->meas.raw );
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_RAW_VALUE );
     TEXT_SetText( hItem, str );
+    
+    snprintf( str, sizeof(str), "%d\0", dev.sens->meas.raw_t );
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT2 );
+    TEXT_SetText( hItem, str );  
 
     //snprintf( str, sizeof(str), "%d\0", dev.sens->meas.adc_mV );
     //snprintf( str, sizeof(str), "0\0" );

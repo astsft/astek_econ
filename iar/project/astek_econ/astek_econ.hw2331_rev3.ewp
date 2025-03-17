@@ -1336,6 +1336,7 @@
                     <state>USE_FULL_LL_DRIVER</state>
                     <state>WF70A2SZAGDNN0</state>
                     <state>NDEBUG</state>
+                    <state>EKON_2025</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1798,7 +1799,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>1</hasPrio>
+                <hasPrio>112</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>

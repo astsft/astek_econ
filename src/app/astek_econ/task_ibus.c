@@ -165,6 +165,24 @@ modbus_client_write(                    const   uint8_t         dev_addr,
 
     return( 0 );
 }
+static char chardig (char v)
+{
+  v-='0';
+  if(v>41) return v-39;
+  if(v>9) return v-7;
+  return v;
+}
+
+static char LRC (char *str)
+{
+  char val=0;
+  while (*str)
+  {
+    val+=(chardig(*str)<<4)|chardig(*(str+1));
+    str+=2;
+  }
+  return (char)(-((signed char)val));
+}
 
 static
 int
@@ -177,12 +195,41 @@ modbus_ascii_client_read( void )
     volatile    uint32_t        cnt;
     volatile    size_t          len;
 
+#ifdef EKON_2025     
+                char            str[]   = ":010300270002D3\r\n";
+#else
                 char            str[]   = ":010300000002FA\r\n";
+#endif
+                //":010300000002FA\r\n" :-cmd, 01-addr, 03-fun, 0000-PAdr, 0002-PNum, FA-CRC, \r\n - CRLF
 
                 int             meas;
                 int             temp;
                 int             lrc;
+                
+                typedef union 
+                {
+                  float           d_f;
+                  uint32_t        d_u;
+                } data_t;               
+                
+                data_t          meas_t;
+                data_t          temp_t;                
+                
+    //0x4146B9EC - raw O2 (float) (12.42039)
+    //0x442b2ccd - temp 684.7
 
+    //char test[]   = ":0103084146B9EC442B2CCDFC\r\n";
+    //sscanf((char *) test, ":010308%08x%08x%02x\r\n", &meas_t.d_u, &temp_t.d_u, &lrc );   
+    //meas = (int)(meas_t.d_f*1000);
+    //temp = (int)(temp_t.d_f*10);  
+    //            
+    //dev.sens->meas.raw          = meas;
+    //dev.sens->meas.raw_t        = temp_t.d_u;   
+    //dev.sens->meas.raw_t_conv   = temp;                   
+    //
+    //memcpy(dev.sens->meas.get_str, test, 25);
+                    
+    //lrc = LRC("010300270002");               
 
     strncpy( (char *) mdbs_adu_xmit, str, sizeof(str) );
 
@@ -214,22 +261,20 @@ modbus_ascii_client_read( void )
         //}
         //TRACE( "\n" );
 
-        sscanf( (char *) mdbs_adu_recv, ":010304%04x%04x%02x\r\n", &meas, &temp, &lrc );
-
-        //uint32_t    ppm = meas * 10;
-        //TRACE( "meas: %d\ttemp: %d\tlrc: %02X\tppm: %d\n", meas, temp, lrc, ppm );
-
+#ifdef EKON_2025
+         sscanf((char *) mdbs_adu_recv, ":010308%08x%08x%02x\r\n", &temp_t.d_u, &meas_t.d_u, &lrc );   
+         meas = (int)(meas_t.d_f*1000);
+         temp = (int)(temp_t.d_f*10);          
+#else
+         sscanf( (char *) mdbs_adu_recv, ":010304%04x%04x%02x\r\n", &meas, &temp, &lrc );         
+#endif        
+            
         dev.sens->meas.raw          = meas;
+        dev.sens->meas.raw_t        = temp;   
         dev.sens->meas.ppm.integral = econ_raw2ppm( dev.sens, meas );
 
         dev.sens->meas.digc.integral    = temp / 10;
         dev.sens->meas.digc.fractional  = temp % 10;
-
-
-        //if( len != MDBS_ERR_NONE )
-        //{
-        //    return( -3 );
-        //}
     }
 
     return( 0 );

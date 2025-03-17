@@ -40,6 +40,7 @@ typedef struct  econ_cal_s
 typedef struct  econ_meas_s
 {
     uint32_t            raw;
+    uint32_t            raw_t;     
     uint16_t            mV;
 
     struct
