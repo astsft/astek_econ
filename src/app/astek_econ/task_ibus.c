@@ -229,7 +229,7 @@ modbus_ascii_client_read( void )
     //
     //memcpy(dev.sens->meas.get_str, test, 25);
                     
-    //lrc = LRC("010300270002");               
+    //lrc = LRC("010300270002");                          
 
     strncpy( (char *) mdbs_adu_xmit, str, sizeof(str) );
 

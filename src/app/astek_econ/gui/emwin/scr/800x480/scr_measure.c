@@ -67,7 +67,7 @@ scr_update(                             WM_HWIN         hWin,
             break;
     }
 
-    snprintf(   str, sizeof(str), "% 3i.%01u °C", temp_digc_i, (temp_digc_f*10 + 5) / 100 );
+    snprintf(   str, sizeof(str), "% 3i.%01u °C", temp_digc_i, temp_digc_f );
     TEXT_SetText( WM_GetDialogItem( hWin, GUI_ID_TEXT_TEMP_VALUE ), str );
     TEXT_SetTextColor( WM_GetDialogItem(hWin, GUI_ID_TEXT_TEMP_VALUE), dev.sens->link_err ? GUI_GRAY : GUI_LIGHTGREEN );
 

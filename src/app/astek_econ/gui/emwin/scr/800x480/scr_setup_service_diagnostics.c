@@ -118,7 +118,7 @@ update( WM_HWIN         hWin )
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_MEAS_LABEL );
     TEXT_SetText( hItem, str );
 
-    snprintf( str, sizeof(str), "% 3d.%01d", dev.sens->meas.digc.integral, (dev.sens->meas.digc.fractional *10 + 5) / 100 );
+    snprintf( str, sizeof(str), "% 3d.%01u", dev.sens->meas.digc.integral, dev.sens->meas.digc.fractional);
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT1 );
     TEXT_SetText( hItem, str );
 
