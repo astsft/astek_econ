@@ -22,7 +22,6 @@ extern uint8_t gt9xx_i2c_addr;
 extern uint8_t gt911_cfg_data[ GT9XX_CONFIG_SIZE ];
 extern uint8_t gt911_cfg_data_rotate180[ GT9XX_CONFIG_SIZE ];
 
-
 typedef enum    gt9xx_reg_e
 {
         GT9XX_REG_COMMAND                       = 0x8040,

@@ -1336,7 +1336,6 @@
                     <state>USE_FULL_LL_DRIVER</state>
                     <state>WF70A2SZAGDNN0</state>
                     <state>NDEBUG</state>
-                    <state>EKON_2025</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1453,7 +1452,7 @@
                 </option>
                 <option>
                     <name>PreInclude</name>
-                    <state></state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\preconfig.h</state>
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
@@ -1799,7 +1798,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>112</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
