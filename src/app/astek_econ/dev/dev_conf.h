@@ -43,6 +43,7 @@ typedef struct  dev_cfg_s
     bool                        cal_autolaunch;
     bool                        sens_t_compensation;
     bool                        sens_p_compensation;
+    uint16_t                    error_filter_count;
     //bool                        cal_zero;
     //dev_union_t           password;
     //dev_mode_t      mode;
@@ -51,6 +52,21 @@ typedef struct  dev_cfg_s
     //time_t          cal_auto_start_timestamp;
     //uint32_t        cal_auto_cycle_hours;
     //uint32_t        cal_auto_flow_seconds;
+    union ext_mdbs_cfg_u
+    {
+      uint32_t ext_mdbs_cfg_param;
+      
+      struct  ext_mdbs_cfg_s
+      {
+        uint32_t stop_bits: 2;
+        uint32_t parity: 2;
+        uint32_t data_width: 2;
+        uint32_t baudrate: 4;
+        uint32_t rtu_addr: 8;
+        uint32_t tcp_addr: 8;        
+      }ext_mdbs_cfg;
+    };
+    
 } dev_cfg_t;
 
 

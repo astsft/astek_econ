@@ -4,3 +4,6 @@
 [submodule "src/bsp/hw2331_rev3"]
 	path = src/bsp/hw2331_rev3
 	url = git@github.com:astsft/ascon_bsp_hw2331_rev3.git
+[submodule "src/lib/astsoft/modbus"]
+	path = src/lib/astsoft/modbus
+	url = git@github.com:astsft/modbus.git

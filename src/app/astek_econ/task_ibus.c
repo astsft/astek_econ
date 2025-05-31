@@ -17,13 +17,15 @@
 #include "beep\beep.h"
 #include "app_pipe.h"
 #include "internal_uart.h"
-#include "hw_config.h"
 #include "hw_cl420.h"
 #include "hw_relay.h"
 
 #ifdef EXT_FLASH
   #include "hw2331_ext_flash.h"
 #endif
+
+#define PROBE_SWITCH   EXTERNAL_7
+#define PROCESS_SWITCH EXTERNAL_8
 
 
 /*******************************************************************************
@@ -323,16 +325,6 @@ int modbus_send_receive_data (uint8_t *mdbs_send_buf, size_t adu_len, size_t *re
 /*******************************************************************************
 * RELAY PROCESS
 *******************************************************************************/
-typedef enum 
-{
-  EXTERNAL_1 = 0x00,
-  EXTERNAL_2,
-  EXTERNAL_3,
-  EXTERNAL_4,
-  EXTERNAL_5,
-  EXTERNAL_6,  
-} Outputs_swithes_e;
-
 static void send_cmd_for_relay_open (uint8_t relay_num)
 {
     dev.ext_relay->link_err = relay_set_state(relay_num, false);
@@ -340,8 +332,7 @@ static void send_cmd_for_relay_open (uint8_t relay_num)
 }
 
 static void send_cmd_for_relay_close (uint8_t relay_num)
-{
-  
+{  
     dev.ext_relay->link_err = relay_set_state(relay_num, true);
     set_ext_relay_status(dev.ext_relay->link_err);   
 }
@@ -362,6 +353,10 @@ static void set_external_switch_open (uint8_t external_num)
     break;
   case EXTERNAL_6:     send_cmd_for_relay_open(EXTERNAL_6);
     break;    
+  case EXTERNAL_7:     send_cmd_for_relay_open(EXTERNAL_7);
+    break;    
+  case EXTERNAL_8:     send_cmd_for_relay_open(EXTERNAL_8);
+    break;        
   }
 }
 
@@ -380,13 +375,17 @@ static void set_external_switch_close (uint8_t external_num)
     break;
   case EXTERNAL_6:      send_cmd_for_relay_close(EXTERNAL_6);
     break;    
+  case EXTERNAL_7:      send_cmd_for_relay_close(EXTERNAL_7);
+    break;    
+  case EXTERNAL_8:      send_cmd_for_relay_close(EXTERNAL_8);    
+    break;
   }
 }
 
 
 static void relay_threshold_process(uint8_t relay_num)
 {
-  static relay_position_e previous_position[6] = {UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION};
+  static relay_position_e previous_position[8] = {UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION};
   
   int32_t     meas_ppm = dev.sens->meas.ppm.integral;
   int32_t     thres_ppm =  (int32_t)dev.ext_relay->relay[relay_num].ppm.ppm_f;
@@ -483,10 +482,10 @@ static void relay_threshold_process(uint8_t relay_num)
 
 static void relay_alarm_process(uint8_t relay_num)
 {
-  static uint32_t previous_warning_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  static uint32_t previous_error_status[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  static uint32_t previous_state[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  
-  static uint8_t power_on_flag[6] = {1,1,1,1,1,1};
+  static uint32_t previous_warning_status[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static uint32_t previous_error_status[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static uint32_t previous_state[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  
+  static uint8_t power_on_flag[8] = {1,1,1,1,1,1,1,1};
   
   if (power_on_flag[relay_num])
   {
@@ -496,20 +495,23 @@ static void relay_alarm_process(uint8_t relay_num)
     previous_state[relay_num] = dev.ext_relay->relay[relay_num].relay_state;
   }
   
-  if ((previous_error_status[relay_num] != dev.state.error_status) || (previous_warning_status[relay_num] != dev.state.warnings_status) || previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)
+  //if ((previous_error_status[relay_num] != dev.state.error_status) || (previous_warning_status[relay_num] != dev.state.warnings_status) || previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)
+  if ((previous_error_status[relay_num] != dev.state.error_status) || previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)  
   {  
     switch (dev.ext_relay->relay[relay_num].relay_state) {
     case NORMAL_OPEN_STATE:
         // 1. Check alarm or not
         // 2. set state
-        if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
+        //if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
+        if (dev.state.error_status != 0)      
           set_external_switch_close(relay_num); 
         else
           set_external_switch_open(relay_num); // no error
       break;
       
     case NORMAL_CLOSE_STATE:
-        if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
+        //if ((dev.state.warnings_status != 0) || (dev.state.error_status != 0))
+        if (dev.state.error_status != 0)      
           set_external_switch_open(relay_num); 
         else 
           set_external_switch_close(relay_num); // no error
@@ -525,7 +527,7 @@ static void relay_alarm_process(uint8_t relay_num)
 
 static void relay_not_active_process(uint8_t relay_num)
 {
-  static relay_state_e previous_state[6] = {UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE};
+  static relay_state_e previous_state[8] = {UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE};
   
   if (previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state)
   {  
@@ -566,10 +568,10 @@ static void relay_process (uint8_t relay_num)
 static void relays_process(void)
 {
   // Relay 0
-  relay_process(0);
+  relay_process(EXTERNAL_1);
     
   // Relay 1
-  relay_process(1);  
+  relay_process(EXTERNAL_2);  
 }
 
 static 
@@ -620,15 +622,14 @@ sensor_init(                                    sens_t *            p )
 {
     int     err;
 
-
-    err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0000, 16, dev.sens->info.raw );
+    err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0000, 32, dev.sens->info.raw );
     TRACE("%d\t", err); for(int i = 0; i < 16; i++){TRACE("%04X", *(dev.sens->info.raw+i));} TRACE("\n");
     if( err )
     {
         return( err );
     }
 
-    err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0200, 16, dev.sens->conf.raw );
+    err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0200, 32, dev.sens->conf.raw );  
     TRACE("%d\t", err); for(int i = 0; i < 16; i++){TRACE("%04X", *(dev.sens->conf.raw+i));} TRACE("\n");
     if( err )
     {
@@ -683,8 +684,11 @@ cl420_ch1_update(                       dev_cl420_t *   p,
     int32_t     ppm         = sens->meas.ppm.integral;
     uint32_t    range_ppm   = p->range[ p->range_idx ].ppm;
     if (ppm < 0) ppm = 0;
+    uint64_t temp_uA = 4000 + (16000 * (int64_t)ppm) / (int64_t)range_ppm;
+    if (temp_uA > 0xFFFFFFFF)
+      temp_uA = 0xFFFFFFFF;
 
-    p->range[ p->range_idx ].mb_output.uA   = 4000 + (16000 * ppm) / range_ppm;
+    p->range[ p->range_idx ].mb_output.uA   = temp_uA;
     
     if (p->range[ p->range_idx ].mb_output.uA < MIN_LOW_CURRENT_LEVEL) p->range[ p->range_idx ].mb_output.uA = MIN_LOW_CURRENT_LEVEL; 
   
@@ -846,7 +850,7 @@ cloop_init (void)
 *******************************************************************************/
 void
 task_ibus_sens_conf_lpf_update( const   uint16_t        cutoff,
-                                const   uint16_t        order )
+                                const   uint16_t        order)
 {
     app_pipe_t result;
     result.tag    = OS_USER_TAG_SENS_CONF_FILTER;
@@ -966,6 +970,28 @@ void send_cmd_for_cloop_20mA_write (uint8_t channel)
     osDelay(3);       
 }
 
+void send_cmd_for_cloop_set_current (uint8_t channel, uint32_t uA)
+{
+    BaseType_t result;  
+    app_pipe_t queue_data;  
+    if (channel == 1)
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_CURRENT;          
+    else
+      queue_data.tag      = OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_CURRENT;
+    
+    queue_data.param_data = uA;
+    
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);    
+}
+
 void send_cmd_for_cloop_write_range (void)
 {
     BaseType_t result;  
@@ -1017,7 +1043,6 @@ vTimerCallback1SecExpired(              TimerHandle_t           xTimer )
 }
 
 #ifdef EXT_FLASH
-
 static void write_data_to_ext_flash(const uint32_t param_id, const uint32_t param_value)
 {
   flash_write_param(param_id, param_value);
@@ -1274,6 +1299,15 @@ task_ibus(                      const   void *          argument )
               set_cloop_status(dev.cloop->link_err);
               break;   
               
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_CURRENT:
+              dev.cloop->link_err = cloop_set_uA(1, queue_data.param_data);
+              set_cloop_status(dev.cloop->link_err);
+            break;
+
+            case OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_CURRENT:
+              dev.cloop->link_err = cloop_set_uA(2, queue_data.param_data);              
+              set_cloop_status(dev.cloop->link_err);
+            break;
 #ifdef EXT_FLASH
             case OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH:
               write_data_to_ext_flash(queue_data.param_id, queue_data.param_data);

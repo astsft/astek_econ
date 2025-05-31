@@ -1450,7 +1450,7 @@
                 </option>
                 <option>
                     <name>PreInclude</name>
-                    <state></state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\preconfig.h</state>
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
@@ -2267,28 +2267,13 @@
                     <group>
                         <name>font</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_100.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma150.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_150.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma30.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_200.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_30_unicode_custom.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_40_unicode_custom.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_50.c</name>
-                            <excluded>
-                                <configuration>debug</configuration>
-                            </excluded>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_75.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma40.c</name>
                         </file>
                     </group>
                     <group>
@@ -2348,6 +2333,9 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_cal.c</name>
@@ -2423,9 +2411,6 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_status_bar.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\src_setup_service_cloop.c</name>
                             </file>
                         </group>
                         <file>

@@ -254,7 +254,7 @@ gui_set_defaults_neon( void )
     radio.aColorButton[ 0]  = GUI_GRAY;             //Outer color of button frame.
     radio.aColorButton[ 1]  = GUI_GRAY;             //Middle color of button frame.
     radio.aColorButton[ 2]  = GUI_DARKGRAY;         //Inner color of button frame.
-    radio.aColorButton[ 3]  = GUI_DARKBLUE;         //Inner color of button.
+    radio.aColorButton[ 3]  = GUI_WHITE;         //Inner color of button.
     radio.ButtonSize        = 26;                   //Size of the button in pixels.
     RADIO_SetSkinFlexProps( &radio, RADIO_SKINFLEX_PI_PRESSED );
 
@@ -326,7 +326,7 @@ gui_set_defaults_lite( void )
 
     BUTTON_SetDefaultTextColor(     GUI_GRAY,       BUTTON_CI_DISABLED      );
     BUTTON_SetDefaultTextColor(     GUI_WHITE,      BUTTON_CI_PRESSED       );
-    BUTTON_SetDefaultTextColor(     GUI_BLUE,       BUTTON_CI_UNPRESSED     );
+    BUTTON_SetDefaultTextColor(     GUI_WHITE,       BUTTON_CI_UNPRESSED     );
     BUTTON_SetDefaultFocusColor( GUI_WHITE );
 
     //BUTTON_SetDefaultTextColor(     GUI_BLUE,       BUTTON_SKINFLEX_PI_PRESSED     );
@@ -340,7 +340,7 @@ gui_set_defaults_lite( void )
     // CHECKBOX ////////////////////////////////////////////////////////////////
     CHECKBOX_SetDefaultFont(  &GUI_FontTahoma30 );
     CHECKBOX_SetDefaultAlign( GUI_TA_HCENTER | GUI_TA_VCENTER );
-    CHECKBOX_SetDefaultTextColor( GUI_BLUE );
+    CHECKBOX_SetDefaultTextColor( GUI_WHITE );
     CHECKBOX_SetDefaultFocusColor( GUI_GRAY );
 
     CHECKBOX_SetDefaultImage( &_abmXL[0], CHECKBOX_BI_INACTIV_CHECKED       );
@@ -382,7 +382,7 @@ gui_set_defaults_lite( void )
     radio.aColorButton[ 0]  = GUI_GRAY;             //Outer color of button frame.
     radio.aColorButton[ 1]  = GUI_GRAY;             //Middle color of button frame.
     radio.aColorButton[ 2]  = GUI_DARKGRAY;         //Inner color of button frame.
-    radio.aColorButton[ 3]  = GUI_DARKBLUE;         //Inner color of button.
+    radio.aColorButton[ 3]  = GUI_WHITE;         //Inner color of button.
     radio.ButtonSize        = 26;                   //Size of the button in pixels.
     RADIO_SetSkinFlexProps( &radio, RADIO_SKINFLEX_PI_PRESSED );
 
@@ -402,7 +402,7 @@ gui_set_defaults_lite( void )
 
     SPINBOX_SetDefaultSkinClassic();
 
-    SWIPELIST_SetDefaultFont( SWIPELIST_FI_SEP_ITEM,    &GUI_FontTahoma40 );
+    SWIPELIST_SetDefaultFont( SWIPELIST_FI_SEP_ITEM,    &GUI_FontTahoma30 );
     SWIPELIST_SetDefaultFont( SWIPELIST_FI_ITEM_HEADER, &GUI_FontTahoma30 );
     SWIPELIST_SetDefaultFont( SWIPELIST_FI_ITEM_TEXT,   &GUI_FontTahoma30 );
     SWIPELIST_SetDefaultTextColor( SWIPELIST_CI_ITEM_TEXT_UNSEL, GUI_LIGHTGRAY );

@@ -29,8 +29,8 @@
 // CLOOP ERRORS CURRENT LEVEL
 #define LOW_ERROR_CURRENT_LEVEL         3000
 #define HI_ERROR_CURRENT_LEVEL          22000
-#define MIN_LOW_CURRENT_LEVEL           3800
-#define MAX_HI_CURRENT_LEVEL            21000
+#define MIN_LOW_CURRENT_LEVEL           4000
+#define MAX_HI_CURRENT_LEVEL            20000
 
 // ERRORS RED 
 #define SENSON_LINK_ERR	        (1 << 0)
@@ -189,6 +189,89 @@ typedef struct  dev_cloop_s
     int                     link_err;
 } dev_cloop_t;
 
+typedef struct  dev_net_s
+{
+    union
+    {
+        uint32_t       u32[2];
+        uint8_t        u8[8];   
+    } mac;  ///< MAC Address  
+  
+    union
+    {
+        uint32_t       u32;
+        uint8_t        u8[4];   
+    } ip;  ///< Source IP Address
+
+    union
+    {
+        uint32_t       u32;
+        uint8_t        u8[4];   
+    } sn;  ///< Subnet Mask 
+
+    union
+    {
+        uint32_t       u32;
+        uint8_t        u8[4];   
+    } gw;  ///< Gateway IP Address 
+
+    uint32_t port_modbus;  ///< Modbus Port     
+  
+    uint32_t port_http;  ///< HTTP Port         
+
+    int                     net_err;
+    uint32_t                 net_status;   
+} dev_net_t;
+
+typedef struct  dev_value_s
+{
+  int32_t ppm;
+  int32_t ppb;
+}value_t;
+
+typedef struct  dev_timings_s
+{
+  uint32_t transition_time;
+  uint32_t measure_time;
+  uint32_t return_time;  
+}timings_t;
+
+typedef enum validation_state_e
+{
+  FINISH = 0,
+  IN_PROGRESS = 1,
+} validation_state_t;
+
+typedef enum validation_result_e
+{
+  VALIDATION_SUCCESS = 0,
+  VALIDATION_FAIL,
+  VALIDATION_CANCELED,   
+} validation_result_t;
+
+typedef enum validation_start_e
+{
+  VALIDATION_STOP = 0,
+  VALIDATION_REMOTE_START,  
+  VALIDATION_BREAK,   
+} validation_start_t;
+
+typedef struct  dev_validation_s
+{
+  value_t               value;
+  value_t               deviation;
+  int32_t               measure_buf[600];
+  int32_t               measure_value;
+  int32_t               measure_deviation;
+  uint32_t              measure_num;
+  timings_t             timings;
+  validation_state_t    state;
+  validation_result_t   result;
+  validation_start_t    start;
+}
+dev_validation_t;
+
+
 /*******************************************************************************
 * RELAY MODBUS
 *******************************************************************************/
@@ -257,7 +340,7 @@ typedef struct  dev_mdb_relay_s
 {
     ext_relay_info_t        info;
     int                     link_err;
-    dev_relay_t             relay[6];
+    dev_relay_t             relay[8];
 } dev_ext_relay_t;
 
 /*******************************************************************************
@@ -291,6 +374,7 @@ typedef struct  dev_s
     dev_ext_relay_t *           ext_relay;
     dev_state_t                 state;
     dev_cloop_t *               cloop;
+    dev_net_t *                 net;
 } dev_t;
 
 

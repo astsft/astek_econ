@@ -14,16 +14,7 @@
 #include "modbus.h"
 #include "os\os_user.h"
 #include "external_uart.h"
-
-
-/*******************************************************************************
-*
-*******************************************************************************/
-//#define CONF_SER_POLLING_CYCLE_mSEC     500
-//#define MDBS_DEV_BAUDRATE               19200
-#define MDBS_DEV_ADDR                   13
-
-
+#include "dev/dev.h"
 
 /*******************************************************************************
 *
@@ -47,7 +38,15 @@ static  uint8_t         modbus_adu[ MDBS_RTU_ADU_SIZEOF ];
 *
 *******************************************************************************/
 extern  QueueHandle_t           que_m2m_hndl;
+extern  dev_t           dev;
 
+void task_m2m_ext_mdbs_reinit(void)
+{
+    app_pipe_t queue_data;
+    queue_data.tag    = OS_USER_TAG_EXT_MDBS_REINIT;
+    
+    xQueueSend( que_m2m_hndl, &queue_data, NULL );   
+}
 
 /*******************************************************************************
 *
@@ -83,13 +82,17 @@ task_m2m(                               const   void *          argument )
             switch( sync )
             {
                 case OS_USER_TAG_UART7_RECV:
-                    len     = mdbs_rtu_slave(   MDBS_DEV_ADDR,
+                    len     = mdbs_rtu_slave(   dev.cfg.ext_mdbs_cfg.rtu_addr,
                                                 modbus_adu,
                                                 MDBS_RTU_ADU_SIZEOF - external_uart_rx_get_ndtr() );
 
                     external_uart_xmit( modbus_adu, len );
                     //osDelay( 100 );
                     break;
+                    
+                case OS_USER_TAG_EXT_MDBS_REINIT:
+                      external_uart_init();
+                      break;
 
                 default:
                     break;

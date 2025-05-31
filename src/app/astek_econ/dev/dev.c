@@ -10,6 +10,7 @@
 #include "config.h"
 #include "os\os_user.h"
 #include "version.h"
+#include "hw_relay.h"
 
 extern  dev_t                   dev;
 
@@ -26,6 +27,21 @@ uint32_t range_r1_value_default = 500;
 uint32_t range_r2_value_default = 100;
 uint8_t range_idx_default = 0;
 uint8_t range_units_default = 0;
+static uint32_t default_error_count = 3;
+
+uint8_t default_mac[8] = {0x00, 0x08, 0xdc, 0x00, 0xab, 0xcd, 0x00, 0x00};
+uint8_t default_ip[] = {192, 168, 1, 100};
+uint8_t default_sn[] = {255,255,255,0};
+uint8_t default_gw[] = {192, 168, 1, 1};
+uint32_t default_port_modbus = 502;
+uint32_t default_port_http = 80;
+uint8_t  default_network_state = 0;
+uint32_t default_validation_value = 1000;
+uint32_t default_validation_deviation = 10;
+uint32_t default_validation_transition_time = 100;
+uint32_t default_validation_measure_time = 12;
+uint32_t default_validation_return_time = 100;
+
 
 /*******************************************************************************
 *
@@ -53,6 +69,12 @@ dev_init(                       dev_t *         p )
       p->cfg.lang = L10N_LANG_RUSSIAN;
       p->nvm.put( NVM_REG_LANGUAGE, L10N_LANG_RUSSIAN );
     }
+    dev.cfg.error_filter_count =  dev.nvm.get( NVM_REG_ERROR_COUNT );
+    if (dev.cfg.error_filter_count > 10 || dev.cfg.error_filter_count == 0)
+    {
+      dev.cfg.error_filter_count = default_error_count;
+      dev.nvm.put( NVM_REG_ERROR_COUNT, dev.cfg.error_filter_count);
+    }    
 
     p->cfg.display_mode             = DEV_DSPL_MODE_PERCENTS;
     //dev.log.buf         = log_buf;
@@ -159,6 +181,94 @@ dev_init(                       dev_t *         p )
     dev.cloop->error_level = dev.nvm.get( NVM_REG_RANGE_ERR_LEVEL );
     dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
     
+    dev.cfg.ext_mdbs_cfg_param = dev.nvm.get( NVM_REG_EXT_MODBUS_CFG );
+    if (dev.cfg.ext_mdbs_cfg.data_width != 0)
+    {
+      dev.cfg.ext_mdbs_cfg.data_width = 0;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);
+    }
+    
+    if (dev.cfg.ext_mdbs_cfg.baudrate > 4)
+    {
+      dev.cfg.ext_mdbs_cfg.baudrate = 0;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);
+    }
+    
+    if (dev.cfg.ext_mdbs_cfg.rtu_addr > 247)
+    {
+      dev.cfg.ext_mdbs_cfg.rtu_addr = CFG_RTU_MDBS_DEV_ADDR;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);      
+    }
+    
+    if (dev.cfg.ext_mdbs_cfg.tcp_addr > 247)
+    {
+      dev.cfg.ext_mdbs_cfg.tcp_addr = CFG_TCP_MDBS_DEV_ADDR;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);      
+    }    
+    
+    if (dev.cfg.ext_mdbs_cfg.parity > 2)
+    {
+      dev.cfg.ext_mdbs_cfg.parity = 0;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);
+    }    
+    
+    if (dev.cfg.ext_mdbs_cfg.stop_bits > 1)
+    {
+      dev.cfg.ext_mdbs_cfg.stop_bits = 0;
+      dev.nvm.put(NVM_REG_EXT_MODBUS_CFG, dev.cfg.ext_mdbs_cfg_param);
+    }
+    
+    dev.net->net_status = dev.nvm.get( NVM_REG_NET_STATE ); 
+    if (dev.net->net_status == 0xFFFFFFFF)
+    {
+      dev.net->net_status = default_network_state;
+      dev.nvm.put( NVM_REG_NET_STATE,  dev.net->net_status); 
+    }
+      
+    dev.net->mac.u32[0] = dev.nvm.get( NVM_REG_NET_MAC_PART1 );
+    dev.net->mac.u32[1] = dev.nvm.get( NVM_REG_NET_MAC_PART2 );
+    if (dev.net->mac.u8[0]==0xFF && dev.net->mac.u8[1]==0xFF && dev.net->mac.u8[2]==0xFF && dev.net->mac.u8[3]==0xFF && dev.net->mac.u8[4]==0xFF && dev.net->mac.u8[5]==0xFF)
+    {
+      memcpy(dev.net->mac.u8, default_mac, sizeof(default_mac));             
+      dev.nvm.put( NVM_REG_NET_MAC_PART1,  dev.net->mac.u32[0]);
+      dev.nvm.put( NVM_REG_NET_MAC_PART2,  dev.net->mac.u32[1]);      
+    }
+    
+    dev.net->ip.u32 = dev.nvm.get( NVM_REG_NET_IP );
+    if (dev.net->ip.u32 == 0xFFFFFFFF)
+    {
+      memcpy(dev.net->ip.u8, default_ip, sizeof(default_ip));
+      dev.nvm.put( NVM_REG_NET_IP,  dev.net->ip.u32);      
+    }
+    
+    dev.net->sn.u32 = dev.nvm.get( NVM_REG_NET_SN );
+    if (dev.net->sn.u32 == 0xFFFFFFFF)
+    {
+      memcpy(dev.net->sn.u8, default_sn, sizeof(default_sn));
+      dev.nvm.put( NVM_REG_NET_SN,  dev.net->sn.u32);      
+    }
+
+    dev.net->gw.u32 = dev.nvm.get( NVM_REG_NET_GATEWAY );
+    if (dev.net->gw.u32 == 0xFFFFFFFF)
+    {
+      memcpy(dev.net->gw.u8, default_gw, sizeof(default_gw));
+      dev.nvm.put( NVM_REG_NET_GATEWAY,  dev.net->gw.u32);      
+    }    
+    
+    dev.net->port_http = dev.nvm.get( NVM_REG_NET_HTTP_PORT );
+    if (dev.net->port_http > 65535 )
+    {
+      dev.net->port_http = default_port_http;
+      dev.nvm.put( NVM_REG_NET_HTTP_PORT,  dev.net->port_http);      
+    }   
+    
+    dev.net->port_modbus = dev.nvm.get( NVM_REG_NET_MODBUS_PORT );
+    if (dev.net->port_modbus > 65535 )
+    {
+      dev.net->port_modbus = default_port_modbus;
+      dev.nvm.put( NVM_REG_NET_MODBUS_PORT,  dev.net->port_modbus);      
+    }            
+        
     snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);    
     
     return( 0 );

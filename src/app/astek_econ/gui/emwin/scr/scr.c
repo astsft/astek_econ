@@ -10,6 +10,8 @@
 #include "dev\dev.h"
 #include "hw_ltdc.h"
 
+#define LCD_LOGO_SIZE                   19401UL
+
 
 static  WM_HWIN         hSbar;
 static  WM_HWIN         hWin;
@@ -17,6 +19,7 @@ static  WM_MESSAGE      msg_sbar;
 
 
 extern  dev_t           dev;
+extern const unsigned char astek_logo_png[LCD_LOGO_SIZE + 1];
 
 /*******************************************************************************
 *
@@ -125,6 +128,10 @@ scr_header_label_update(        const   scr_idx_t           idx )
             msg_sbar.Data.v = L10N_STR_ID_FILTER;
             break;
 
+        case SCR_IDX_SETUP_SERVICE_MODBUS:            
+            msg_sbar.Data.v = L10N_STR_ID_MODBUS;
+            break;
+
         case SCR_IDX_SETUP_SERVICE_ENTRY:
             msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
             break;
@@ -226,7 +233,38 @@ scr_header_label_update(        const   scr_idx_t           idx )
         case SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA:          
             msg_sbar.Data.v = L10N_STR_ID_CLOOP_20MA;
             break;
-                        
+            
+        case SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_DIAGNOSTIC:          
+            msg_sbar.Data.v = L10N_STR_ID_DIAGNOSTICS;          
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK:
+            msg_sbar.Data.v = L10N_STR_ID_NETWORK;
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_MAC:
+            msg_sbar.Data.v = L10N_STR_ID_MAC;
+            break;   
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_IP:
+            msg_sbar.Data.v = L10N_STR_ID_IP;
+            break;    
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_SN:
+            msg_sbar.Data.v = L10N_STR_ID_SN;
+            break;             
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_GW:
+            msg_sbar.Data.v = L10N_STR_ID_GW;
+            break;          
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_MODBUS_PORT:
+        case SCR_IDX_SETUP_SERVICE_NETWORK_HTTP_PORT:  
+            msg_sbar.Data.v = L10N_STR_ID_PORT;
+            break;          
+                                  
         case SCR_IDX_SETUP_SERVICE_RELAY:
             msg_sbar.Data.v = L10N_STR_ID_RELAY;
             break;
@@ -361,6 +399,9 @@ scr_switch(                     const   scr_idx_t       idx,
             hWin    = scr_setup_service_measure();
             break;
 
+        case SCR_IDX_SETUP_SERVICE_MODBUS:
+            hWin    = scr_setup_service_modbus();
+            break;
         case SCR_IDX_SETUP_SERVICE_ENTRY:
             hWin    = scr_setup_service_entry();
             break;
@@ -426,6 +467,7 @@ scr_switch(                     const   scr_idx_t       idx,
             break;                  
           
         case SCR_IDX_SETUP_SERVICE_CLOOP_CAL:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC:
             hWin = scr_setup_service_cloop_channel();
             break;          
             
@@ -444,6 +486,31 @@ scr_switch(                     const   scr_idx_t       idx,
             hWin    = scr_setup_service_cloop_cal_4_20mA();
             break;
             
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC:
+        case SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_DIAGNOSTIC:
+            hWin    = scr_setup_service_cloop_diagnostic();
+            break;            
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK:
+            hWin    = scr_setup_service_network();
+            break;
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_MAC:
+            hWin    = scr_setup_service_network_mac();
+            break;       
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_IP:
+        case SCR_IDX_SETUP_SERVICE_NETWORK_GW:
+        case SCR_IDX_SETUP_SERVICE_NETWORK_SN:
+            hWin    = scr_setup_service_network_ip();
+            break;    
+            
+        case SCR_IDX_SETUP_SERVICE_NETWORK_MODBUS_PORT:
+        case SCR_IDX_SETUP_SERVICE_NETWORK_HTTP_PORT:          
+            hWin    = scr_setup_service_network_port();
+            break;   
+            
+                        
         case SCR_IDX_SETUP_SYSTEM:
             hWin    = scr_setup_system();
             break;
@@ -495,7 +562,6 @@ bgwin_cbk(                              WM_MESSAGE *            pMsg )
 
 
 #ifdef NDEBUG
-#include "gui/emwin/res/astek_logo_800x480_png.c"
 
 static
 void
@@ -559,7 +625,7 @@ scr_show_welcome( void )
 
     scr_show_info();
     GUI_MEMDEV_Select( hMem );
-    GUI_PNG_Draw( astek_logo_800x480_png, sizeof(astek_logo_800x480_png), 0, 0 );
+    GUI_PNG_Draw( astek_logo_png, sizeof(astek_logo_png), 0, 0 );
     scr_show_info();
 
     GUI_MEMDEV_CopyToLCD( hMem );

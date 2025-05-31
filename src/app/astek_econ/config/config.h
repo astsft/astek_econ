@@ -30,12 +30,17 @@
 #define CFG_MDBS_DEV_ADDR_SENS                  32
 #define CFG_MDBS_DEV_ADDR_MDB_RELAY             48
 #define CFG_MDBS_DEV_ADDR_CLOOP                 64
+/*******************************************************************************
+* EXT_MODBUS
+*******************************************************************************/
+#define CFG_RTU_MDBS_DEV_ADDR                 1
+#define CFG_TCP_MDBS_DEV_ADDR                 1
 
 /*******************************************************************************
 * LCD
 *******************************************************************************/
-#define LCD_SPEC_XSIZE                  1024
-#define LCD_SPEC_YSIZE                  600
+#define LCD_SPEC_XSIZE                  800
+#define LCD_SPEC_YSIZE                  480
 
 #define LCD_SPEC_HSYNC_PULSE_WIDTH      70
 #define LCD_SPEC_HSYNC_BACK_PORCH       160

@@ -134,7 +134,7 @@ typedef union  sens_meas_ppm_u
 
         uint16_t            reserved_080A;
         uint16_t            reserved_080B;
-        uint16_t            slope;
+        int16_t             slope;
         uint16_t            offset_raw;
         uint16_t            link_err_cnt;
         uint16_t            status;

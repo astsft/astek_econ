@@ -50,6 +50,14 @@ typedef enum    scr_idx_e
     SCR_IDX_SETUP_SERVICE_ENTRY_ERROR,
     SCR_IDX_SETUP_SERVICE_DIAGNOSTICS,
     SCR_IDX_SETUP_SERVICE_MEASURE,
+    SCR_IDX_SETUP_SERVICE_MODBUS, 
+    SCR_IDX_SETUP_SERVICE_NETWORK,
+    SCR_IDX_SETUP_SERVICE_NETWORK_MAC,
+    SCR_IDX_SETUP_SERVICE_NETWORK_IP,
+    SCR_IDX_SETUP_SERVICE_NETWORK_SN,
+    SCR_IDX_SETUP_SERVICE_NETWORK_GW,
+    SCR_IDX_SETUP_SERVICE_NETWORK_MODBUS_PORT,    
+    SCR_IDX_SETUP_SERVICE_NETWORK_HTTP_PORT,        
     SCR_IDX_SETUP_SERVICE_RESET_PASSWORD_ENTRY,
     SCR_IDX_SETUP_SERVICE_RESET_PASSWORD_ERROR,
     SCR_IDX_SETUP_SERVICE_RESET_PASSWORD_SUCCESS,
@@ -65,6 +73,9 @@ typedef enum    scr_idx_e
     SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_4MA,
     SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_1_20MA,
     SCR_IDX_SETUP_SERVICE_CLOOP_CAL_CHANNEL_2_20MA,    
+    SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC,  
+    SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC,
+    SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_DIAGNOSTIC,    
     SCR_IDX_SETUP_SERVICE_RELAY,  
     SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM,
     SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM,   
@@ -141,6 +152,11 @@ WM_HWIN scr_setup_range_value( void );
 WM_HWIN scr_setup_service( void );
 WM_HWIN scr_setup_service_diagnostics( void );
 WM_HWIN scr_setup_service_measure( void );
+WM_HWIN scr_setup_service_modbus( void );
+WM_HWIN scr_setup_service_network( void );
+WM_HWIN scr_setup_service_network_mac( void );
+WM_HWIN scr_setup_service_network_ip( void );
+WM_HWIN scr_setup_service_network_port( void );
 WM_HWIN scr_setup_service_entry( void );
 WM_HWIN scr_setup_service_entry_error( void );
 WM_HWIN scr_setup_service_reset_password_entry( void );
@@ -159,6 +175,7 @@ WM_HWIN scr_setup_service_cloop_error_level(void);
 WM_HWIN scr_setup_service_cloop_cal( void );
 WM_HWIN scr_setup_service_cloop_channel (void);
 WM_HWIN scr_setup_service_cloop_cal_4_20mA( void );
+WM_HWIN scr_setup_service_cloop_diagnostic(void);
 WM_HWIN scr_setup_system( void );
 WM_HWIN scr_setup_system_date( void );
 WM_HWIN scr_setup_system_info( void );

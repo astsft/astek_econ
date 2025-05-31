@@ -14,7 +14,6 @@
 #include "dev\dev.h"
 #include "os\os_user.h"
 #include "config.h"
-#include "hw_config.h"
 #include "modbus.h"
 
 #ifdef EXT_FLASH
@@ -50,6 +49,7 @@ dev_mcu_t       dev_mcu =
 
 dev_ext_relay_t ext_relay;
 dev_cloop_t cloop;
+dev_net_t   net;
 
 #pragma data_alignment = 8
 dev_t           dev =
@@ -71,26 +71,25 @@ dev_t           dev =
     .info.hardware_str          = CONFIG_HARDWARE_STR,
     .info.device_str            = CONFIG_DEVICE_STR,    
 
-    .info.serial_num_u32[ 0] = (uint32_t *) (UID_BASE_ADDRESS +  0),
-    .info.serial_num_u32[ 1] = (uint32_t *) (UID_BASE_ADDRESS +  4),
-    .info.serial_num_u32[ 2] = (uint32_t *) (UID_BASE_ADDRESS +  8),
-    .info.serial_num_u32[ 3] = (uint32_t *) (UID_BASE_ADDRESS + 12),
+    .info.uid_u32[ 0] = (uint32_t *) (UID_BASE_ADDRESS +  0),
+    .info.uid_u32[ 1] = (uint32_t *) (UID_BASE_ADDRESS +  4),
+    .info.uid_u32[ 2] = (uint32_t *) (UID_BASE_ADDRESS +  8),
+    .info.uid_u32[ 3] = (uint32_t *) (UID_BASE_ADDRESS + 12),
 
-    .info.serial_num_u16[ 0] = (uint16_t *) (UID_BASE_ADDRESS +  0),
-    .info.serial_num_u16[ 1] = (uint16_t *) (UID_BASE_ADDRESS +  2),
-    .info.serial_num_u16[ 2] = (uint16_t *) (UID_BASE_ADDRESS +  4),
-    .info.serial_num_u16[ 3] = (uint16_t *) (UID_BASE_ADDRESS +  6),
-    .info.serial_num_u16[ 4] = (uint16_t *) (UID_BASE_ADDRESS +  8),
-    .info.serial_num_u16[ 5] = (uint16_t *) (UID_BASE_ADDRESS + 10),
-    .info.serial_num_u16[ 6] = (uint16_t *) (UID_BASE_ADDRESS + 12),
-    .info.serial_num_u16[ 7] = (uint16_t *) (UID_BASE_ADDRESS + 14),
+    .info.uid_u16[ 0] = (uint16_t *) (UID_BASE_ADDRESS +  0),
+    .info.uid_u16[ 1] = (uint16_t *) (UID_BASE_ADDRESS +  2),
+    .info.uid_u16[ 2] = (uint16_t *) (UID_BASE_ADDRESS +  4),
+    .info.uid_u16[ 3] = (uint16_t *) (UID_BASE_ADDRESS +  6),
+    .info.uid_u16[ 4] = (uint16_t *) (UID_BASE_ADDRESS +  8),
+    .info.uid_u16[ 5] = (uint16_t *) (UID_BASE_ADDRESS + 10),
+    .info.uid_u16[ 6] = (uint16_t *) (UID_BASE_ADDRESS + 12),
+    .info.uid_u16[ 7] = (uint16_t *) (UID_BASE_ADDRESS + 14),
 
     .cfg.display_mode       = DEV_DSPL_MODE_PERCENTS,
     .ext_relay              = &ext_relay,
     .cloop                  = &cloop,
+    .net                    = &net,
 };
-
-
 
 /*******************************************************************************
 * MAIN

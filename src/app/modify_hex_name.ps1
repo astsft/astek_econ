@@ -15,17 +15,19 @@ $script_path = $PSScriptRoot
 "Current location $script_path"
 
 #$app_name = Split-path $script_path -Leaf
-$app_name = $CharArray[-5]
-"Current app $app_name"	
+$workspace_name = $CharArray[-5]
+"Current workspace $workspace_name"	
 
 $CharArray2 = $CharArray[-3].Split(".")
+$app_name = $CharArray2[0]
+"Current app $app_name"	
 
 $hw_name = $CharArray2[-1].Substring(2)
 "Current HW $hw_name"
 	
-Remove-Item $script_path\..\..\hex\$hw_name\$app_name.*$hw_name.*.hex	
+Remove-Item $script_path\..\..\hex\$app_name\$hw_name\$app_name.*$hw_name.*.hex		
 	
-$filename = Get-ChildItem $script_path\..\..\hex\$hw_name\$app_name* -Name
+$filename = Get-ChildItem $script_path\..\..\hex\$app_name\$hw_name\$app_name* -Name
 "Old filename $filename"
 
 $idx = $filename.IndexOf("hex")
@@ -34,7 +36,7 @@ $idx = $filename.IndexOf("hex")
 $filename1 = $filename.Remove($idx)
 #$filename1
 
-$version_path = "$script_path\$app_name\version\version.c"
+$version_path = "$script_path\$workspace_name\version\version.c"
 #$version_path
 
 foreach($line in Get-Content $version_path) {
@@ -51,5 +53,42 @@ $datatime = $version_str.Substring($version_str.IndexOf('"') + 1, 13)
 $newfilename = "$filename1" + "$datatime" + "_$commit.hex"
 "New filename $newfilename"
 
-Rename-Item $script_path\..\..\hex\$hw_name\$filename -NewName $newfilename
+Rename-Item $script_path\..\..\hex\$app_name\$hw_name\$filename -NewName $newfilename
 #Copy-Item -Path $script_path\..\..\iar\project\hex\$newfilename -Destination $script_path\..\..\
+if ($hw_name -eq "2331_rev3")
+{
+	$preconfig_path = "$script_path\preconfig.h"
+	$preconfig_path
+
+	$SEL = Select-String -Path $preconfig_path -Pattern "ASBACK_HW2353REV3"	
+
+	if ($SEL -ne $null)
+	{
+	    $asback_hw="ASBACK_HW2353REV5"
+		$asback_hw
+	}	
+
+	$SEL = Select-String -Path $preconfig_path -Pattern "ASBACK_HW2353REV5"	
+
+	if ($SEL -ne $null)
+	{
+	    $asback_hw="ASBACK_HW2353REV5"
+		$asback_hw
+	}	
+
+	$SEL = Select-String -Path $preconfig_path -Pattern "EKON_2025"
+
+	if ($SEL -ne $null)
+	{
+	    $ekon_2025="EKON_2025\"
+		$ekon_2025
+	}
+	else
+	{
+		$ekon_2025=""
+	}
+
+	Remove-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025*.*
+	Move-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$newfilename -Destination $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025$newfilename
+	"Move fw to $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025$newfilename"	
+}

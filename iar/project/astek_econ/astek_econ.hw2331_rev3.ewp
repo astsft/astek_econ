@@ -1483,6 +1483,11 @@
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash</state>
+                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\app\astek_4021\hw\hw2331r2\eth</state>
+                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500</state>
+                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Ethernet</state>
+                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Ethernet\W5500</state>
+                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Internet\httpServer</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1780,7 +1785,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$\..\..\..\hex\2331_rev3\$PROJ_FNAME$.hex</state>
+                    <state>$PROJ_DIR$\..\..\..\hex\astek_econ\2331_rev3\$PROJ_FNAME$.hex</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -2271,28 +2276,13 @@
                     <group>
                         <name>font</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_100.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma150.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_150.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma30.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_200.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_30_unicode_custom.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_40_unicode_custom.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_50.c</name>
-                            <excluded>
-                                <configuration>debug</configuration>
-                            </excluded>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma_75.c</name>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\font\tahoma40.c</name>
                         </file>
                     </group>
                     <group>
@@ -2354,6 +2344,9 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_cal.c</name>
                             </file>
                             <file>
@@ -2361,6 +2354,9 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_channel.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_diagnostic.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_error_level.c</name>
@@ -2376,6 +2372,21 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_measure.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_modbus.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_ip.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_mac.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_port.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_relay.c</name>
@@ -2428,10 +2439,10 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_status_bar.c</name>
                             </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\src_setup_service_cloop.c</name>
-                            </file>
                         </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\common\gui\emwin\res\astek_logo_800x480_png.c</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\scr.c</name>
                         </file>
@@ -2467,6 +2478,24 @@
                         <name>cl420</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\cl420\hw2331_cl420.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>eth</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth\hw2331_eth.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth\hw2331_eth.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth\webhandlers.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth\webhandlers.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth\webpages.h</name>
                         </file>
                     </group>
                     <group>
@@ -2559,6 +2588,9 @@
                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_m2m.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_net.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_start.c</name>
             </file>
         </group>
@@ -2621,7 +2653,13 @@
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_fmc.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_eth_int.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_lcd.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_led1.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_gpio_touch_int.c</name>
@@ -2648,6 +2686,9 @@
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_spi2.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_spi4.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_tim2_beep.c</name>
                 </file>
                 <file>
@@ -2661,6 +2702,66 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\stm32\stm32_usart2.c</name>
+                </file>
+            </group>
+            <group>
+                <name>w5500</name>
+                <group>
+                    <name>ioLibrary_Driver</name>
+                    <group>
+                        <name>Ethernet</name>
+                        <group>
+                            <name>w5500</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\W5500\w5500.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\W5500\w5500.h</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\socket.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\socket.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\wizchip_conf.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\wizchip_conf.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>Internet</name>
+                        <group>
+                            <name>httpServer</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpParser.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpParser.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpServer.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpServer.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpUtil.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer\httpUtil.h</name>
+                            </file>
+                        </group>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\w5500_work.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\w5500_work.h</name>
                 </file>
             </group>
         </group>
@@ -2713,6 +2814,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\src\lib\astsoft\modbus\src\rtu\modbus_rtu_server.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>tcp</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\lib\astsoft\modbus\src\tcp\modbus_tcp_server.c</name>
                         </file>
                     </group>
                     <file>

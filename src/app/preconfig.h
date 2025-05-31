@@ -1,2 +1,1 @@
-#define ASBACK_HW2353REV5
-#define EKON_2025
+#define ASBACK_HW2353REV5 

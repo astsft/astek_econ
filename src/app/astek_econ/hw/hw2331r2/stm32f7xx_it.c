@@ -34,6 +34,7 @@ void    LTDC_ER_IRQHandler( void );
 void    EXTI9_5_IRQHandler( void );
 void    I2C3_EV_IRQHandler( void );
 void    I2C3_ER_IRQHandler( void );
+void    EXTI0_IRQHandler( void );
 /*******************************************************************************
 * Cortex Processor Interruption and Exception Handlers
 *******************************************************************************/
@@ -268,4 +269,21 @@ void
 EXTI9_5_IRQHandler( void )
 {
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+}
+
+/*******************************************************************************
+* ETH 
+*******************************************************************************/
+/**
+  * @brief
+  */
+
+void
+EXTI0_IRQHandler( void )
+{
+  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET)
+  {
+    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
+    stm32_exti0_isr();
+  }
 }

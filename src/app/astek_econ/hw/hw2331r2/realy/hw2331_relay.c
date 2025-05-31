@@ -37,10 +37,16 @@ int relay_set_state(const uint8_t relay_num, const bool state)
           break;
   case 5: relay = ASBACK_RELAY_6;
           break;
+  case 6: relay = ASBACK_RELAY_7;
+          break;
+  case 7: relay = ASBACK_RELAY_0;
+          break;             
   default: return -1;    
   }
     
   asback_relay_set(relay, state);
+  
+  return 0;
 }
 
 int relay_get_state(const uint8_t relay_num, bool *state)
@@ -60,9 +66,15 @@ int relay_get_state(const uint8_t relay_num, bool *state)
           break;
   case 5: relay = ASBACK_RELAY_6;
           break;
+  case 6: relay = ASBACK_RELAY_7;
+          break;
+  case 7: relay = ASBACK_RELAY_0;
+          break;          
   default: return -1;    
   }  
   
  *state = asback_relay_get(relay);
+ 
+ return 0;
 }
 

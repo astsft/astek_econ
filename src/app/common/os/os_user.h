@@ -43,17 +43,19 @@ typedef enum    sys_sync_e
     OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_4MA,
     OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_4MA,    
     OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_RAW_20MA,
-    OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_20MA,    
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_RAW_20MA,  
+    OS_USER_TAG_CAL_CLOOP_CHANNEL1_SET_CURRENT,
+    OS_USER_TAG_CAL_CLOOP_CHANNEL2_SET_CURRENT,
     OS_USER_TAG_IBUS_BOARDS_INIT,
     OS_USER_TAG_CAL_CLOOP_SET_RANGE,
     OS_USER_TAG_KEYBOARD_RECV_IDLE,
     OS_USER_TAG_KEYBOARD_RECV_RXNE,
     OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH,
-    //OS_USER_TAG_CL_SENS,
-    //OS_USER_TAG_THLD_1_ON,
-    //OS_USER_TAG_THLD_1_OFF,
-    //OS_USER_TAG_THLD_2_ON,
-    //OS_USER_TAG_THLD_2_OFF,
+    OS_USER_TAG_EXT_MDBS_REINIT,
+    OS_USER_TAG_ETH_START,
+    OS_USER_TAG_ETH_INT,
+    OS_USER_TAG_ETH_CHANGE_PARAM,    
+    OS_USER_TAG_ETH_QUEUE_TIMEOUT
 } os_user_tag_t;
 
 void send_cmd_for_cloop_set_raw_4mA (uint8_t channel);
@@ -62,6 +64,8 @@ void send_cmd_for_cloop_4mA_write (uint8_t channel);
 void send_cmd_for_cloop_20mA_write (uint8_t channel);
 void send_cmd_for_cloop_write_range (void);
 void send_cmd_for_nvm_write_param (const uint32_t param_id, const uint32_t param_value);
-
+void task_m2m_ext_mdbs_reinit(void);
+void send_cmd_to_net_task (os_user_tag_t tag);
+void send_cmd_for_cloop_set_current(uint8_t channel, uint32_t uA);
 
 #endif //OS_USER_H

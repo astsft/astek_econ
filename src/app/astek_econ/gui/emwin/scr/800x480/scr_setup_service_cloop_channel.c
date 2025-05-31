@@ -91,19 +91,38 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                 switch( Id )
                                 {
                                         case GUI_ID_BUTTON_CLOOP_CHANNEL_1:
-                                                dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL, GUI_ID_BUTTON_DUMMY );
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CAL)
+                                                {
+                                                  dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL;
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_CAL, GUI_ID_BUTTON_DUMMY );
+                                                }
+                                                else
+                                                {
+                                                  dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC;
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC, GUI_ID_BUTTON_DUMMY );                                                  
+                                                }
                                                 beep_play( BEEP_SHRT );
                                                 break;
 
                                         case GUI_ID_BUTTON_CLOOP_CHANNEL_2:
-                                                dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL, GUI_ID_BUTTON_DUMMY );
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CAL)
+                                                {
+                                                  dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL;
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_CAL, GUI_ID_BUTTON_DUMMY );                                                  
+                                                }
+                                                else
+                                                {
+                                                  dev.gui.scr_idx    = SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_DIAGNOSTIC;
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_2_DIAGNOSTIC, GUI_ID_BUTTON_DUMMY );                                                                                                    
+                                                }
                                                 beep_play( BEEP_SHRT );
                                                 break;                                                
                                                                                                 
                                         case GUI_ID_BUTTON_BACK:
-                                                scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CLOOP_CAL );
+                                                if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CAL)                                                
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CLOOP_CAL );                                                
+                                                else
+                                                  scr_switch( SCR_IDX_SETUP_SERVICE_CURRENT_LOOP, GUI_ID_BUTTON_CLOOP_VERIFY );                                                                                                  
                                                 beep_play( BEEP_SHRT );
                                                 break;
 
