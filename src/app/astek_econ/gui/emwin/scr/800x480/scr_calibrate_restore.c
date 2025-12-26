@@ -177,7 +177,7 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
                         break;
                     case GUI_ID_BUTTON_BACK:
                         beep_play( BEEP_SHRT );
-                        scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_RESTORE );
+                        scr_switch( SCR_IDX_CALIBRATE_MANUAL, GUI_ID_BUTTON_RESTORE );
                         break;
                     default:
                         break;

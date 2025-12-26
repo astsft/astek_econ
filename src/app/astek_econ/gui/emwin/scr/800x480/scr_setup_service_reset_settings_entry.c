@@ -28,6 +28,7 @@ typedef enum    listwheel_idx_e
 /*******************************************************************************
 * PRIVATE VARIBLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
@@ -46,8 +47,32 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                            0, 100,1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,  25, 960, 350, 0, 0x0, 0 },
 
-static  const   char *  symb[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", };
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT0,               256, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT1,               384, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT2,               512, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT3,               640, 175, 128,  50, 0, 0x0, 0 },
+
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,          256,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,          384,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,          512,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL3,          640,  75, 128, 250, 0, 0x0, 0 },
+
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,     0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,    512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,     -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
+
+static const char* symb[] = {
+    "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
+static  const   size_t  symb_size = sizeof( symb ) / sizeof( char * );
 
 static  listwheel_idx_t listwheel_idx;
 static  WM_HWIN         hWheel;
@@ -166,9 +191,13 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
 
                 case GUI_KEY_UP:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                    if( idx > 0 )
                     {
-                        idx     = 0;
+                        idx--;
+                    }
+                    else
+                    {
+                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
                     }
                     LISTWHEEL_SetPos( hWheel, idx );
                     LISTWHEEL_SetSel( hWheel, idx );
@@ -177,13 +206,9 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
 
                 case GUI_KEY_DOWN:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( idx > 0 )
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
                     {
-                        idx--;
-                    }
-                    else
-                    {
-                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
+                        idx     = 0;
                     }
                     LISTWHEEL_SetPos( hWheel, idx );
                     LISTWHEEL_SetSel( hWheel, idx );
@@ -238,10 +263,10 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
 
                     case GUI_ID_BUTTON_ENTER:
                     case GUI_ID_BUTTON_DUMMY:
-                        password.u08[ 3] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
-                        password.u08[ 2] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
-                        password.u08[ 1] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
-                        password.u08[ 0] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ) );
+                        password.u08[ 3] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
+                        password.u08[ 2] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
+                        password.u08[ 1] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
+                        password.u08[ 0] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ) );
                         if( password.u32 == dev.safe.master.password.u32 )
                         {
                             dev.factory_reset( &( dev.cfg ) );
@@ -264,21 +289,37 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
         case WM_INIT_DIALOG:
             init_dialog( pMsg->hWin );
 
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 40, symb, sizeof( symb ) / sizeof( char * ) );
-            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ), 0 );
-            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ), 0 );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 50, symb, sizeof( symb ) / sizeof( char * ) );            
+#endif            
+            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ), (symb_size - 1) );
+            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ), (symb_size - 1) );
 
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 40, symb, sizeof( symb ) / sizeof( char * ) );
-            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ), 0 );
-            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ), 0 );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 50, symb, sizeof( symb ) / sizeof( char * ) );            
+#endif            
+            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ), (symb_size - 1) );
+            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ), (symb_size - 1) );
 
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480                        
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 40, symb, sizeof( symb ) / sizeof( char * ) );
-            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ), 0 );
-            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ), 0 );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 50, symb, sizeof( symb ) / sizeof( char * ) );            
+#endif            
+            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ), (symb_size - 1) );
+            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ), (symb_size - 1) );
 
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480                                    
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, symb, sizeof( symb ) / sizeof( char * ) );
-            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ), 0 );
-            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ), 0 );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 50, symb, sizeof( symb ) / sizeof( char * ) );            
+#endif            
+            LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ), (symb_size - 1) );
+            LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ), (symb_size - 1) );
 
             listwheel_idx   = LISTWHEEL_IDX_0;
             hWheel  = listwheel_set_focus( pMsg->hWin, listwheel_idx );

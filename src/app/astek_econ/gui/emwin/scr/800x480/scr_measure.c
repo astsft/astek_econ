@@ -46,7 +46,7 @@ scr_update(                             WM_HWIN         hWin,
                                         dev_t *         p )
 {
     char        str[32];
-    int32_t     ppm         = p->sens->meas.ppm.integral;
+    int32_t     ppm         = p->sens->meas.ppm.i32;
     int16_t     temp_digc_i = p->sens->meas.digc.integral;
     uint16_t    temp_digc_f = p->sens->meas.digc.fractional;
     if (ppm < 0) ppm = 0;

@@ -1,6 +1,6 @@
 /**
-  * @file   scr_calibrate.c
-  * @brief  Screen Calibrate
+  * @file   scr_setup_system.c
+  * @brief  Screen Setup System
   * @author Igor T. <research.tahoe@gmail.com>
   */
 
@@ -14,196 +14,169 @@ extern  dev_t           dev;
 
 /*******************************************************************************
 * PRIVATE VARIABLES
-*******************************************************************************/
+*******************************************************************************/  
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
-    { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
-    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       25,  20, 750, 280, 0, 0x0, 0 },
+    { WINDOW_CreateIndirect,    "", 0,                             0, 80, 800, 400, 0, 0x0, 0 },
 
-    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_SPAN,            50,  40, 375,  64, 0, 0x0, 0 },
-    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_ZERO,            50, 120, 375,  64, 0, 0x0, 0 },
-
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_SPAN,         450,  40, 300,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ZERO,         450, 120, 300,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RESTORE,      450, 200, 300,  64, 0, 0x0, 0 },
-
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_LEFT,           0, 320, 400,  80, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RIGHT,        400, 320, 400,  80, 0, 0x0, 0 },
+#if defined(USE_REMOTE_CALIBRATION)      
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_AUTO,      100,  64, 600,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MANUAL,    100, 192, 600,  64, 0, 0x0, 0 },    
+#else    
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MANUAL,    100, 128, 600,  64, 0, 0x0, 0 },
+#endif     
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_LEFT,        0, 320, 400,  80, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RIGHT,     400, 320, 400,  80, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                         0, 100, 1024, 500, 0, 0x0, 0 },
+
+#if defined(USE_REMOTE_CALIBRATION)     
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_AUTO,      128,  80,  768,  80, 0, 0x0, 0 },  
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MANUAL,    128, 240,  768,  80, 0, 0x0, 0 },    
+#else
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MANUAL,    128, 160,  768,  80, 0, 0x0, 0 },    
+#endif    
+
+    
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_LEFT,         0, 400, 512,  100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RIGHT,      512, 400, 512,  100, 0, 0x0, 0 },
+};
+#endif
 
 
 /*******************************************************************************
 * PRIVATE FUNCTIONS
 *******************************************************************************/
 static
-void
-init_dialog(                            const   WM_HWIN         hWin )
+void    init_dialog(                               WM_HWIN         hWin )
 {
-    WM_HWIN         hItem;
-    char            str[ 64];
-    time_t          ts;
-    int             pi, pf;
-    int             y, m, d;
-	struct tm *     cur;
-    int32_t         cal_ppm, tstmp;
+        WM_HWIN         hItem;
 
-    ////////////////////////////////////////////////////////
-    // MIDDLE AREA
-    ////////////////////////////////////////////////////////
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_BACKPLANE );
-    TEXT_SetFont(           hItem, &GUI_FontTahoma30                        );
-    TEXT_SetBkColor(        hItem, GUI_BLACK                                );
-    TEXT_SetTextColor(      hItem, GUI_BLACK                                );
+        ////////////////////////////////////////////////////////
+        // MIDDLE AREA
+        ////////////////////////////////////////////////////////
+#if defined(USE_REMOTE_CALIBRATION)         
+        hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_AUTO );
+        BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_AUTO )     );
+        BUTTON_SetFocusable(    hItem, 1                                        );
+#endif  
+        hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_MANUAL );
+        BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_MANUAL )     );
+        BUTTON_SetFocusable(    hItem, 1                                        );
+       
 
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SPAN );
-    TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
-    TEXT_SetTextAlign(      hItem, TEXT_CF_RIGHT | TEXT_CF_VCENTER          );
-    //TEXT_SetBkColor(        hItem, GUI_DARKGRAY                          );
-    TEXT_SetBkColor(        hItem, GUI_TRANSPARENT                          );
-    TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
-    //cal_ppm = ( (dev.sens->cal.span.ppm_int_hi << 16) | (dev.sens->cal.span.ppm_int_lo & 0xFFFF) );
-    cal_ppm = dev.sens->cal.span.ppm.i32;
-    pi  = cal_ppm / 10000;
-    pf  = (cal_ppm % 10000) / 100;
-    tstmp   = dev.sens->cal.span.timestamp.i32;
-    ts  = (time_t) tstmp;
-	cur = gmtime( &ts );
-    y   = cur->tm_year + 1900;
-    m   = cur->tm_mon + 1;
-    d   = cur->tm_mday;
-	snprintf( str, sizeof(str), "% 4d.%02d%%  %02d.%02d.%02d", pi, pf, y, m, d);
-	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
-    //snprintf( str, sizeof(str), "% 8d PPM", ppb / 1000 );
-
-    TEXT_SetText(           hItem, str                                      );
-    WM_BringToTop( hItem );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_ZERO );
-    TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
-    TEXT_SetTextAlign(      hItem, TEXT_CF_RIGHT | TEXT_CF_VCENTER          );
-    //TEXT_SetBkColor(        hItem, GUI_DARKGRAY                          );
-    TEXT_SetBkColor(        hItem, GUI_TRANSPARENT                          );
-    TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
-    //cal_ppm = ( (dev.sens->cal.zero.ppm_int_hi << 16) | (dev.sens->cal.zero.ppm_int_lo & 0xFFFF) );
-    cal_ppm = dev.sens->cal.zero.ppm.i32;
-    pi      = cal_ppm / 10000;
-    pf      = (cal_ppm % 10000) / 100;
-    //tstmp   = (dev.sens->cal.zero.timestamp_hi << 16) | (dev.sens->cal.zero.timestamp_lo & 0xFFFF);
-    tstmp   = dev.sens->cal.zero.timestamp.i32;
-    ts      = (time_t) tstmp;
-	cur     = gmtime( &ts );
-    y       = cur->tm_year + 1900;
-    m       = cur->tm_mon + 1;
-    d       = cur->tm_mday;
-	snprintf( str, sizeof(str), "% 4d.%02d%%  %02d.%02d.%02d", pi, pf, y, m, d);
-	//snprintf( str, sizeof(str), "% 8d PPM  %02d.%02d.%02d", cal_ppm, y, m, d );
-    TEXT_SetText(           hItem, str                                      );
-    WM_BringToTop( hItem );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_SPAN );
-    BUTTON_SetFocusable(    hItem, 1 );
-    BUTTON_SetText(         hItem, "SPAN" );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_ZERO );
-    BUTTON_SetFocusable(    hItem, 1 );
-    BUTTON_SetText(         hItem, "ZERO"  );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_RESTORE );
-    BUTTON_SetFocusable(    hItem, 1 );
-    BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_RESTORE )  );
-
-    ////////////////////////////////////////////////////////
-    // FOOTER AREA
-    ////////////////////////////////////////////////////////
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_LEFT );
-    BUTTON_SetFocusable(    hItem, 0 );
-    BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_MEASURE_AL )   );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_RIGHT );
-    BUTTON_SetFocusable(    hItem, 0 );
-    BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_SETUP_AR )   );
+        ////////////////////////////////////////////////////////
+        // FOOTER AREA
+        ////////////////////////////////////////////////////////
+        hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_LEFT );
+        BUTTON_SetFocusable(    hItem, 0 );
+        BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_MEASURE_AL )   );
+    
+        hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_RIGHT );
+        BUTTON_SetFocusable(    hItem, 0 );
+#if defined(USE_VALIDATION)
+        BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_VALIDATION_AR )   );
+#else
+        BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_CONSOLE_AR )   );
+#endif
 }
 
 
-/**
-  * @brief
-  * @param  None
-  * @retval None */
 static
 void
-dialog_callback(                                WM_MESSAGE *    pMsg )
+dialog_callback(                                WM_MESSAGE *            pMsg )
 {
-    switch( pMsg->MsgId )
-    {
-        case WM_KEY:
-            switch( ((WM_KEY_INFO*) (pMsg->Data.p) )->Key )
-            {
-                case GUI_KEY_UP:
-                    GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
-                    beep_play( BEEP_SHRT );
-                    break;
-                case GUI_KEY_DOWN:
-                    GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
-                    beep_play( BEEP_SHRT );
-                    break;
-                case GUI_KEY_LEFT:
-                    scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
-                    beep_play( BEEP_SHRT );
-                    break;
-                case GUI_KEY_RIGHT:
-                    scr_switch( SCR_IDX_SETUP, GUI_ID_BUTTON_MEASURE );
-                    beep_play( BEEP_SHRT );
-                    break;
-                case GUI_KEY_ESCAPE:
-                    scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
-                    beep_play( BEEP_SHRT );
-                    break;
+        switch( pMsg->MsgId )
+        {
+                case WM_KEY:
+                        switch( ((WM_KEY_INFO*) (pMsg->Data.p) )->Key )
+                        {
+                                case GUI_KEY_UP:
+                                        beep_play( BEEP_SHRT );
+                                        GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );                                        
+                                        break;
+
+                                case GUI_KEY_DOWN:
+                                        beep_play( BEEP_SHRT );
+                                        GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
+                                        break;
+                                        
+                                case GUI_KEY_LEFT:
+                                    scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
+                                    beep_play( BEEP_SHRT );
+                                    break;                                        
+
+                                case GUI_KEY_RIGHT:
+#if defined(USE_VALIDATION)                  
+                                scr_switch( SCR_IDX_VALIDATION, GUI_ID_BUTTON_MEASURE );
+#else
+                                scr_switch( SCR_IDX_CONSOLE, GUI_ID_BUTTON_DUMMY );                    
+#endif                    
+                                beep_play( BEEP_SHRT );
+                                break;                                    
+                                    
+                                case GUI_KEY_ESCAPE:
+                                        beep_play( BEEP_SHRT );
+                                        scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
+                                        break;
+
+                                default:
+                                        break;
+                        }
+
+                        break;
+
+                case WM_NOTIFY_PARENT:
+                        if( pMsg->Data.v == WM_NOTIFICATION_RELEASED )
+                        {
+                                int Id = WM_GetId(pMsg->hWinSrc);
+                                switch( Id )
+                                {
+                                        case GUI_ID_BUTTON_AUTO:
+                                                dev.gui.scr_idx    = SCR_IDX_CALIBRATE_AUTO;
+                                                scr_switch( SCR_IDX_CALIBRATE_AUTO, GUI_ID_BUTTON_DUMMY );
+                                                beep_play( BEEP_SHRT );
+                                                break;
+
+                                        case GUI_ID_BUTTON_MANUAL:
+                                                dev.gui.scr_idx    = SCR_IDX_CALIBRATE_MANUAL;
+                                                scr_switch( SCR_IDX_CALIBRATE_MANUAL, GUI_ID_BUTTON_DUMMY );
+                                                beep_play( BEEP_SHRT );
+                                                break;                                                
+                                                                                                
+                                        case GUI_ID_BUTTON_LEFT:
+                                            scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
+                                            beep_play( BEEP_SHRT );                  
+                                            break;
+                                        
+                                        case GUI_ID_BUTTON_RIGHT:
+                    #if defined(USE_VALIDATION)                      
+                                            scr_switch( SCR_IDX_VALIDATION, GUI_ID_BUTTON_MEASURE );
+                    #else
+                                            scr_switch( SCR_IDX_CONSOLE, GUI_ID_BUTTON_MEASURE );
+                    #endif                        
+                                            beep_play( BEEP_SHRT );                                          
+                                            break;
+                                            
+                                          default:
+                                          beep_play( BEEP_TYPE_ERROR );
+                                            break;
+                                }
+                        }
+                        break;
+
+                case WM_INIT_DIALOG:
+                        init_dialog( pMsg->hWin );
+                        break;
+
                 default:
-                    break;
-            }
-            break;
-
-        case WM_NOTIFY_PARENT:
-            if( pMsg->Data.v == WM_NOTIFICATION_RELEASED )
-            {
-                switch( WM_GetId( pMsg->hWinSrc ) )
-                {
-                    case GUI_ID_BUTTON_SPAN:
-                        dev.gui.cal_idx = 1;
-                        scr_switch( SCR_IDX_CALIBRATE_POINT, GUI_ID_LISTWHEEL0 );
-                        beep_play( BEEP_SHRT );
+                        WM_DefaultProc(pMsg);
                         break;
-                    case GUI_ID_BUTTON_ZERO:
-                        dev.gui.cal_idx = 0;
-                        scr_switch( SCR_IDX_CALIBRATE_POINT, GUI_ID_LISTWHEEL0 );
-                        beep_play( BEEP_SHRT );
-                        break;
-                    case GUI_ID_BUTTON_RESTORE:
-                        scr_switch( SCR_IDX_CALIBRATE_RESTORE, GUI_ID_BUTTON_SPAN );
-                        beep_play( BEEP_SHRT );
-                        break;
-                    case GUI_ID_BUTTON_LEFT:
-                        scr_switch( SCR_IDX_MEASURE, GUI_ID_BUTTON_DUMMY );
-                        beep_play( BEEP_SHRT );                  
-                        break;
-                    case GUI_ID_BUTTON_RIGHT:
-                        scr_switch( SCR_IDX_SETUP, GUI_ID_BUTTON_MEASURE );
-                        beep_play( BEEP_SHRT );                                          
-                        break;
-                    default:
-                        break;
-                }
-            }
-            break;
-
-        case WM_INIT_DIALOG:
-            init_dialog( pMsg->hWin );
-            break;
-
-        default:
-            WM_DefaultProc( pMsg );
-            break;
-    }
+        }
 }
 
 
@@ -218,10 +191,10 @@ dialog_callback(                                WM_MESSAGE *    pMsg )
 WM_HWIN
 scr_calibrate( void )
 {
-    return  GUI_CreateDialogBox(    dialog_info,
-                                    GUI_COUNTOF( dialog_info ),
-                                    &dialog_callback,
-                                    WM_HBKWIN,
-                                    0,
-                                    0 );
+        return  GUI_CreateDialogBox(    dialog_info,
+                                        GUI_COUNTOF( dialog_info ),
+                                        &dialog_callback,
+                                        WM_HBKWIN,
+                                        0,
+                                        0 );
 }

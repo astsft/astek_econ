@@ -27,6 +27,7 @@ typedef enum    listwheel_idx_e
 /*******************************************************************************
 * PRIVATE VARIABLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
@@ -45,10 +46,31 @@ static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                            0, 100,1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,  25, 960, 350, 0, 0x0, 0 },
 
-//static  const   char *  symb[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", };
-static  const   char *  list[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", };
-static  const   size_t  list_countof    = sizeof( list ) / sizeof( char * );
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS0,         256, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS1,         384, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS2,         512, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS3,         640, 175, 128,  50, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,          256,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,          384,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,          512,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL3,          640,  75, 128, 250, 0, 0x0, 0 },
+
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,         0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
+
+static const char* symb[] = {
+    "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
+static uint32_t symb_size =  sizeof( symb ) / sizeof( char * );
 
 static  listwheel_idx_t listwheel_idx;
 static  WM_HWIN         hWheel;
@@ -57,7 +79,6 @@ static  WM_HWIN         hWheel;
 /*******************************************************************************
 * PRIVATE FUNCTIONS
 *******************************************************************************/
-/*
 static
 void
 listwheel_set_focus(                    const   WM_HWIN                 hWin,
@@ -111,124 +132,6 @@ listwheel_set_focus(                    const   WM_HWIN                 hWin,
             break;
     }
 }
-*/
-
-static
-void
-listwheel_set_focus(                    const   WM_HWIN                 hWin,
-                                                listwheel_idx_t         idx )
-{
-    const   WM_HWIN     hText0  = WM_GetDialogItem( hWin, GUI_ID_TEXT_FOCUS0 );
-    const   WM_HWIN     hText1  = WM_GetDialogItem( hWin, GUI_ID_TEXT_FOCUS1 );
-    const   WM_HWIN     hText2  = WM_GetDialogItem( hWin, GUI_ID_TEXT_FOCUS2 );
-    const   WM_HWIN     hText3  = WM_GetDialogItem( hWin, GUI_ID_TEXT_FOCUS3 );
-
-
-    switch( idx )
-    {
-        case LISTWHEEL_IDX_0:
-            TEXT_SetBkColor( hText0, CONFIG_UI_COLOR_WHEEL_SEL   );
-            TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
-            listwheel_idx   = idx;
-            break;
-
-        case LISTWHEEL_IDX_1:
-            TEXT_SetBkColor( hText0, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_SEL   );
-            TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 );
-            listwheel_idx   = idx;
-            break;
-
-        case LISTWHEEL_IDX_2:
-            TEXT_SetBkColor( hText0, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_SEL   );
-            TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 );
-            listwheel_idx   = idx;
-            break;
-
-        case LISTWHEEL_IDX_3:
-            TEXT_SetBkColor( hText0, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText1, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText2, CONFIG_UI_COLOR_WHEEL_UNSEL );
-            TEXT_SetBkColor( hText3, CONFIG_UI_COLOR_WHEEL_SEL   );
-            hWheel          = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 );
-            listwheel_idx   = idx;
-            break;
-
-        default:
-            break;
-    }
-}
-
-
-
-
-/*
-static
-void
-listwheel_move(                                 const   WM_HWIN         hWin,
-                                                const   int             dir )
-{
-        LISTWHEEL_SetBkColor(   hWheel, LISTWHEEL_CI_UNSEL,     GUI_BLACK        );
-        LISTWHEEL_SetBkColor(   hWheel, LISTWHEEL_CI_SEL,       GUI_BLACK        );
-
-        if( dir != 0 )
-        {
-                if( listwheel_idx < (LISTWHEEL_IDX_LAST - 1) )
-                {
-                        listwheel_idx++;
-                }
-                else
-                {
-                        listwheel_idx   = LISTWHEEL_IDX_0;
-                }
-        }
-        else
-        {
-                if( listwheel_idx > 0 )
-                {
-                        listwheel_idx--;
-                }
-                else
-                {
-                        listwheel_idx   = (listwheel_idx_t) (LISTWHEEL_IDX_LAST - 1);
-                }
-        }
-
-        switch( listwheel_idx )
-        {
-                case LISTWHEEL_IDX_0:
-                        hWheel  = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
-                        break;
-
-                case LISTWHEEL_IDX_1:
-                        hWheel  = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 );
-                        break;
-
-                case LISTWHEEL_IDX_2:
-                        hWheel  = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 );
-                        break;
-
-                case LISTWHEEL_IDX_3:
-                        hWheel  = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 );
-                        break;
-
-                case LISTWHEEL_IDX_LAST:
-                default:
-                        break;
-        }
-
-        LISTWHEEL_SetBkColor(   hWheel, LISTWHEEL_CI_UNSEL,     GUI_BLACK        );
-        LISTWHEEL_SetBkColor(   hWheel, LISTWHEEL_CI_SEL,       GUI_GRAY_2F      );
-}
-*/
 
 static
 void
@@ -263,77 +166,10 @@ listwheel_swtch_rght(                   const   WM_HWIN         hWin )
     listwheel_set_focus( hWin, listwheel_idx );
 }
 
-
-
-
-
-/*
-static
-void
-setup_listwheel(                                        WM_HWIN         hWin,
-                                                const   char **         list,
-                                                const   int             list_countof )
-{
-        const   int     y_size          = WM_GetWindowSizeY( hWin );
-        const   size_t  line_height     = 40;
-
-
-        LISTWHEEL_SetFont(      hWin,  &GUI_FontTahoma40                        );
-        LISTWHEEL_SetBkColor(   hWin,  LISTWHEEL_CI_UNSEL,     GUI_BLACK        );
-        LISTWHEEL_SetBkColor(   hWin,  LISTWHEEL_CI_SEL,       GUI_BLACK        );
-        LISTWHEEL_SetLBorder(   hWin,  20                                       );
-        LISTWHEEL_SetLineHeight( hWin, line_height                              );
-        LISTWHEEL_SetRBorder(   hWin,  20                                       );
-        LISTWHEEL_SetTextAlign( hWin,  GUI_TA_HCENTER | GUI_TA_VCENTER          );
-        LISTWHEEL_SetTextColor( hWin,  LISTWHEEL_CI_UNSEL,     GUI_GRAY         );
-        LISTWHEEL_SetTextColor( hWin,  LISTWHEEL_CI_SEL,       GUI_BLUE         );
-
-        for( int i = 0; i < list_countof; i++ )
-        {
-                LISTWHEEL_AddString( hWin, list[i] );
-        }
-
-        LISTWHEEL_SetSnapPosition( hWin, (y_size/2 - line_height/2) );
-}
-*/
-
 static
 void
 init_listwheel(                                         WM_HWIN         hWin )
 {
-        //WM_HWIN         hItem;
-        //int             idx;
-
-
-        //hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 );
-        //setup_listwheel( hItem, symb, sizeof( symb ) / sizeof( char * ) );
-        //idx     = 0;
-        //LISTWHEEL_SetPos( hItem, idx );
-        //LISTWHEEL_SetSel( hItem, idx );
-
-        //hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 );
-        //setup_listwheel( hItem, symb, sizeof( symb ) / sizeof( char * ) );
-        //idx     = 0;
-        //LISTWHEEL_SetPos( hItem, idx );
-        //LISTWHEEL_SetSel( hItem, idx );
-
-        //hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 );
-        //setup_listwheel( hItem, symb, sizeof( symb ) / sizeof( char * ) );
-        //idx     = 0;
-        //LISTWHEEL_SetPos( hItem, idx );
-        //LISTWHEEL_SetSel( hItem, idx );
-
-        //hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
-        //setup_listwheel( hItem, symb, sizeof( symb ) / sizeof( char * ) );
-        //idx     = 0;
-        //LISTWHEEL_SetPos( hItem, idx );
-        //LISTWHEEL_SetSel( hItem, idx );
-
-        //LISTWHEEL_SetBkColor(   hItem,  LISTWHEEL_CI_UNSEL, GUI_BLACK        );
-        //LISTWHEEL_SetBkColor(   hItem,  LISTWHEEL_CI_SEL,   GUI_GRAY_2F      );
-
-        //listwheel_idx   = LISTWHEEL_IDX_0;
-
         hWheel  = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
 }
 
@@ -388,29 +224,16 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
             switch( ((WM_KEY_INFO*) (pMsg->Data.p) )->Key )
             {
                 case GUI_KEY_LEFT:
-                    //listwheel_move( pMsg->hWin, 0 );
                     listwheel_swtch_left( pMsg->hWin );
                     beep_play( BEEP_SHRT );
                     break;
 
                 case GUI_KEY_RIGHT:
-                    //listwheel_move( pMsg->hWin, 1 );
                     listwheel_swtch_rght( pMsg->hWin );
                     beep_play( BEEP_SHRT );
                     break;
 
                 case GUI_KEY_UP:
-                    beep_play( BEEP_SHRT );
-                    idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
-                    {
-                        idx     = 0;
-                    }
-                    LISTWHEEL_SetPos( hWheel, idx );
-                    LISTWHEEL_SetSel( hWheel, idx );
-                    break;
-
-                case GUI_KEY_DOWN:
                     beep_play( BEEP_SHRT );
                     idx     = LISTWHEEL_GetPos( hWheel );
                     if( idx > 0 )
@@ -420,6 +243,17 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
                     else
                     {
                         idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
+                    }
+                    LISTWHEEL_SetPos( hWheel, idx );
+                    LISTWHEEL_SetSel( hWheel, idx );
+                    break;
+
+                case GUI_KEY_DOWN:
+                    beep_play( BEEP_SHRT );
+                    idx     = LISTWHEEL_GetPos( hWheel );
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                    {
+                        idx     = 0;
                     }
                     LISTWHEEL_SetPos( hWheel, idx );
                     LISTWHEEL_SetSel( hWheel, idx );
@@ -472,10 +306,10 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
 
                     case GUI_ID_BUTTON_ENTER:
                     case GUI_ID_BUTTON_DUMMY:
-                        password.u08[ 3] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
-                        password.u08[ 2] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
-                        password.u08[ 1] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
-                        password.u08[ 0] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ) );
+                        password.u08[ 3] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
+                        password.u08[ 2] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
+                        password.u08[ 1] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
+                        password.u08[ 0] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ) );
                         if( password.u32 == dev.safe.master.password.u32 )
                         {
                             scr_switch( SCR_IDX_SETUP_SERVICE, GUI_ID_BUTTON_SERVICE );
@@ -495,11 +329,22 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
 
         case WM_INIT_DIALOG:
             init_dialog( pMsg->hWin );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 40, list, list_countof );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 40, list, list_countof );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 40, list, list_countof );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, list, list_countof );
-            //setup_listwheel( pMsg->hWin, LISTWHEEL_IDX_3, 0 );
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 40, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 40, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 40, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, symb, symb_size );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 50, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 50, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 50, symb, symb_size );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 50, symb, symb_size );            
+#endif            
+            for (int i = 0; i < 4; i++)
+            {
+              LISTWHEEL_SetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + i ), (symb_size - 1) );
+              LISTWHEEL_SetSel( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + i ), (symb_size - 1) );              
+            }
 
             listwheel_idx   = LISTWHEEL_IDX_0;
             init_listwheel( pMsg->hWin );

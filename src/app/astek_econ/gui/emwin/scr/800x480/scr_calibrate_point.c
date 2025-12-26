@@ -40,8 +40,8 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_MEAS_LABEL,      25,  20, 225,  50, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_MEAS_VALUE,      25,  70, 225,  70, 0, 0x0, 0 },
-    //{ TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_LABEL,     25, 180, 225,  50, 0, 0x0, 0 },
-    //{ TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_VALUE,     25, 230, 225,  70, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_LABEL,     25, 180, 225,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_SLOPE_VALUE,     25, 230, 225,  70, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,      275,  20, 500, 280, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      "", GUI_ID_TEXT_POINT,          525, 140,  10,  40, 0, 0x0, 0 },
 
@@ -64,7 +64,9 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
 
-static  const   char *          list[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", };
+static const char* list[] = {
+    "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
 static  const   size_t          list_countof    = sizeof( list ) / sizeof( char * );
 static  listwheel_idx_t         listwheel_idx;
 
@@ -84,26 +86,26 @@ listwheel_setup(                const   WM_HWIN                 hWin,
     {
         case LISTWHEEL_IDX_0:
             hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 );
-            LISTWHEEL_SetPos( hItem, (val / 100000) % 10 );
-            LISTWHEEL_SetSel( hItem, (val / 100000) % 10 );
+            LISTWHEEL_SetPos( hItem, (list_countof - 1) - (val / 100000) % 10 );
+            LISTWHEEL_SetSel( hItem, (list_countof - 1) - (val / 100000) % 10 );
             break;
 
         case LISTWHEEL_IDX_1:
             hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 );
-            LISTWHEEL_SetPos( hItem, (val / 10000 ) % 10 );
-            LISTWHEEL_SetSel( hItem, (val / 10000 ) % 10 );
+            LISTWHEEL_SetPos( hItem, (list_countof - 1) - (val / 10000 ) % 10 );
+            LISTWHEEL_SetSel( hItem, (list_countof - 1) - (val / 10000 ) % 10 );
             break;
 
         case LISTWHEEL_IDX_2:
             hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 );
-            LISTWHEEL_SetPos( hItem, (val / 1000  ) % 10 );
-            LISTWHEEL_SetSel( hItem, (val / 1000  ) % 10 );
+            LISTWHEEL_SetPos( hItem, (list_countof - 1) - (val / 1000  ) % 10 );
+            LISTWHEEL_SetSel( hItem, (list_countof - 1) - (val / 1000  ) % 10 );
             break;
 
         case LISTWHEEL_IDX_3:
             hItem   = WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 );
-            LISTWHEEL_SetPos( hItem, (val / 100   ) % 10 );
-            LISTWHEEL_SetSel( hItem, (val / 100   ) % 10 );
+            LISTWHEEL_SetPos( hItem, (list_countof - 1) - (val / 100   ) % 10 );
+            LISTWHEEL_SetSel( hItem, (list_countof - 1) - (val / 100   ) % 10 );
             break;
 
         //case LISTWHEEL_IDX_4:
@@ -259,10 +261,15 @@ listwheel_increment(            const   WM_HWIN                 hWin,
 
     val     = LISTWHEEL_GetPos( hItem );
 
-    if( ++val >= list_countof )
+    if( val > 0 )
     {
-        val       = 0;
+        val--;
     }
+    else
+    {
+        val       = list_countof-1;
+    }
+
 
     LISTWHEEL_SetPos( hItem, val );
     LISTWHEEL_SetSel( hItem, val );
@@ -293,13 +300,9 @@ listwheel_decrement(            const   WM_HWIN                 hWin,
 
     val     = LISTWHEEL_GetPos( hItem );
 
-    if( val > 0 )
+    if( ++val >= list_countof )
     {
-        val--;
-    }
-    else
-    {
-        val       = list_countof-1;
+        val       = 0;
     }
 
     LISTWHEEL_SetPos( hItem, val );
@@ -313,10 +316,10 @@ listwheel_assemble(             const   WM_HWIN                 hWin )
 {
     int     val = 0;
 
-    val += 100000 * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 ) );
-    val += 10000  * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 ) );
-    val += 1000   * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 ) );
-    val += 100    * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 ) );
+    val += 100000 * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 )));
+    val += 10000  * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 )));
+    val += 1000   * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 )));
+    val += 100    * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 )));
 //    val += 10     * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL4 ) );
 //    val += 1      * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL5 ) );
 
@@ -345,19 +348,18 @@ init_dialog(                            WM_HWIN                 hWin )
     TEXT_SetBkColor(        hItem, CONFIG_UI_COLOR_BACKGROUND               );
     TEXT_SetTextColor(      hItem, GUI_LIGHTGREEN                           );
 
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_LABEL );
-    //TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
-    //TEXT_SetTextAlign(      hItem, TEXT_CF_HCENTER | TEXT_CF_BOTTOM         );
-    //TEXT_SetBkColor(        hItem, CONFIG_UI_COLOR_BACKGROUND               );
-    //TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
-    //TEXT_SetText(           hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_SLOPE   )  );
-    ////TEXT_SetText( hItem, "V/sec\0" );
-    //
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_VALUE );
-    //TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
-    //TEXT_SetTextAlign(      hItem, TEXT_CF_HCENTER | TEXT_CF_VCENTER        );
-    //TEXT_SetBkColor(        hItem, CONFIG_UI_COLOR_BACKGROUND               );
-    //TEXT_SetTextColor(      hItem, GUI_LIGHTGREEN                           );
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_LABEL );
+    TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
+    TEXT_SetTextAlign(      hItem, TEXT_CF_HCENTER | TEXT_CF_BOTTOM         );
+    TEXT_SetBkColor(        hItem, CONFIG_UI_COLOR_BACKGROUND               );
+    TEXT_SetTextColor(      hItem, GUI_LIGHTGRAY                            );
+    TEXT_SetText(           hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_SLOPE   )  );
+    
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_VALUE );
+    TEXT_SetFont(           hItem, &GUI_FontTahoma40                        );
+    TEXT_SetTextAlign(      hItem, TEXT_CF_HCENTER | TEXT_CF_VCENTER        );
+    TEXT_SetBkColor(        hItem, CONFIG_UI_COLOR_BACKGROUND               );
+    TEXT_SetTextColor(      hItem, GUI_LIGHTGREEN                           );
 
     ////////////////////////////////////////////////////////
     // MIDDLE AREA, RIGHT SIDE
@@ -450,10 +452,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                 case GUI_KEY_ESCAPE:
                     switch( dev.gui.cal_idx )
                     {
-                        case 2:     scr_switch( SCR_IDX_SETUP_SERVICE_DIAGNOSTICS, GUI_ID_BUTTON_FACTORY_ZERO );    break;
-                        case 1:     scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_SPAN );    break;
-                        default:    scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_ZERO );    break;
+                        case 1:     scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_MANUAL );    break;
+                        default:    scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_MANUAL );    break;
                     }
+                    dev.state.process_status = PROCESS_MEASURE;
                     beep_play( BEEP_SHRT );
                     break;
                 default:
@@ -481,19 +483,13 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                     case GUI_ID_LISTWHEEL3:
                         listwheel_set_focus( pMsg->hWin, LISTWHEEL_IDX_3 );
                         beep_play( BEEP_SHRT );
-                        break;
-//                    case GUI_ID_LISTWHEEL4:
-//                        listwheel_set_focus( pMsg->hWin, LISTWHEEL_IDX_4 );
-//                        beep_play( BEEP_SHRT );
-//                        break;
-//                    case GUI_ID_LISTWHEEL5:
-//                        listwheel_set_focus( pMsg->hWin, LISTWHEEL_IDX_5 );
-//                        beep_play( BEEP_SHRT );
-//                        break;                                                
+                        break;                                            
                     case GUI_ID_BUTTON_DUMMY:
                     case GUI_ID_BUTTON_ENTER:
                         i32                 = listwheel_assemble( pMsg->hWin );
                         point->ppm.i32   = i32; 
+                        point->raw.u32   = dev.sens->meas.raw;
+                        point->ppb.i32   = i32 * 1000; 
                         i32                 = dev.mcu->rtc.get_timestamp();
                         point->timestamp.i32 = i32;
                         task_hmi_cal_update( dev.gui.cal_idx );
@@ -504,7 +500,7 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                             case 1:     scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_SPAN );    break;
                             default:    scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_ZERO );    break;
                         }
-
+                        dev.state.process_status = PROCESS_MEASURE;
                         beep_play( BEEP_TYPE_CONFIRM );
                         break;
                     default:
@@ -519,10 +515,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                     case GUI_ID_BUTTON_CANCEL:
                         switch( dev.gui.cal_idx )
                         {
-                            case 2:     scr_switch( SCR_IDX_SETUP_SERVICE_DIAGNOSTICS, GUI_ID_BUTTON_FACTORY_ZERO );    break;
                             case 1:     scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_SPAN );    break;
                             default:    scr_switch( SCR_IDX_CALIBRATE, GUI_ID_BUTTON_ZERO );    break;
                         }
+                        dev.state.process_status = PROCESS_MEASURE;
                         beep_play( BEEP_SHRT );
                         break;
                     default:
@@ -533,14 +529,14 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
 
         case WM_TIMER:
             blink++;
-            ppm = dev.sens->meas.ppm.integral;
+            ppm = dev.sens->meas.ppm.i32;
             //ppb = (dev.sens->meas.ppb_hi << 16) | (dev.sens->meas.ppb_lo & 0xFFFF);        
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_MEAS_LABEL );
             TEXT_SetText( hItem, (blink & 1) ? "" : l10n_str_get( dev.cfg.lang, L10N_STR_ID_MEASURE ) );
 
-            //hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_SLOPE_LABEL );
-            //TEXT_SetText( hItem, (blink & 1) ? "" : l10n_str_get( dev.cfg.lang, L10N_STR_ID_SLOPE ) );
+            hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_SLOPE_LABEL );
+            TEXT_SetText( hItem, (blink & 1) ? "" : l10n_str_get( dev.cfg.lang, L10N_STR_ID_SLOPE ) );
 
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_MEAS_VALUE );
@@ -556,9 +552,9 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
             }
             TEXT_SetText( hItem, str );
 
-            //hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_SLOPE_VALUE );
-            //snprintf( str, sizeof(str), "%8d\0", dev.sens->meas.slope );
-            //TEXT_SetText( hItem, str );
+            hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_SLOPE_VALUE );
+            snprintf( str, sizeof(str), "%d", dev.sens->meas.slope ); 
+            TEXT_SetText( hItem, str );
 
             hItem   = pMsg->Data.v; //pMsg->Data.v contains a handle the expired timer only if the message WM_TIMER is currently processed
             WM_RestartTimer( hItem, 0 );

@@ -35,8 +35,15 @@ scr_header_label_update(        const   scr_idx_t           idx )
             break;
 
         case SCR_IDX_CALIBRATE:
+        case SCR_IDX_CALIBRATION_STEP1:
+        case SCR_IDX_CALIBRATION_STEP2:
+        case SCR_IDX_CALIBRATION_STEP3:          
             msg_sbar.Data.v = L10N_STR_ID_CALIBRATION;
             break;
+            
+        case SCR_IDX_CALIBRATE_MANUAL:     
+            msg_sbar.Data.v = L10N_STR_ID_MANUAL;
+            break;                
 
         case SCR_IDX_CALIBRATE_POINT:
             switch( dev.gui.cal_idx )
@@ -46,11 +53,43 @@ scr_header_label_update(        const   scr_idx_t           idx )
                 case 0:
                 default:    msg_sbar.Data.v =  L10N_STR_ID_ZERO; break;
             }
-            break;
+            break;                      
 
         case SCR_IDX_CALIBRATE_RESTORE:
             msg_sbar.Data.v = L10N_STR_ID_RESTORE;
             break;
+            
+        case SCR_IDX_CALIBRATION_SETUP:
+            msg_sbar.Data.v = L10N_STR_ID_SETTINGS;
+            break;              
+            
+        case SCR_IDX_CALIBRATION_SETUP_ZERO:
+            msg_sbar.Data.v = L10N_STR_ID_ZERO;
+            break;           
+            
+        case SCR_IDX_CALIBRATION_AUTO_CYCLE_TIME:            
+            msg_sbar.Data.v = L10N_STR_ID_CYCLE_TIME;
+            break;            
+            
+        case SCR_IDX_VALIDATION_SETUP_DEVIATION: 
+        case SCR_IDX_CALIBRATION_SETUP_DEVIATION:
+            msg_sbar.Data.v = L10N_STR_ID_DEVIATION;           
+            break;      
+
+        case SCR_IDX_CALIBRATION_SETUP_SLOPE:
+            msg_sbar.Data.v = L10N_STR_ID_SLOPE;
+            break;
+            
+        case SCR_IDX_VALIDATION:
+        case SCR_IDX_VALIDATION_STEP1:
+        case SCR_IDX_VALIDATION_STEP2:
+        case SCR_IDX_VALIDATION_STEP3:
+            msg_sbar.Data.v = L10N_STR_ID_VALIDATION;
+            break;      
+            
+        case SCR_IDX_VALIDATION_SETUP:
+            msg_sbar.Data.v = L10N_STR_ID_SETUP;
+            break;            
 
         case SCR_IDX_CONSOLE:
             msg_sbar.Data.v = L10N_STR_ID_CONSOLE;
@@ -60,41 +99,9 @@ scr_header_label_update(        const   scr_idx_t           idx )
             msg_sbar.Data.v = L10N_STR_ID_SETUP;
             break;
 
-        case SCR_IDX_SETUP_CALIBRATION:
-            msg_sbar.Data.v = L10N_STR_ID_CALIBRATION;
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO:
+        case SCR_IDX_CALIBRATE_AUTO:
             msg_sbar.Data.v = L10N_STR_ID_AUTO;
             break;
-
-        //case SCR_IDX_SETUP_CALIBRATION_AUTO_CHECK:
-        //    msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
-        //    break;
-
-        //case SCR_IDX_SETUP_CALIBRATION_AUTO_CHECK_ERROR:
-        //    msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
-        //    break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_PURGE:
-            msg_sbar.Data.v = L10N_STR_ID_PURGE;
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_CYCLE:
-            msg_sbar.Data.v = L10N_STR_ID_CYCLE;
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_LAUNCH:
-            msg_sbar.Data.v = L10N_STR_ID_LAUNCH;
-            break;
-
-        //case SCR_IDX_SETUP_CALIBRATION_REMOTELY:
-        //    msg_sbar.Data.v = L10N_STR_ID_CALIBRATION;
-        //    break;
-
-        //case SCR_IDX_SETUP_HELP:
-        //    msg_sbar.Data.v = L10N_STR_ID_HELP;
-        //    break;
 
         case SCR_IDX_SETUP_MEASURE:
             msg_sbar.Data.v = L10N_STR_ID_MEASURE;
@@ -107,10 +114,6 @@ scr_header_label_update(        const   scr_idx_t           idx )
         case SCR_IDX_SETUP_MEASURE_CL420_VALUE:
             msg_sbar.Data.v = L10N_STR_ID_RANGE;
             break;
-
-        //case SCR_IDX_SETUP_MEASURE_DISCRETE_OUTPUT:
-        //    msg_sbar.Data.v = L10N_STR_ID_DISCRETE_OUTPUT;
-        //    break;
 
         case SCR_IDX_SETUP_MEASURE_SENSOR:
             msg_sbar.Data.v = L10N_STR_ID_SENSOR;
@@ -140,26 +143,6 @@ scr_header_label_update(        const   scr_idx_t           idx )
             msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
             break;
 
-        //case SCR_IDX_SETUP_CALIBRATION_PASSWORD:
-        //    msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
-        //    break;
-
-        //case SCR_IDX_SETUP_CALIBRATION_PASSWORD_ERROR:
-        //    msg_sbar.Data.v = L10N_STR_ID_PASSWORD;
-        //    break;
-
-        //case SCR_IDX_SETUP_MEASURE:
-        //    msg_sbar.Data.v = SCR_IDX_SETUP_MEASURE;
-        //    break;
-
-        //case SCR_IDX_SETUP_RANGE:
-        //    msg_sbar.Data.v = L10N_STR_ID_RANGE;
-        //    break;
-
-        //case SCR_IDX_SETUP_RANGE_VALUE:
-        //    msg_sbar.Data.v = L10N_STR_ID_RANGE;
-        //    break;
-
         case SCR_IDX_SETUP_SYSTEM:
             msg_sbar.Data.v = L10N_STR_ID_SYSTEM;
             break;
@@ -168,9 +151,9 @@ scr_header_label_update(        const   scr_idx_t           idx )
             msg_sbar.Data.v = L10N_STR_ID_DATE;
             break;
 
-        //case SCR_IDX_SETUP_SYSTEM_INFO:
-        //    msg_sbar.Data.v = L10N_STR_ID_INFO;
-        //    break;
+        case SCR_IDX_SETUP_SYSTEM_INFO:
+            msg_sbar.Data.v = L10N_STR_ID_INFO;
+            break;
 
         case SCR_IDX_SETUP_SYSTEM_LANGUAGE:
             msg_sbar.Data.v = L10N_STR_ID_LANGUAGE;
@@ -292,6 +275,10 @@ scr_header_label_update(        const   scr_idx_t           idx )
         case SCR_IDX_SETUP_SYSTEM_TIME:
             msg_sbar.Data.v = L10N_STR_ID_TIME;
             break;
+            
+        case SCR_IDX_SETUP_SYSTEM_INFO_TAG:
+            msg_sbar.Data.v = L10N_STR_ID_TAG;          
+            break;            
 
         default:
             msg_sbar.Data.v = L10N_STR_ID_LAST;
@@ -322,10 +309,14 @@ scr_switch(                     const   scr_idx_t       idx,
         case SCR_IDX_CALIBRATE:
             hWin    = scr_calibrate();
             break;
+            
+        case SCR_IDX_CALIBRATE_AUTO:
+            hWin    = scr_calibrate_auto();
+            break;             
 
-        //case SCR_IDX_CALIBRATE_FACTORY_SETTINGS:
-        //    hWin    = scr_calibrate_factory_settings();
-        //    break;
+        case SCR_IDX_CALIBRATE_MANUAL:
+            hWin    = scr_calibrate_manual();
+            break;  
 
         case SCR_IDX_CALIBRATE_POINT:
             hWin    = scr_calibrate_point();
@@ -334,6 +325,65 @@ scr_switch(                     const   scr_idx_t       idx,
         case SCR_IDX_CALIBRATE_RESTORE:
             hWin    = scr_calibrate_restore();
             break;
+            
+        case SCR_IDX_CALIBRATION_SETUP:
+            hWin    = scr_calibration_setup();
+            break;       
+            
+        case SCR_IDX_CALIBRATION_STEP1:
+            hWin    = scr_calibration_step1();
+            break;    
+            
+        case SCR_IDX_CALIBRATION_STEP2:
+            hWin    = scr_calibration_step2();
+            break;   
+            
+        case SCR_IDX_CALIBRATION_STEP3:
+            hWin    = scr_calibration_step3();
+            break;            
+            
+        case SCR_IDX_CALIBRATION_AUTO_CYCLE_TIME:
+            hWin    = scr_calibrate_auto_cycle_time();
+            break;            
+            
+        case SCR_IDX_VALIDATION_SETUP_TRANSITION_TIME:           
+        case SCR_IDX_VALIDATION_SETUP_MEASURE_TIME:    
+        case SCR_IDX_VALIDATION_SETUP_RETURN_TIME:  
+        case SCR_IDX_CALIBRATION_SETUP_TRANSITION_TIME:
+        case SCR_IDX_CALIBRATION_SETUP_MEASURE_TIME:
+        case SCR_IDX_CALIBRATION_SETUP_RETURN_TIME:
+        case SCR_IDX_CALIBRATION_SETUP_SLOPE:
+        case SCR_IDX_CALIBRATION_SETUP_SLOPE_TIME:
+            hWin    = scr_validation_setup_time();        
+            break;            
+            
+        case SCR_IDX_VALIDATION_SETUP_VALUE:            
+        case SCR_IDX_VALIDATION_SETUP_DEVIATION:    
+        case SCR_IDX_CALIBRATION_SETUP_ZERO:
+        case SCR_IDX_CALIBRATION_SETUP_SPAN:    
+        case SCR_IDX_CALIBRATION_SETUP_DEVIATION:
+            hWin    = scr_validation_setup_value();        
+            break; 
+
+        case SCR_IDX_VALIDATION:            
+            hWin    = scr_validation();
+            break;
+            
+        case SCR_IDX_VALIDATION_SETUP:
+            hWin    = scr_validation_setup();
+            break;    
+            
+        case SCR_IDX_VALIDATION_STEP1:
+            hWin    = scr_validation_step1();
+            break;    
+            
+        case SCR_IDX_VALIDATION_STEP2:
+            hWin    = scr_validation_step2();
+            break;    
+            
+        case SCR_IDX_VALIDATION_STEP3:
+            hWin    = scr_validation_step3();
+            break;             
 
         case SCR_IDX_CONSOLE:
             hWin    = scr_console();
@@ -343,48 +393,12 @@ scr_switch(                     const   scr_idx_t       idx,
             hWin    = scr_setup();
             break;
 
-        case SCR_IDX_SETUP_CALIBRATION:
-            hWin    = scr_setup_calibration();
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_CYCLE:
-            hWin    = scr_setup_calibration_auto_cycle();
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_PURGE:
-            hWin    = scr_setup_calibration_auto_flow();
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO:
-            hWin    = scr_setup_calibration_auto();
-            break;
-
-        case SCR_IDX_SETUP_CALIBRATION_AUTO_LAUNCH:
-            hWin    = scr_setup_calibration_auto_start();
-            break;
-
-        //case SCR_IDX_SETUP_HELP:
-        //    hWin    = scr_setup_help();
-        //    break;
-
-        case SCR_IDX_SETUP_MEASURE:
-            hWin    = scr_setup_measure();
-            break;
-
         case SCR_IDX_SETUP_MEASURE_CL420:
             hWin    = scr_setup_measure_cl420();
             break;
 
         case SCR_IDX_SETUP_MEASURE_CL420_VALUE:
             hWin    = scr_setup_measure_cl420_value();
-            break;
-
-        //case SCR_IDX_SETUP_MEASURE_DISCRETE_OUTPUT:
-        //    hWin    = scr_setup_measure_discrete_output();
-        //    break;
-
-        case SCR_IDX_SETUP_MEASURE_SENSOR:
-            hWin    = scr_setup_measure_sensor();
             break;
 
         case SCR_IDX_SETUP_SERVICE:
@@ -515,9 +529,9 @@ scr_switch(                     const   scr_idx_t       idx,
             hWin    = scr_setup_system();
             break;
 
-        //case SCR_IDX_SETUP_SYSTEM_INFO:
-        //    hWin    = scr_setup_system_info();
-        //    break;
+        case SCR_IDX_SETUP_SYSTEM_INFO:
+            hWin    = scr_setup_system_info();
+            break;
 
         case SCR_IDX_SETUP_SYSTEM_LANGUAGE:
             hWin    = scr_setup_system_language();
@@ -534,6 +548,10 @@ scr_switch(                     const   scr_idx_t       idx,
         case SCR_IDX_SETUP_SYSTEM_TIME:
             hWin    = scr_setup_system_time();
             break;
+            
+        case SCR_IDX_SETUP_SYSTEM_INFO_TAG:
+            hWin    = scr_setup_system_info_tag();
+            break;          
 
         case SCR_IDX_LAST:
         default:

@@ -12,6 +12,12 @@
 /*******************************************************************************
 * TYPES
 *******************************************************************************/
+typedef union
+{
+    char        c_tag[12];
+    uint32_t    u32[3];
+} dev_tag_t;
+
 typedef struct  dev_info_s
 {
     uint16_t        device_id;
@@ -19,6 +25,7 @@ typedef struct  dev_info_s
     uint32_t        sn;
     uint16_t *      uid_u16[ 8];
     uint32_t *      uid_u32[ 4];
+    dev_tag_t *     tag;
     char            real_firmware_id[64];           
     char const *    firmware_str;
     char const *    hardware_str;  

@@ -1,5 +1,5 @@
 @echo off
-set worspace_name=astek_10x2
+set worspace_name=astek_econ
 echo -------------------------------------------------------------------------
 echo Workspace name: %worspace_name%
 set year=%date:~-4%

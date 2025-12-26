@@ -19,10 +19,11 @@ static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
 
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_LANGUAGE,     100,  12, 600,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DATE,         100,  90, 600,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_TIME,         100, 166, 600,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_PASSWORD,     100, 244, 600,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_LANGUAGE,     100,  10, 600,  52, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DATE,         100,  72, 600,  52, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_TIME,         100, 134, 600,  52, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_PASSWORD,     100, 196, 600,  52, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_INFO,         100, 258, 600,  52, 0, 0x0, 0 },    
 
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_BACK,           0, 320, 800,  80, 0, 0x0, 0 },
 };
@@ -56,19 +57,9 @@ void    scr_cfg_sys_init(                               WM_HWIN         hWin )
     BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_TIME )         );
     BUTTON_SetFocusable(    hItem, 1                                        );
 
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_INFO );
-    //BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_INFO )         );
-    //BUTTON_SetFocusable(    hItem, 1                                        );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON1 );
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_INFO );
+    BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_INFO )         );
     BUTTON_SetFocusable(    hItem, 1                                        );
-
-    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON2 );
-    BUTTON_SetFocusable(    hItem, 1                                        );
-
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_SERVICE );
-    //BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_SERVICE )      );
-    //BUTTON_SetFocusable(    hItem, 1                                        );
 
     ////////////////////////////////////////////////////////
     // FOOTER AREA
@@ -105,17 +96,11 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_LEFT:
                     GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
-                    GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
-                    GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
-                    //GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
                     beep_play( BEEP_SHRT );
                     break;
 
                 case GUI_KEY_RIGHT:
                     GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
-                    GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
-                    GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
-                    //GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
                     beep_play( BEEP_SHRT );
                     break;
 
@@ -130,14 +115,10 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                 int Id = WM_GetId(pMsg->hWinSrc);
                 switch( Id )
                 {
-                    //case GUI_ID_BUTTON_INFO:
-                    //    scr_switch( SCR_IDX_SETUP_SYSTEM_INFO, GUI_ID_BUTTON_DUMMY );
-                    //    beep_play( BEEP_SHRT );
-                    //    break;
-                    //case GUI_ID_BUTTON_SERVICE:
-                    //    scr_switch( SCR_IDX_SETUP_SERVICE, GUI_ID_BUTTON_RESET );
-                    //    beep_play( BEEP_SHRT );
-                    //    break;
+                    case GUI_ID_BUTTON_INFO:
+                        scr_switch( SCR_IDX_SETUP_SYSTEM_INFO, GUI_ID_BUTTON_DUMMY );
+                        beep_play( BEEP_SHRT );
+                        break;
                     case GUI_ID_BUTTON_PASSWORD:
                         scr_switch( SCR_IDX_SETUP_SYSTEM_PASSWORD, GUI_ID_LISTWHEEL0 );
                         beep_play( BEEP_SHRT );

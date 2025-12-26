@@ -44,6 +44,8 @@ typedef struct  dev_cfg_s
     bool                        sens_t_compensation;
     bool                        sens_p_compensation;
     uint16_t                    error_filter_count;
+    uint16_t                    lpf_cutoff;
+    uint16_t                    lpf_order;     
     //bool                        cal_zero;
     //dev_union_t           password;
     //dev_mode_t      mode;

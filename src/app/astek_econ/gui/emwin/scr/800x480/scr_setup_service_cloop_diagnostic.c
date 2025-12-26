@@ -27,6 +27,7 @@ typedef enum    listwheel_idx_e
 /*******************************************************************************
 * PRIVATE VARIABLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
@@ -49,8 +50,33 @@ static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                            0, 100,1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,  25, 960, 350, 0, 0x0, 0 },
+    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS0,         256, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS1,         384, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS2,         512, 175, 128,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_FOCUS3,         640, 175, 128,  50, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,          256,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,          384,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,          512,  75, 128, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL3,          640,  75, 128, 250, 0, 0x0, 0 },
+    
+    { TEXT_CreateIndirect,      ".", GUI_ID_TEXT1,              506, 175,  23,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT2,               768, 175, 128,  50, 0, 0x0, 0 },     
+    
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,         0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
 
-static  const   char *  list[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", };
+static const char* list[] = {
+    "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
 static  const   size_t  list_countof    = sizeof( list ) / sizeof( char * );
 
 static  listwheel_idx_t listwheel_idx;
@@ -65,30 +91,30 @@ static void check_current (WM_HWIN         hWin)
    uint32_t temp_uA = 0;
    uint8_t idx;
    
-   temp_uA   += 10000 * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 ) );
-   temp_uA   += 1000  * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 ) );
-   temp_uA   += 100   * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 ) );
-   temp_uA   += 10    * LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 ) );  
+   temp_uA   += 10000 * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 )));
+   temp_uA   += 1000  * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1 )));
+   temp_uA   += 100   * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2 )));
+   temp_uA   += 10    * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3 )));  
    
-   if (temp_uA < 3900)
-     temp_uA = 3900;
-   else if (temp_uA > 21000)
-     temp_uA = 21000;
+   if (temp_uA < 3800)
+     temp_uA = 3800;
+   else if (temp_uA > 22500)
+     temp_uA = 22500;
    
    
-   idx     = (temp_uA / 10000) % 10;
+   idx     = (list_countof - 1) - (temp_uA / 10000) % 10;
    LISTWHEEL_SetPos(  WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0), idx );
    LISTWHEEL_SetSel( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0), idx );   
 
-   idx     = (temp_uA / 1000) % 10;
+   idx     = (list_countof - 1) - (temp_uA / 1000) % 10;
    LISTWHEEL_SetPos(  WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1), idx );
    LISTWHEEL_SetSel( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL1), idx );   
    
-   idx     = (temp_uA / 100) % 10;
+   idx     = (list_countof - 1) - (temp_uA / 100) % 10;
    LISTWHEEL_SetPos(  WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2), idx );
    LISTWHEEL_SetSel( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL2), idx );      
    
-   idx     = (temp_uA / 10) % 10;
+   idx     = (list_countof - 1) - (temp_uA / 10) % 10;
    LISTWHEEL_SetPos(  WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3), idx );
    LISTWHEEL_SetSel( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL3), idx );         
    
@@ -237,6 +263,7 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
 
     int             idx;
     uint32_t        temp_uA = 4000;
+    WM_HWIN         hItem;
 
     switch( pMsg->MsgId )
     {
@@ -256,19 +283,6 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
                 case GUI_KEY_UP:
                     beep_play( BEEP_SHRT );
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
-                    {
-                        idx     = 0;
-                    }
-                    LISTWHEEL_SetPos( hWheel, idx );
-                    LISTWHEEL_SetSel( hWheel, idx );
-                    
-                    check_current(pMsg->hWin);
-                    break;
-
-                case GUI_KEY_DOWN:
-                    beep_play( BEEP_SHRT );
-                    idx     = LISTWHEEL_GetPos( hWheel );
                     if( idx > 0 )
                     {
                         idx--;
@@ -280,16 +294,35 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
                     LISTWHEEL_SetPos( hWheel, idx );
                     LISTWHEEL_SetSel( hWheel, idx );
                     
+                    check_current(pMsg->hWin);
+                    break;
+
+                case GUI_KEY_DOWN:
+                    beep_play( BEEP_SHRT );
+                    idx     = LISTWHEEL_GetPos( hWheel );
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                    {
+                        idx     = 0;
+                    }
+                    LISTWHEEL_SetPos( hWheel, idx );
+                    LISTWHEEL_SetSel( hWheel, idx );
+                    
                     check_current(pMsg->hWin);                    
                     break;
 
                 case GUI_KEY_ESCAPE:
                         dev.cloop->cloop_state = CLOOP_NORMAL_WORK;
                         dev.state.process_status = PROCESS_MEASURE;
-                        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC)                                                
+                        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC)  
+                        {
+                          dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC;
                           scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC, GUI_ID_BUTTON_CLOOP_CHANNEL_1 );                                                
+                        }
                         else
+                        {
+                          dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC;
                           scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC, GUI_ID_BUTTON_CLOOP_CHANNEL_2  );                                                                                                  
+                        }
                         beep_play( BEEP_SHRT ); 
                     break;
 
@@ -335,17 +368,18 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
                         if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC)                                                
                           scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC, GUI_ID_BUTTON_CLOOP_CHANNEL_1 );                                                
                         else
-                          scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC, GUI_ID_BUTTON_CLOOP_CHANNEL_2  );                                                                                                  
+                          scr_switch( SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC, GUI_ID_BUTTON_CLOOP_CHANNEL_2  );   
+                        dev.gui.scr_idx = SCR_IDX_SETUP_SERVICE_CLOOP_DIAGNOSTIC;
                         beep_play( BEEP_SHRT );                        
                         break;
 
                     case GUI_ID_BUTTON_ENTER:
                     case GUI_ID_BUTTON_DUMMY:
                         temp_uA = 0;
-                        temp_uA   += 10000 * LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
-                        temp_uA   += 1000  * LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
-                        temp_uA   += 100   * LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
-                        temp_uA   += 10    * LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 ) );
+                        temp_uA   += 10000 * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 )));
+                        temp_uA   += 1000  * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 )));
+                        temp_uA   += 100   * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 )));
+                        temp_uA   += 10    * ((list_countof - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL3 )));
                         if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_CLOOP_CHANNEL_1_DIAGNOSTIC)
                           send_cmd_for_cloop_set_current(1, temp_uA);
                         else
@@ -362,16 +396,25 @@ dialog_callback(                                        WM_MESSAGE *    pMsg )
         case WM_INIT_DIALOG:
             init_dialog( pMsg->hWin );
             dev.cloop->cloop_state = CLOOP_FREEZ;
-            dev.state.process_status = PROCESS_CLOOP_CALIBRATION;            
-                     
+            dev.state.process_status = PROCESS_CLOOP_VALIDATION;            
+            
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 40, list, list_countof );
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 40, list, list_countof );
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 40, list, list_countof );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, list, list_countof );         
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, list, list_countof );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL3, 50, list, list_countof );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 50, list, list_countof );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 50, list, list_countof );
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 50, list, list_countof );            
+#endif            
 
             listwheel_idx   = LISTWHEEL_IDX_0;
             init_listwheel( pMsg->hWin );
             listwheel_set_focus( pMsg->hWin, listwheel_idx );                   
+            
+            check_current(pMsg->hWin); 
             
             break;
 

@@ -122,16 +122,7 @@ init_dialog(                                            WM_HWIN         hWin )
     BUTTON_SetFont(         hItem, &GUI_FontTahoma30                        );
     BUTTON_SetTextAlign(    hItem, GUI_TA_HCENTER | GUI_TA_VCENTER          );
     BUTTON_SetFocusable(    hItem, 1                                        );
-    button_text_update(     hItem, DEV_RANGE_IDX_R3, range_units );    
-    
-    //hItem   = RADIO_CreateEx( 650, 60, 100, 200, hWin, WM_CF_SHOW, 0, GUI_ID_RADIO1, CL420_UNITS_MAX, 60 );
-    //RADIO_SetBkColor(       hItem,  GUI_TRANSPARENT                         );
-    //RADIO_SetFont(          hItem,  &GUI_FontTahoma30                       );
-    //RADIO_SetTextColor( hItem, GUI_BLUE                                     );
-    //RADIO_SetText( hItem, " PPM ",  0 );
-    //RADIO_SetText( hItem, " %   ",  1 );
-    //RADIO_SetValue( hItem, range_units );    
-    
+    button_text_update(     hItem, DEV_RANGE_IDX_R3, range_units );       
     
     //
     // FOOTER AREA
@@ -190,11 +181,6 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                                 RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ), range_idx );
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ) );
                         }
-                        //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
-                        //{
-                        //        RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ), range_units );
-                        //        WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
-                        //}
                         else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ) ) )
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
@@ -240,18 +226,6 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
                         }                        
-                        //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
-                        //{
-                        //        if( range_units > 0 )
-                        //        {
-                        //                range_units--;
-                        //                RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ), range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ), DEV_RANGE_IDX_R1, range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON2 ), DEV_RANGE_IDX_R2, range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON3 ), DEV_RANGE_IDX_R3, range_units );
-                        //                dev_cl420_set_units(&dev.cl420, range_units);
-                        //        }
-                        //}
                         break;
 
                 case GUI_KEY_DOWN:
@@ -282,18 +256,6 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                         {
                                 WM_SetFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0 ) );
                         }                         
-                        //else if(        1 == WM_HasFocus( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ) ) )
-                        //{
-                        //        if( range_units < CL420_UNITS_MAX-1 )
-                        //        {
-                        //                range_units++;
-                        //                RADIO_SetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1 ), range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ), DEV_RANGE_IDX_R1, range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON2 ), DEV_RANGE_IDX_R2, range_units );
-                        //                button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON3 ), DEV_RANGE_IDX_R3, range_units );
-                        //                dev_cl420_set_units(&dev.cl420, range_units);
-                        //        }
-                        //}
                         break;              
                     
                 case GUI_KEY_ESCAPE:
@@ -336,19 +298,10 @@ dialog_callback(                        WM_MESSAGE *            pMsg )
                     case GUI_ID_RADIO0:
                         range_idx = (dev_range_idx_t)RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0));         
                         beep_play( BEEP_SHRT );
-                        break;
-                   //case GUI_ID_RADIO1:
-                   //     range_units = RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO1));    
-                   //     dev_cl420_set_units(&dev.cl420, range_units);
-                   //     button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON1 ), DEV_RANGE_IDX_R1, range_units );
-                   //     button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON2 ), DEV_RANGE_IDX_R2, range_units );
-                   //     button_text_update( WM_GetDialogItem( pMsg->hWin, GUI_ID_BUTTON3 ), DEV_RANGE_IDX_R3, range_units );
-                   //     beep_play( BEEP_SHRT );
-                   //     break;                            
+                        break;                         
                     case GUI_ID_BUTTON_DUMMY:
                     case GUI_ID_BUTTON_ENTER:
                         dev_cl420_set_range_idx( &dev.cl420, range_idx );
-                        //dev_cl420_set_units(&dev.cl420, range_units);
                         task_ibus_cl420_ch2_update();
                         scr_switch( SCR_IDX_SETUP, GUI_ID_BUTTON_RANGE );
                         beep_play( BEEP_TYPE_CONFIRM );

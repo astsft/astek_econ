@@ -19,6 +19,7 @@
 #include "internal_uart.h"
 #include "hw_cl420.h"
 #include "hw_relay.h"
+#include "filter\sma.h"
 
 #ifdef EXT_FLASH
   #include "hw2331_ext_flash.h"
@@ -31,6 +32,9 @@
 /*******************************************************************************
 * PUBLIC VARIABLES
 *******************************************************************************/
+sma_t           lpf_sma[ LPF_ORDER_MAX ];
+int32_t        lpf_sma_buf[ LPF_ORDER_MAX ][ LPF_BUF_SIZE ];   
+
 extern  QueueHandle_t           que_mdbs_clnt_hndl;
 extern  QueueHandle_t           que_hmi_hndl;
 extern  QueueHandle_t           que_ibus_hndl;
@@ -167,6 +171,27 @@ modbus_client_write(                    const   uint8_t         dev_addr,
 
     return( 0 );
 }
+
+static
+int32_t
+sma16_full_filter(                      sma_t *         p_sma,
+                                        int32_t        data)
+{
+  int32_t result = 0;
+  result = data;
+
+  if (dev.cfg.lpf_order > LPF_ORDER_MAX) return data;
+  if (dev.cfg.lpf_cutoff > LPF_BUF_SIZE) return data;
+
+
+  for( size_t pass = 0; pass < dev.cfg.lpf_order; pass++ )
+  {
+      result = sma16_filter( &p_sma[pass], result);
+  }
+
+  return result;
+}
+
 static char chardig (char v)
 {
   v-='0';
@@ -270,13 +295,36 @@ modbus_ascii_client_read( void )
 #else
          sscanf( (char *) mdbs_adu_recv, ":010304%04x%04x%02x\r\n", &meas, &temp, &lrc );         
 #endif        
-            
-        dev.sens->meas.raw          = meas;
+                    
+        //dev.sens->meas.raw          = meas;
+        dev.sens->meas.raw          = sma16_full_filter(lpf_sma, meas);
         dev.sens->meas.raw_t        = temp;   
-        dev.sens->meas.ppm.integral = econ_raw2ppm( dev.sens, meas );
+        dev.sens->meas.ppm.i32 = econ_raw2ppm( dev.sens, dev.sens->meas.raw );
+        dev.sens->meas.ppb.i32 = dev.sens->meas.ppm.i32 * 1000;
 
         dev.sens->meas.digc.integral    = temp / 10;
         dev.sens->meas.digc.fractional  = temp % 10;
+        
+        dev.sens->meas.slope = econ_calc_slope(dev.sens->meas.raw);
+        
+        
+        if (dev.state.process_status == PROCESS_VALIDATION_SPAN || dev.state.process_status == PROCESS_VALIDATION_ZERO)
+        {
+          dev.validation.ppb_hi = dev.sens->meas.ppb.u16[1];
+          dev.validation.ppb_lo = dev.sens->meas.ppb.u16[0];    
+        }
+        else if ((dev.state.process_status == PROCESS_CALIBRATION_ZERO) || (dev.state.process_status == PROCESS_CALIBRATION_SPAN)) 
+        {
+          dev.calibration.ppb_hi = dev.sens->meas.ppb.u16[1];
+          dev.calibration.ppb_lo = dev.sens->meas.ppb.u16[0];     
+        }
+        else
+        {
+          dev.sens->modbus_ppb_hi = dev.sens->meas.ppb.u16[1];
+          dev.sens->modbus_ppb_lo = dev.sens->meas.ppb.u16[0];
+          dev.sens->modbus_ppm_hi = dev.sens->meas.ppm.u16[1];
+          dev.sens->modbus_ppm_lo = dev.sens->meas.ppm.u16[0];    
+        }        
     }
 
     return( 0 );
@@ -387,7 +435,7 @@ static void relay_threshold_process(uint8_t relay_num)
 {
   static relay_position_e previous_position[8] = {UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION, UNKNOWN_POSITION};
   
-  int32_t     meas_ppm = dev.sens->meas.ppm.integral;
+  int32_t     meas_ppm = dev.sens->meas.ppm.i32;
   int32_t     thres_ppm =  (int32_t)dev.ext_relay->relay[relay_num].ppm.ppm_f;
   int32_t     hyst_ppm = (int32_t)dev.ext_relay->relay[relay_num].hyst_ppm.ppm_f;
   
@@ -546,6 +594,34 @@ static void relay_not_active_process(uint8_t relay_num)
   
 }
 
+static void relay_validation_process (uint8_t relay_num)
+{
+  static relay_state_e previous_state[8] = {UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE, UNKNOWN_STATE};
+  static validation_state_t previous_validation_state[8] = {FINISH, FINISH, FINISH, FINISH, FINISH, FINISH, FINISH, FINISH};
+  
+  if (previous_state[relay_num] != dev.ext_relay->relay[relay_num].relay_state || previous_validation_state[relay_num] != dev.validation.state)
+  {  
+    switch (dev.ext_relay->relay[relay_num].relay_state) {
+    case NORMAL_OPEN_STATE:
+        if (dev.validation.state == FINISH)
+          set_external_switch_open(relay_num); 
+        else
+          set_external_switch_close(relay_num); 
+      break;
+      
+    case NORMAL_CLOSE_STATE:
+        if (dev.validation.state == FINISH)
+          set_external_switch_close(relay_num); 
+        else
+          set_external_switch_open(relay_num); 
+      break;
+    }
+  }
+  
+  previous_validation_state[relay_num] = dev.validation.state;
+  previous_state[relay_num] = dev.ext_relay->relay[relay_num].relay_state;
+}
+
 static void relay_process (uint8_t relay_num)
 {
   // Relay mode
@@ -558,6 +634,11 @@ static void relay_process (uint8_t relay_num)
       
   case NOT_ACTIVE_MODE: relay_not_active_process (relay_num);
       break;
+      
+#if defined(USE_VALIDATION)       
+  case VALIDATION_MODE: relay_validation_process(relay_num);
+      break; 
+#endif       
       
   default:
       break;
@@ -681,7 +762,7 @@ cl420_ch1_update(                       dev_cl420_t *   p,
                                         econ_t *        sens )
 {
     int         err = 0;
-    int32_t     ppm         = sens->meas.ppm.integral;
+    int32_t     ppm         = sens->meas.ppm.i32;
     uint32_t    range_ppm   = p->range[ p->range_idx ].ppm;
     if (ppm < 0) ppm = 0;
     uint64_t temp_uA = 4000 + (16000 * (int64_t)ppm) / (int64_t)range_ppm;
@@ -813,16 +894,19 @@ cloop_init (void)
     {
       need_write_range = 1;
       dev.cl420.range[0].ppm = range_r0_value_default;
+      dev.cl420.range[0].ppb = dev.cl420.range[0].ppm * 1000;
     }
     if ((dev.cl420.range[1].ppm <= 0) || (dev.cl420.range[1].ppm > 999999))
     {
       need_write_range = 1;
       dev.cl420.range[1].ppm = range_r1_value_default;      
+      dev.cl420.range[1].ppb = dev.cl420.range[1].ppm * 1000;
     }
     if ((dev.cl420.range[2].ppm <= 0) || (dev.cl420.range[2].ppm > 999999))
     {
       need_write_range = 1;
       dev.cl420.range[2].ppm = range_r2_value_default;      
+      dev.cl420.range[2].ppb = dev.cl420.range[2].ppm * 1000;      
     }
     if (dev.cl420.range_idx > 2)
     {
@@ -852,12 +936,19 @@ void
 task_ibus_sens_conf_lpf_update( const   uint16_t        cutoff,
                                 const   uint16_t        order)
 {
-    app_pipe_t result;
-    result.tag    = OS_USER_TAG_SENS_CONF_FILTER;
+    BaseType_t result;
+    app_pipe_t queue_data;
+    queue_data.tag    = OS_USER_TAG_SENS_CONF_FILTER;
 
-    //dev.sens->conf.lpf_cutoff   = cutoff;
-    //dev.sens->conf.lpf_order    = order;
-    xQueueSend( que_ibus_hndl, &result, NULL );
+    dev.cfg.lpf_cutoff   = cutoff;
+    dev.cfg.lpf_order    = order;
+    result = xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }    
 }
 
 void
@@ -1030,6 +1121,397 @@ void send_cmd_for_nvm_write_param (const uint32_t param_id, const uint32_t param
 #endif  
 }
 
+void send_cmd_for_validation_start (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };   
+    queue_data.tag      = OS_USER_TAG_VALIDATION_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_validation_stop (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_VALIDATION_STOP;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_validation_return_to_measure (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_VALIDATION_SWITCH_FOR_MEASURE;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_validation_error (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_VALIDATION_ERROR;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_validation_passed (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_VALIDATION_PASSED;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_remote_validation_start(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_REMOTE_VALIDATION_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);   
+}
+
+void send_cmd_for_remote_validation_break(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };  
+    queue_data.tag      = OS_USER_TAG_REMOTE_VALIDATION_BREAK;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);    
+}
+
+//------------------------------------------------------------------------------
+void send_cmd_for_calibration_zero_start (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };   
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_ZERO_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_calibration_span_start (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };   
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_SPAN_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_calibration_stop (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_STOP;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);     
+}
+
+void send_cmd_for_calibration_error(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_ERROR;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);     
+}
+
+void send_cmd_for_calibration_passed (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_PASSED;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_calibration_return_to_measure (void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_CALIBRATION_SWITCH_FOR_MEASURE;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);           
+}
+
+void send_cmd_for_remote_calibration_zero_start(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_REMOTE_ZERO_CALIBRATION_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);   
+}
+
+void send_cmd_for_remote_calibration_span_start(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    }; 
+    queue_data.tag      = OS_USER_TAG_REMOTE_SPAN_CALIBRATION_START;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);   
+}
+
+void send_cmd_for_remote_calibration_break(void)
+{
+    BaseType_t result;  
+    app_pipe_t      queue_data = 
+    {
+      .cnt = 0, 
+      .data = NULL,
+      .param_data = 0,
+      .param_id = 0,
+      .tag = 0
+    };  
+    queue_data.tag      = OS_USER_TAG_REMOTE_CALIBRATION_BREAK;          
+    result = xQueueSendToFront( que_ibus_hndl, &queue_data, NULL );
+ 
+    if (result != pdTRUE) 
+    {
+      xQueueReset(que_ibus_hndl);
+      xQueueSend( que_ibus_hndl, &queue_data, NULL );
+    }                
+    
+    osDelay(3);    
+}
+
+//------------------------------------------------------------------------------
+
+static void close_process(void)
+{
+  set_external_switch_open(PROCESS_SWITCH);  
+}
+
+static void open_process(void)
+{
+  set_external_switch_close(PROCESS_SWITCH);  
+}
+
+static void close_probe(void)
+{
+  set_external_switch_open(PROBE_SWITCH);
+}
+
+static void open_probe(void)
+{
+  set_external_switch_close(PROBE_SWITCH);
+}
+
 /*******************************************************************************
 *
 *******************************************************************************/
@@ -1069,6 +1551,11 @@ task_ibus(                      const   void *          argument )
 
     dev_init( &dev );
     
+    for( size_t i = 0; i < LPF_ORDER_MAX; i++ )
+    {
+        sma16_init( &(lpf_sma[ i]), lpf_sma_buf[ i], dev.cfg.lpf_cutoff );
+    }    
+    
     (void) argument;
 
     tmr_1sec_hndl   = xTimerCreateStatic(   "TMR1SEC",                      //const char * const pcTimerName,
@@ -1086,8 +1573,8 @@ task_ibus(                      const   void *          argument )
 
     sens->link_err      = 1;
     set_sensor_status(dev.sens->link_err);
-    sens->meas.ppm.integral   = 0;
-    sens->meas.ppm.fractional = 0;
+    sens->meas.ppm.i32   = 0;
+
     
     dev.cloop->link_err = 1;
     set_cloop_status(dev.cloop->link_err);
@@ -1097,6 +1584,11 @@ task_ibus(                      const   void *          argument )
     cloop_hw_init();
     relay_hw_init();
     task_ibus_boards_init();
+    
+    close_process();
+    close_probe();     
+    
+    dev.state.process_status = PROCESS_MEASURE;
 
     while( true )
     {
@@ -1142,12 +1634,11 @@ task_ibus(                      const   void *          argument )
                 break;                
 
             case OS_USER_TAG_SENS_CONF_FILTER:
-                //dev.sens->link_err  = modbus_client_write( CFG_MDBS_DEV_ADDR_SENS, 0x0200, 16, dev.sens->conf.raw );
-                //set_sensor_status(dev.sens->link_err); 
-                //if( dev.sens->link_err )
-                //    break;
-                //dev.sens->link_err = modbus_client_read( CFG_MDBS_DEV_ADDR_SENS, 0x0200, 16, dev.sens->conf.raw );
-                //set_sensor_status(dev.sens->link_err);
+                // reinit SMA filter
+              
+                // save param in flash 
+                send_cmd_for_nvm_write_param(NVM_SMA_FILTER_CUTOFF, dev.cfg.lpf_cutoff);
+                send_cmd_for_nvm_write_param(NVM_SMA_FILTER_ORDER, dev.cfg.lpf_order);
                 break;
 
             case OS_USER_TAG_CAL0_UPDATE:
@@ -1308,6 +1799,110 @@ task_ibus(                      const   void *          argument )
               dev.cloop->link_err = cloop_set_uA(2, queue_data.param_data);              
               set_cloop_status(dev.cloop->link_err);
             break;
+            
+#if defined(USE_VALIDATION)                        
+            case OS_USER_TAG_VALIDATION_START:  // Manual validation start
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_VALIDATION_START);
+              dev.state.warnings_status |= VALIDATION_START_WAR;
+              open_process();                            
+              open_probe();              
+              break;
+
+            case OS_USER_TAG_VALIDATION_STOP:
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_VALIDATION_STOP);   
+              dev.state.warnings_status &=~ VALIDATION_START_WAR;
+              break;
+              
+#if defined(ASBACK_HW2353REV5)              
+            case OS_USER_TAG_VALIDATION_SWITCH_FOR_MEASURE:  // Common validation finish
+              close_probe();                            
+              //open_process();
+              close_process();
+              break;      
+#endif               
+
+            case OS_USER_TAG_VALIDATION_ERROR:
+              //dev.state.error_status |= VALIDATION_ERR;
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_VALIDATION_ERROR);              
+              break;
+              
+            case OS_USER_TAG_VALIDATION_PASSED:
+              dev.state.error_status &=~ VALIDATION_ERR;
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_VALIDATION_PASSED);              
+              break;
+              
+#if defined(ASBACK_HW2353REV5)
+            case OS_USER_TAG_REMOTE_VALIDATION_START:
+              queue_data.tag = OS_USER_TAG_IBUS_SHOW_VALIDATION;            
+              xQueueSend( que_hmi_hndl, &queue_data, NULL ); 
+              //close_process();                            
+              open_process();
+              open_probe();
+              break;
+#endif              
+              
+            case OS_USER_TAG_REMOTE_VALIDATION_BREAK:
+              break;             
+#endif           
+            
+//------------------------------------------------------------------------------              
+#if defined(USE_REMOTE_CALIBRATION)              
+            case OS_USER_TAG_CALIBRATION_ZERO_START:
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_CALIBRATION_ZERO_START);
+              dev.state.warnings_status |= CALIBRATION_ZERO_START_WAR;
+              open_process();                            
+              close_probe();                         
+              break;
+              
+            case OS_USER_TAG_CALIBRATION_SPAN_START:
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_CALIBRATION_SPAN_START);
+              dev.state.warnings_status |= CALIBRATION_SPAN_START_WAR;
+              open_process();                            
+              open_probe();                         
+              break;   
+              
+            case OS_USER_TAG_CALIBRATION_STOP:
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_CALIBRATION_STOP);   
+              dev.state.warnings_status &=~ CALIBRATION_START_WAR;
+              break;       
+              
+            case OS_USER_TAG_CALIBRATION_ERROR:
+              //dev.state.error_status |= VALIDATION_ERR;
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_CALIBRATION_ERROR);              
+              break;              
+              
+            case OS_USER_TAG_CALIBRATION_PASSED:
+              dev.state.error_status &=~ CALIBRATION_ERR;
+              log_write_event(&dev.log, LOG_SOURCE_SYSTEM, LOG_SYSTEM_EVENT_CALIBRATION_PASSED);                  
+              break;
+              
+#if defined(ASBACK_HW2353REV5)              
+            case OS_USER_TAG_CALIBRATION_SWITCH_FOR_MEASURE:  // Common calibration finish
+              close_probe();                            
+              //open_process();
+              close_process();
+              break;      
+              
+            case OS_USER_TAG_REMOTE_ZERO_CALIBRATION_START:
+              queue_data.tag = OS_USER_TAG_IBUS_SHOW_CALIBRATION_ZERO;            
+              xQueueSend( que_hmi_hndl, &queue_data, NULL ); 
+              open_process();                            
+              close_probe(); 
+              break;   
+              
+            case OS_USER_TAG_REMOTE_SPAN_CALIBRATION_START:
+              queue_data.tag = OS_USER_TAG_IBUS_SHOW_CALIBRATION_SPAN;            
+              xQueueSend( que_hmi_hndl, &queue_data, NULL ); 
+              open_process();                            
+              open_probe();  
+              break;            
+                          
+#endif               
+            case OS_USER_TAG_REMOTE_CALIBRATION_BREAK:
+              break;                  
+              
+#endif
+              
 #ifdef EXT_FLASH
             case OS_USER_TAG_WRITE_PARAM_TO_EXT_FLASH:
               write_data_to_ext_flash(queue_data.param_id, queue_data.param_data);

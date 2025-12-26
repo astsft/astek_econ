@@ -241,7 +241,7 @@ static int32_t fsm_tcp_socket_process (uint8_t sn, uint8_t* buf, uint16_t port)
          {
            TRACE("%d:Wait for closed status\r\n",sn);
          }
-         send_cmd_to_net_task(OS_USER_TAG_ETH_INT); // Start socket again
+         send_cmd_to_net_task(OS_USER_TAG_ETH_START); // Start socket again
          break; 
          
       default:
@@ -264,6 +264,10 @@ static int32_t open_and_listen_socket (uint8_t sn, uint8_t* buf, uint16_t port)
   
   TRACE("%d:Listen, port [%d]\r\n",sn, port);
   if( (ret = listen(sn)) != SOCK_OK) return ret;  
+  
+  TRACE("%d:Keep-alive time [%d]\r\n", sn, getSn_KPALVTR(sn));
+  setSn_KPALVTR(sn, 1);
+  TRACE("%d:Keep-alive time [%d]\r\n", sn, getSn_KPALVTR(sn));  
   
   return 1;
 }

@@ -27,6 +27,7 @@ typedef enum    listwheel_idx_e
 /*******************************************************************************
 * PRIVATE VARIABLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  80, 800, 400, 0, 0x0, 0 },
@@ -48,25 +49,47 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
-
-static  const   char *                  year[]          =
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 {
-    "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009",
-    "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
-    "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029",
-    "2030", "2031", "2032", "2023", "2034", "2035", "2036", "2037", "2038", "2039",
+    { WINDOW_CreateIndirect,    "", 0,                        0, 100,1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,   32,  25, 960, 350, 0, 0x0, 0 },
+
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_YEAR,       128,  25, 256,  75, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_MONTH,      384,  25, 256,  75, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_DAY,       640,  25, 256,  75, 0, 0x0, 0 },
+
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT0,           128, 200, 256,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT1,           384, 200, 256,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT2,           640, 200, 256,  50, 0, 0x0, 0 },
+
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,      128, 100, 256, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,      384, 100, 256, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,      640, 100, 256, 250, 0, 0x0, 0 },
+
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,     0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,    512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,     -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
+
+static const char *year[] = {
+    "2039", "2038", "2037", "2036", "2035", "2034", "2033", "2032", "2031", "2030",
+    "2029", "2028", "2027", "2026", "2025", "2024", "2023", "2022", "2021", "2020",
+    "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010",
+    "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000"
 };
 
-static  const   char *                  month[]         =
-{
-    "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+static const char *month[] = {
+    "12", "11", "10", "09", "08", "07", "06", "05", "04", "03", "02", "01"
 };
 
-static  const   char *                  day[]           =
-{
-    "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-    "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
-    "25", "26", "27", "28", "29", "30", "31",
+static const char *day[] = {
+    "31", "30", "29", "28", "27", "26", "25",
+    "24", "23", "22", "21", "20", "19", "18",
+    "17", "16", "15", "14", "13", "12", "11",
+    "10", "09", "08", "07", "06", "05", "04",
+    "03", "02", "01"
 };
 
 static  listwheel_idx_t         listwheel_idx;
@@ -229,9 +252,13 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_UP:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                                        if( idx > 0 )
                     {
-                        idx     = 0;
+                        idx--;
+                    }
+                    else
+                    {
+                        idx = LISTWHEEL_GetNumItems( hWheel ) - 1;
                     }
 
                     LISTWHEEL_SetPos( hWheel, idx );
@@ -242,15 +269,10 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_DOWN:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( idx > 0 )
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
                     {
-                        idx--;
+                        idx     = 0;
                     }
-                    else
-                    {
-                        idx = LISTWHEEL_GetNumItems( hWheel ) - 1;
-                    }
-
                     LISTWHEEL_SetPos( hWheel, idx );
                     LISTWHEEL_SetSel( hWheel, idx );
 
@@ -307,9 +329,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                 case GUI_ID_BUTTON_DUMMY:
                     if( pMsg->Data.v == WM_NOTIFICATION_RELEASED )
                     {
-                        idx_year    = 30 + LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 ) );
-                        idx_month   = 1 + LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 ) );
-                        idx_day     = 1 + LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 ) );
+                        idx_year    = 30 + (((sizeof(year) / sizeof( char * )) - 1) - LISTWHEEL_GetPos(WM_GetDialogItem(pMsg->hWin, GUI_ID_LISTWHEEL0)));
+                        idx_month   = 1 + (((sizeof(month) / sizeof( char * )) - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 )));
+                        idx_day     = 1 + (((sizeof(day) / sizeof( char * )) - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 )));
                         dev.mcu->rtc.set_date( idx_year, idx_month, idx_day );
                         scr_switch( SCR_IDX_SETUP_SYSTEM, GUI_ID_BUTTON_DATE );
                         beep_play( BEEP_TYPE_CONFIRM );
@@ -325,22 +347,34 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
             init_dialog( pMsg->hWin );
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 );
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 40, day, sizeof( day ) / sizeof( char * ) );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 50, day, sizeof( day ) / sizeof( char * ) );            
+#endif            
             idx     = dev.mcu->rtc.get_day();
-            LISTWHEEL_SetPos( hItem, idx-1 );
-            LISTWHEEL_SetSel( hItem, idx-1 );
+            LISTWHEEL_SetPos( hItem, (sizeof( day ) / sizeof( char * )) - idx );
+            LISTWHEEL_SetSel( hItem, (sizeof( day ) / sizeof( char * )) - idx );
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL1 );
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 40, month, sizeof( month ) / sizeof( char * ) );
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 50, month, sizeof( month ) / sizeof( char * ) );            
+#endif            
             idx     = dev.mcu->rtc.get_month();
-            LISTWHEEL_SetPos( hItem, idx-1 );
-            LISTWHEEL_SetSel( hItem, idx-1 );
+            LISTWHEEL_SetPos( hItem, (sizeof( month ) / sizeof( char * )) - idx );
+            LISTWHEEL_SetSel( hItem, (sizeof( month ) / sizeof( char * )) - idx );
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 );
-            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, year, sizeof( year ) / sizeof( char * ) );
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 40, year, sizeof( year ) / sizeof( char * ) );            
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+            gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 50, year, sizeof( year ) / sizeof( char * ) );            
+#endif                        
             idx     = dev.mcu->rtc.get_year() - 30;
-            LISTWHEEL_SetPos( hItem, idx );
-            LISTWHEEL_SetSel( hItem, idx );
+            LISTWHEEL_SetPos( hItem, (sizeof( year ) / sizeof( char * )) - 1 - idx );
+            LISTWHEEL_SetSel( hItem, (sizeof( year ) / sizeof( char * )) - 1 - idx );
 
             listwheel_idx   = LISTWHEEL_IDX_0;
             listwheel_set_focus( pMsg->hWin, listwheel_idx );

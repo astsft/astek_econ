@@ -9,6 +9,7 @@
 #include "scr\scr.h"
 #include "dev\dev.h"
 #include "os\os_user.h"
+#include "hw_relay.h"
 
 /*******************************************************************************
 * GLOBAL VARIBLES
@@ -61,8 +62,8 @@ init_dialog(                                            WM_HWIN         hWin )
         RADIO_SetText( hRadio_0, l10n_str_get( dev.cfg.lang, L10N_STR_ID_RELAY_STATE_NC ), 1 );
         WM_SetFocus( WM_GetDialogItem(hWin, GUI_ID_RADIO0 ) );
         
-        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) value = dev.ext_relay->relay[0].relay_state;
-        else value = dev.ext_relay->relay[1].relay_state;
+        if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM) value = dev.ext_relay->relay[EXTERNAL_1].relay_state;
+        else value = dev.ext_relay->relay[EXTERNAL_2].relay_state;
         RADIO_SetValue( hRadio_0,  value );
 
         //
@@ -123,19 +124,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                             relay_state = (relay_state_e) RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0));                                                                                    
                                             if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                             {
-                                              dev.ext_relay->relay[0].relay_state = relay_state;
-                                              config =  dev.ext_relay->relay[0].relay_mode << 16;
-                                              config |= dev.ext_relay->relay[0].relay_state << 8;
-                                              config |= dev.ext_relay->relay[0].thld_type;  
+                                              dev.ext_relay->relay[EXTERNAL_1].relay_state = relay_state;
+                                              config =  dev.ext_relay->relay[EXTERNAL_1].relay_mode << 16;
+                                              config |= dev.ext_relay->relay[EXTERNAL_1].relay_state << 8;
+                                              config |= dev.ext_relay->relay[EXTERNAL_1].thld_type;  
                                               send_cmd_for_nvm_write_param(NVM_REG_RELAY1_MODE_STATE_TYPE, config);
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }
                                             else
                                             {
-                                              dev.ext_relay->relay[1].relay_state = relay_state;                                               
-                                              config =  dev.ext_relay->relay[1].relay_mode << 16;
-                                              config |= dev.ext_relay->relay[1].relay_state << 8;
-                                              config |= dev.ext_relay->relay[1].thld_type;  
+                                              dev.ext_relay->relay[EXTERNAL_2].relay_state = relay_state;                                               
+                                              config =  dev.ext_relay->relay[EXTERNAL_2].relay_mode << 16;
+                                              config |= dev.ext_relay->relay[EXTERNAL_2].relay_state << 8;
+                                              config |= dev.ext_relay->relay[EXTERNAL_2].thld_type;  
                                               send_cmd_for_nvm_write_param(NVM_REG_RELAY2_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }                                  
@@ -168,19 +169,19 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                                             relay_state = (relay_state_e) RADIO_GetValue( WM_GetDialogItem( pMsg->hWin, GUI_ID_RADIO0));                                                                                    
                                             if (dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM)
                                             {
-                                              dev.ext_relay->relay[0].relay_state = relay_state;                                                  
-                                              config =  dev.ext_relay->relay[0].relay_mode << 16;
-                                              config |= dev.ext_relay->relay[0].relay_state << 8;
-                                              config |= dev.ext_relay->relay[0].thld_type;
+                                              dev.ext_relay->relay[EXTERNAL_1].relay_state = relay_state;                                                  
+                                              config =  dev.ext_relay->relay[EXTERNAL_1].relay_mode << 16;
+                                              config |= dev.ext_relay->relay[EXTERNAL_1].relay_state << 8;
+                                              config |= dev.ext_relay->relay[EXTERNAL_1].thld_type;
                                               send_cmd_for_nvm_write_param(NVM_REG_RELAY1_MODE_STATE_TYPE, config);                                              
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }
                                             else
                                             {
-                                              dev.ext_relay->relay[1].relay_state = relay_state;
-                                              config =  dev.ext_relay->relay[1].relay_mode << 16;
-                                              config |= dev.ext_relay->relay[1].relay_state << 8;
-                                              config |= dev.ext_relay->relay[1].thld_type;
+                                              dev.ext_relay->relay[EXTERNAL_2].relay_state = relay_state;
+                                              config =  dev.ext_relay->relay[EXTERNAL_2].relay_mode << 16;
+                                              config |= dev.ext_relay->relay[EXTERNAL_2].relay_state << 8;
+                                              config |= dev.ext_relay->relay[EXTERNAL_2].thld_type;
                                               send_cmd_for_nvm_write_param(NVM_REG_RELAY2_MODE_STATE_TYPE, config);                                               
                                               scr_switch( SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM, GUI_ID_BUTTON_RELAY_STATE );
                                             }

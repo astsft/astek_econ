@@ -164,6 +164,42 @@ add_event_string (char * event_string, log_source_t source, uint8_t event)
       case LOG_SYSTEM_EVENT_FACTORY_RESET:
         snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_FACTORY_RESET ));        
         break;  
+        
+      case LOG_SYSTEM_EVENT_VALIDATION_START:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_VALIDATION_START ));        
+        break;
+        
+      case LOG_SYSTEM_EVENT_VALIDATION_STOP:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_VALIDATION_STOP ));        
+        break;
+
+      case LOG_SYSTEM_EVENT_VALIDATION_ERROR:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_VALIDATION_ERROR ));        
+        break;        
+        
+      case LOG_SYSTEM_EVENT_VALIDATION_PASSED:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_VALIDATION_PASSED ));        
+        break;        
+        
+      case LOG_SYSTEM_EVENT_CALIBRATION_ZERO_START:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_CALIBRATION_ZERO_START ));        
+        break; 
+
+      case LOG_SYSTEM_EVENT_CALIBRATION_SPAN_START:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_CALIBRATION_SPAN_START ));        
+        break;
+
+      case LOG_SYSTEM_EVENT_CALIBRATION_PASSED:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_CALIBRATION_PASSED ));        
+        break; 
+        
+      case LOG_SYSTEM_EVENT_CALIBRATION_STOP:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_CALIBRATION_STOP ));        
+        break;       
+        
+      case LOG_SYSTEM_EVENT_CALIBRATION_ERROR:
+        snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_EVENT_CALIBRATION_ERROR ));        
+        break;          
                 
       default:
         snprintf(event_str, 80, "%s: %s", l10n_str_get( dev.cfg.lang, L10N_STR_ID_SYSTEM ), l10n_str_get( dev.cfg.lang, L10N_STR_ID_ERROR ));        

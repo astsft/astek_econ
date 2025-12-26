@@ -38,6 +38,9 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 
     { TEXT_CreateIndirect,      "",         GUI_ID_TEXT2,               400,  64, 200,  32, 0, 0x0, 0 },
     { TEXT_CreateIndirect,      " T RAW",   GUI_ID_TEXT3,               600,  64, 100,  32, 0, 0x0, 0 },
+    
+    { TEXT_CreateIndirect,      "",         GUI_ID_TEXT_SLOPE_VALUE,    400, 128, 200,  32, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      " SLOPE",   GUI_ID_TEXT_SLOPE_LABEL,    600, 128, 100,  32, 0, 0x0, 0 },    
         
     { TEXT_CreateIndirect,      "",         GUI_ID_TEXT_REAL_FW_VER,    50,  270, 896,  32, 0, 0x0, 0 },
 
@@ -83,7 +86,10 @@ void    init_dialog(                                    WM_HWIN         hWin )
     scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_REAL_FW_VER ) );
     
     scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT2  ) );
-    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT3  ) );        
+    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT3  ) );    
+
+    scr_init_text_value( WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_VALUE ) );
+    scr_init_text_label( WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_LABEL ) );    
 
     
     TEXT_SetText( WM_GetDialogItem( hWin, GUI_ID_TEXT_REAL_FW_VER ), dev.info.real_firmware_id );    
@@ -108,7 +114,7 @@ update( WM_HWIN         hWin )
     WM_HWIN     hItem;
     char        str[64];
 
-    int32_t     ppm     = dev.sens->meas.ppm.integral;
+    int32_t     ppm     = dev.sens->meas.ppm.i32;
     uint32_t    adc_raw = dev.sens->meas.raw;
 
     hItem   = WM_GetDialogItem( hWin, GUI_ID_PROGBAR0 );
@@ -157,9 +163,9 @@ update( WM_HWIN         hWin )
     //hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_mV_VALUE );
     //TEXT_SetText( hItem, str );
 
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_VALUE );
-    //snprintf( str, sizeof(str), "%d\0", dev.sens->meas.slope );
-    //TEXT_SetText( hItem, str );
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_SLOPE_VALUE );
+    snprintf( str, sizeof(str), "%d\0", dev.sens->meas.slope );
+    TEXT_SetText( hItem, str );
 }
 
 

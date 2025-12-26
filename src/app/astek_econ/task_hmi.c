@@ -160,7 +160,6 @@ task_hmi(                               const   void *          argument )
                     //TRACE( "RXNE key_id: %02X, key_pressed: %d\n", key_id, key_pressed );
                     break;
 
-
                 case OS_USER_TAG_TOUCH_INT:
                     ui_touch_int();
                     ui_touch_scan();
@@ -169,7 +168,33 @@ task_hmi(                               const   void *          argument )
 
                 case OS_USER_TAG_IBUS_REFRESH:
                     GUI_Exec();
+                    break;     
+                    
+#if defined(USE_VALIDATION)                    
+                case OS_USER_TAG_IBUS_SHOW_VALIDATION:
+                    dev.cloop->cloop_state = CLOOP_FREEZ;
+                    dev.validation.state = IN_PROGRESS;
+                    dev.state.process_status = PROCESS_VALIDATION_SPAN;
+                    scr_switch( SCR_IDX_VALIDATION_STEP2, GUI_ID_BUTTON_DUMMY );                     
                     break;
+#endif                      
+                    
+#if defined(USE_REMOTE_CALIBRATION) 
+                case OS_USER_TAG_IBUS_SHOW_CALIBRATION_ZERO:
+                    dev.cloop->cloop_state = CLOOP_FREEZ;
+                    dev.calibration.state = CALIBRATION_IN_PROGRESS;
+                    dev.state.process_status = PROCESS_CALIBRATION_ZERO;
+                    scr_switch( SCR_IDX_CALIBRATION_STEP2, GUI_ID_BUTTON_DUMMY );                     
+                    break;      
+                    
+                case OS_USER_TAG_IBUS_SHOW_CALIBRATION_SPAN:
+                    dev.cloop->cloop_state = CLOOP_FREEZ;
+                    dev.calibration.state = CALIBRATION_IN_PROGRESS;
+                    dev.state.process_status = PROCESS_CALIBRATION_SPAN;
+                    scr_switch( SCR_IDX_CALIBRATION_STEP2, GUI_ID_BUTTON_DUMMY );                     
+                    break;                                          
+#endif    
+                          
 
                 default:
                     GUI_Exec();

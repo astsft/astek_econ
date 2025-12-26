@@ -7,6 +7,7 @@
 
 #include "scr\scr.h"
 #include "dev\dev.h"
+#include "hw_relay.h"
 
 
 extern  dev_t           dev;
@@ -55,11 +56,11 @@ void    scr_cfg_sys_init(                               WM_HWIN         hWin )
         
         switch (dev.gui.scr_idx) {
           case SCR_IDX_SETUP_SERVICE_RELAY_1_PARAM:
-            if (dev.ext_relay->relay[0].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
+            if (dev.ext_relay->relay[EXTERNAL_1].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
             break;
           
           case SCR_IDX_SETUP_SERVICE_RELAY_2_PARAM:
-            if (dev.ext_relay->relay[1].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
+            if (dev.ext_relay->relay[EXTERNAL_2].relay_mode != THRESHOLD_MODE) WM_DisableWindow(hItem);
             break;
         }
 

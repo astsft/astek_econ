@@ -42,6 +42,7 @@ typedef struct  cl420_s
     //uint16_t                value_uA;
     //uint16_t                range_uA;
     uint32_t                ppm;
+    uint32_t                ppb;    
     cl420_units_t           units;
     cl420_output_t          mb_output;
 } cl420_t;

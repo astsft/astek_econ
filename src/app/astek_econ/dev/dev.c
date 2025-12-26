@@ -11,6 +11,7 @@
 #include "os\os_user.h"
 #include "version.h"
 #include "hw_relay.h"
+#include "filter\sma.h"
 
 extern  dev_t                   dev;
 
@@ -33,15 +34,18 @@ uint8_t default_mac[8] = {0x00, 0x08, 0xdc, 0x00, 0xab, 0xcd, 0x00, 0x00};
 uint8_t default_ip[] = {192, 168, 1, 100};
 uint8_t default_sn[] = {255,255,255,0};
 uint8_t default_gw[] = {192, 168, 1, 1};
-uint32_t default_port_modbus = 502;
-uint32_t default_port_http = 80;
-uint8_t  default_network_state = 0;
-uint32_t default_validation_value = 1000;
-uint32_t default_validation_deviation = 10;
-uint32_t default_validation_transition_time = 100;
-uint32_t default_validation_measure_time = 12;
-uint32_t default_validation_return_time = 100;
-
+static uint32_t default_port_modbus = 502;
+static uint32_t default_port_http = 80;
+static uint8_t  default_network_state = 0;
+static uint32_t default_validation_value = 1000;
+static uint32_t default_validation_deviation = 10;
+static uint32_t default_validation_transition_time = 100;
+static uint32_t default_validation_measure_time = 12;
+static uint32_t default_validation_return_time = 100;
+static uint16_t filter_order_default = 1;
+static uint16_t filter_cutoff_default = 1;
+static int32_t default_calibration_max_slope = 50;
+static uint32_t default_calibration_deviation = 10;
 
 /*******************************************************************************
 *
@@ -75,16 +79,31 @@ dev_init(                       dev_t *         p )
       dev.cfg.error_filter_count = default_error_count;
       dev.nvm.put( NVM_REG_ERROR_COUNT, dev.cfg.error_filter_count);
     }    
-
+    
+    p->cfg.lpf_order = p->nvm.get( NVM_SMA_FILTER_ORDER );
+    if ((p->cfg.lpf_order == 0) || (p->cfg.lpf_order == 0xFFFF) || (p->cfg.lpf_order > LPF_ORDER_MAX))
+    {
+      p->cfg.lpf_order = filter_order_default;
+      dev.nvm.put( NVM_SMA_FILTER_ORDER, p->cfg.lpf_order);
+    }    
+    
+    p->cfg.lpf_cutoff = p->nvm.get( NVM_SMA_FILTER_CUTOFF );
+    if ((p->cfg.lpf_cutoff == 0) || (p->cfg.lpf_cutoff == 0xFFFF) || (p->cfg.lpf_cutoff > LPF_BUF_SIZE))
+    {
+      p->cfg.lpf_cutoff = filter_cutoff_default;
+      dev.nvm.put( NVM_SMA_FILTER_ORDER, p->cfg.lpf_order);
+    }    
+      
     p->cfg.display_mode             = DEV_DSPL_MODE_PERCENTS;
-    //dev.log.buf         = log_buf;
-    //dev.log.buf_size    = CONFIG_LOG_DATA_SIZE;
-    //dev.log.head        = 0;
 
     p->cl420.range_idx              = (dev_range_idx_t) (p->nvm.get( NVM_REG_RANGE_IDX ));
     p->cl420.range[ 0].ppm          = p->nvm.get( NVM_REG_RANGE_R1_PPM );
     p->cl420.range[ 1].ppm          = p->nvm.get( NVM_REG_RANGE_R2_PPM );
     p->cl420.range[ 2].ppm          = p->nvm.get( NVM_REG_RANGE_R3_PPM );
+    p->cl420.range[ 0].ppb          = p->cl420.range[ 0].ppm * 1000;
+    p->cl420.range[ 1].ppb          = p->cl420.range[ 1].ppm * 1000;
+    p->cl420.range[ 2].ppb          = p->cl420.range[ 2].ppm * 1000;
+    
     for (int i = 0; i < 3; i++)
     {
       p->cl420.range[ 0].units      = p->nvm.get( NVM_REG_RANGE_UNITS );
@@ -267,7 +286,102 @@ dev_init(                       dev_t *         p )
     {
       dev.net->port_modbus = default_port_modbus;
       dev.nvm.put( NVM_REG_NET_MODBUS_PORT,  dev.net->port_modbus);      
-    }            
+    }    
+    //-------------------------------------------------------------------------------------------
+    dev.validation.value.ppb = dev.nvm.get( NVM_REG_VALIDATION_VALUE );
+    if (dev.validation.value.ppb == 0xFFFFFFFF )
+    {
+      dev.validation.value.ppb = default_validation_value;
+      dev.nvm.put( NVM_REG_VALIDATION_VALUE,  dev.validation.value.ppb);      
+    }  
+    
+    dev.validation.deviation.ppb = dev.nvm.get( NVM_REG_VALIDATION_DEVIATION );
+    if (dev.validation.deviation.ppb == 0xFFFFFFFF )
+    {
+      dev.validation.deviation.ppb = default_validation_deviation;
+      dev.nvm.put( NVM_REG_VALIDATION_DEVIATION,  dev.validation.deviation.ppb);      
+    }  
+    
+    dev.validation.timings.transition_time = dev.nvm.get( NVM_REG_VALIDATION_TRANSITION_TIME );
+    if (dev.validation.timings.transition_time == 0xFFFFFFFF )
+    {
+      dev.validation.timings.transition_time = default_validation_transition_time;
+      dev.nvm.put( NVM_REG_VALIDATION_TRANSITION_TIME,  dev.validation.timings.transition_time);      
+    }  
+
+    dev.validation.timings.measure_time = dev.nvm.get( NVM_REG_VALIDATION_MEASURE_TIME );
+    if (dev.validation.timings.measure_time == 0xFFFFFFFF )
+    {
+      dev.validation.timings.measure_time = default_validation_measure_time;
+      dev.nvm.put( NVM_REG_VALIDATION_MEASURE_TIME,  dev.validation.timings.measure_time);      
+    }   
+
+    dev.validation.timings.return_time = dev.nvm.get( NVM_REG_VALIDATION_RETURN_TIME );
+    if (dev.validation.timings.return_time == 0xFFFFFFFF )
+    {
+      dev.validation.timings.return_time = default_validation_return_time;
+      dev.nvm.put( NVM_REG_VALIDATION_RETURN_TIME,  dev.validation.timings.return_time);      
+    }           
+    
+    //-------------------------------------------------------------------------------------------
+    
+    dev.calibration.remote_calibration_enabled = (bool) dev.nvm.get( NVM_REG_CALIBRATION_REMOTE_ENABLE );
+
+    dev.calibration.zero.ppb = dev.nvm.get( NVM_REG_CALIBRATION_ZERO );
+    if (dev.calibration.zero.ppb == 0xFFFFFFFF )
+    {
+      dev.calibration.zero.ppb = 0;
+      dev.nvm.put( NVM_REG_CALIBRATION_ZERO ,  dev.calibration.zero.ppb);      
+    }
+    
+    dev.calibration.span.ppb = dev.nvm.get( NVM_REG_CALIBRATION_SPAN );
+    if (dev.calibration.span.ppb == 0xFFFFFFFF )
+    {
+      dev.calibration.span.ppb = 0;
+      dev.nvm.put( NVM_REG_CALIBRATION_SPAN ,  dev.calibration.span.ppb);      
+    }    
+    
+    dev.calibration.max_slope = dev.nvm.get( NVM_REG_CALIBRATION_SLOPE );    
+    if (dev.calibration.max_slope == 0xFFFFFFFF )
+    {
+      dev.calibration.max_slope = default_calibration_max_slope;
+      dev.nvm.put( NVM_REG_CALIBRATION_SLOPE,  dev.calibration.max_slope);            
+    }
+    
+    dev.calibration.deviation.ppb = dev.nvm.get( NVM_REG_CALIBRATION_DEVIATION );
+    if (dev.calibration.deviation.ppb == 0xFFFFFFFF )
+    {
+      dev.calibration.deviation.ppb = default_calibration_deviation;
+      dev.nvm.put( NVM_REG_CALIBRATION_DEVIATION,  dev.calibration.deviation.ppb);      
+    }      
+        
+    dev.calibration.timings.transition_time = dev.nvm.get( NVM_REG_CALIBRATION_TRANSITION_TIME );
+    if (dev.calibration.timings.transition_time == 0xFFFFFFFF )
+    {
+      dev.calibration.timings.transition_time = default_validation_transition_time;
+      dev.nvm.put( NVM_REG_CALIBRATION_TRANSITION_TIME,  dev.calibration.timings.transition_time);      
+    }  
+
+    dev.calibration.timings.measure_time = dev.nvm.get( NVM_REG_CALIBRATION_MEASURE_TIME );
+    if (dev.calibration.timings.measure_time == 0xFFFFFFFF )
+    {
+      dev.calibration.timings.measure_time = default_validation_measure_time;
+      dev.nvm.put( NVM_REG_CALIBRATION_MEASURE_TIME,  dev.calibration.timings.measure_time);      
+    }   
+
+    dev.calibration.timings.return_time = dev.nvm.get( NVM_REG_CALIBRATION_RETURN_TIME );
+    if (dev.calibration.timings.return_time == 0xFFFFFFFF )
+    {
+      dev.calibration.timings.return_time = default_validation_return_time;
+      dev.nvm.put( NVM_REG_CALIBRATION_RETURN_TIME,  dev.calibration.timings.return_time);      
+    } 
+    
+    dev.calibration.timings.stable_slope_time = dev.nvm.get( NVM_REG_CALIBRATION_SLOPE_TIME );
+    if (dev.calibration.timings.stable_slope_time == 0xFFFFFFFF )
+    {
+      dev.calibration.timings.stable_slope_time = default_validation_return_time;
+      dev.nvm.put( NVM_REG_CALIBRATION_SLOPE_TIME,  dev.calibration.timings.stable_slope_time);      
+    }    
         
     snprintf (dev.info.real_firmware_id, sizeof(dev.info.real_firmware_id), "%s.%s.%s_%s",dev.info.device_str, dev.info.hardware_str, built_date_time, firmware_commit);    
     
@@ -635,12 +749,15 @@ dev_cl420_set_range(                    dev_cl420_t *       p,
     {
         case DEV_RANGE_IDX_R1:
             p->range[ 0].ppm    = ppm;
+            p->range[ 0].ppb    = ppm * 1000;
             break;
         case DEV_RANGE_IDX_R2:
             p->range[ 1].ppm    = ppm;
+            p->range[ 1].ppb    = ppm * 1000;
             break;
         case DEV_RANGE_IDX_R3:
             p->range[ 2].ppm    = ppm;
+            p->range[ 2].ppb    = ppm * 1000;
             break;
         default:
             break;

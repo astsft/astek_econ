@@ -44,3 +44,16 @@ econ_raw2ppm(                           econ_t *        p,
 
     return( (int32_t) (ppm + 0.5f) );
 }
+
+int32_t econ_calc_slope (const   int32_t        raw)
+{
+  int32_t result = 0;
+  
+  static int32_t previous_raw = 0;
+  
+  result = raw - previous_raw;
+  
+  previous_raw = raw;
+  
+  return result;
+}

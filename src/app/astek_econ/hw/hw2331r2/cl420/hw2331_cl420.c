@@ -121,7 +121,9 @@ int cloop_get_range(void)
   dev.cl420.range[0].ppm  = dev.nvm.get(NVM_REG_RANGE_R1_PPM); 
   dev.cl420.range[1].ppm  = dev.nvm.get(NVM_REG_RANGE_R2_PPM);        
   dev.cl420.range[2].ppm  = dev.nvm.get(NVM_REG_RANGE_R3_PPM);
-  
+  dev.cl420.range[0].ppb = dev.cl420.range[0].ppm * 1000; 
+  dev.cl420.range[1].ppb = dev.cl420.range[1].ppm * 1000; 
+  dev.cl420.range[2].ppb = dev.cl420.range[2].ppm * 1000;
   dev.cl420.range_idx = dev.nvm.get(NVM_REG_RANGE_IDX);      
   dev.cl420.range[0].units = dev.nvm.get(NVM_REG_RANGE_UNITS);
   dev.cl420.range[1].units = dev.nvm.get(NVM_REG_RANGE_UNITS);

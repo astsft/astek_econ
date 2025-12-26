@@ -21,6 +21,7 @@ extern  dev_t           dev;
 /*******************************************************************************
 * PRIVATE VARIABLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  100, 800, 400, 0, 0x0, 0 },
@@ -67,6 +68,49 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                            0,  100, 1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,   25,  960, 350, 0, 0x0, 0 },
+
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT0,                47, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT1,               117, 175, 70,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT2,               203, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT3,               273, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT4,               360, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT5,               430, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT6,               516, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT7,               586, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT8,               672, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT9,               742, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT10,              828, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT11,              898, 175, 70,  50, 0, 0x0, 0 },
+    
+    { TEXT_CreateIndirect,      "-", GUI_ID_TEXT12,             188, 175, 15,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "-", GUI_ID_TEXT13,             344, 175, 15,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "-", GUI_ID_TEXT14,             500, 175, 15,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "-", GUI_ID_TEXT15,             656, 175, 15,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "-", GUI_ID_TEXT16,             812, 175, 15,  50, 0, 0x0, 0 },
+        
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,           47,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,          118,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,          203,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL3,          273,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL4,          360,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL5,          430,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL6,          516,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL7,          586,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL8,          672,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL9,          742,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL10,         828,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL11,         898,  75, 70, 250, 0, 0x0, 0 },
+
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,         0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
 
 typedef enum    listwheel_idx_e
 {
@@ -87,8 +131,10 @@ typedef enum    listwheel_idx_e
 
 static  listwheel_idx_t         listwheel_idx;
 static  WM_HWIN                 hWheel;
-static  const   char *          symb[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
-
+static const char* symb[] = {
+    "F", "E", "D", "C", "B", "A", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
+static  const   size_t  symb_size = sizeof( symb ) / sizeof( char * );
 /*******************************************************************************
 * PRIVATE FUNCTIONS
 *******************************************************************************/
@@ -415,9 +461,13 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_UP:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                    if( idx > 0 )
                     {
-                        idx     = 0;
+                        idx--;
+                    }
+                    else
+                    {
+                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
                     }
 
                     LISTWHEEL_SetPos( hWheel, idx );
@@ -427,13 +477,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_DOWN:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( idx > 0 )
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
                     {
-                        idx--;
-                    }
-                    else
-                    {
-                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
+                        idx     = 0;
                     }
 
                     LISTWHEEL_SetPos( hWheel, idx );
@@ -565,9 +611,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                     {                                            
                         for (int i = 0; i < 6; i++)
                         {
-                          dev.net->mac.u8[i] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*2) ) );
+                          dev.net->mac.u8[i] = (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*2) ) );
                           dev.net->mac.u8[i] <<= 4;
-                          dev.net->mac.u8[i] |= LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*2) + 1 ) );
+                          dev.net->mac.u8[i] |= (symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*2) + 1 ) );
                         }
                         send_cmd_for_nvm_write_param(NVM_REG_NET_MAC_PART1, dev.net->mac.u32[0]);
                         send_cmd_for_nvm_write_param(NVM_REG_NET_MAC_PART2, dev.net->mac.u32[1]);                        
@@ -596,9 +642,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
               gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 75, symb, sizeof( symb ) / sizeof( char * ) );            
 #endif           
               if (i % 2)
-                idx = mac_byte & 0x0F;
+                idx = (symb_size - 1) - (mac_byte & 0x0F);
               else
-                idx = mac_byte >> 4;                            
+                idx = (symb_size - 1) - (mac_byte >> 4);                            
               LISTWHEEL_SetPos( hItem, idx );
               LISTWHEEL_SetSel( hItem, idx );
             }              

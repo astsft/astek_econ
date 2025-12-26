@@ -21,6 +21,7 @@ extern  dev_t           dev;
 /*******************************************************************************
 * PRIVATE VARIABLES
 *******************************************************************************/
+#if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480
 static const GUI_WIDGET_CREATE_INFO dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                            0,  100, 800, 400, 0, 0x0, 0 },
@@ -60,6 +61,47 @@ static const GUI_WIDGET_CREATE_INFO dialog_info[] =
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        400, 320, 400,  80, 0, 0x0, 0 },
     { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
 };
+#elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
+static const GUI_WIDGET_CREATE_INFO dialog_info[] =
+{
+    { WINDOW_CreateIndirect,    "", 0,                            0,  100, 1024, 500, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT_BACKPLANE,       32,   25,  960, 350, 0, 0x0, 0 },
+
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT0,                55, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT1,               125, 175, 70,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT2,               195, 175, 70,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT3,               289, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT4,               359, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT5,               429, 175, 70,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT6,               523, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT7,               593, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT8,               663, 175, 70,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT9,               758, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT10,              828, 175, 70,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      "", GUI_ID_TEXT11,              898, 175, 70,  50, 0, 0x0, 0 },
+    
+    { TEXT_CreateIndirect,      ".", GUI_ID_TEXT12,             266, 175, 23,  50, 0, 0x0, 0 },
+    { TEXT_CreateIndirect,      ".", GUI_ID_TEXT13,             500, 175, 23,  50, 0, 0x0, 0 },    
+    { TEXT_CreateIndirect,      ".", GUI_ID_TEXT14,             734, 175, 23,  50, 0, 0x0, 0 },
+        
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL0,           55,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL1,          125,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL2,          195,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL3,          289,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL4,          359,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL5,          429,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL6,          523,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL7,          593,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL8,          663,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL9,          758,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL10,         828,  75, 70, 250, 0, 0x0, 0 },
+    { LISTWHEEL_CreateIndirect, "", GUI_ID_LISTWHEEL11,         898,  75, 70, 250, 0, 0x0, 0 },
+
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CANCEL,         0, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_ENTER,        512, 400, 512, 100, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DUMMY,         -1,  -1,   1,   1, 0, 0x0, 0 },
+};
+#endif
 
 typedef enum    listwheel_idx_e
 {
@@ -80,8 +122,14 @@ typedef enum    listwheel_idx_e
 
 static  listwheel_idx_t         listwheel_idx;
 static  WM_HWIN                 hWheel;
-static  const   char *          symb[]  = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-
+static const char* symb[] = {
+    "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"
+};
+static const char* symb2[] = {
+    "2", "1", "0"
+};
+static  const   size_t  symb_size = sizeof( symb ) / sizeof( char * );
+static  const   size_t  symb2_size = sizeof( symb2 ) / sizeof( char * );
 /*******************************************************************************
 * PRIVATE FUNCTIONS
 *******************************************************************************/
@@ -92,9 +140,9 @@ static void check_ip (WM_HWIN         hWin)
   
   for (int i = 0; i < 4; i++)
   {
-    ip[i] = LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) ) ) * 100;
-    ip[i] += LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) + 1 ) ) * 10;
-    ip[i] += LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) + 2 ) ) * 1;
+    ip[i] =  ((symb2_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) ))) * 100;
+    ip[i] +=  ((symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) + 1 ))) * 10;
+    ip[i] +=  ((symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + (i*3) + 2 ))) * 1;
     if (ip[i] > 255)
     {
       ip[i] = 255;
@@ -104,11 +152,11 @@ static void check_ip (WM_HWIN         hWin)
   for (int i = 0; i < LISTWHEEL_IDX_LAST; i++)
   {         
     if (i % 3 == 0)
-      idx = ip[i/3] / 100;
+      idx = (symb2_size - 1) - ip[i/3] / 100;
     else if (i % 3 == 1)
-      idx = (ip[i/3] / 10) % 10;
+      idx = (symb_size - 1) -  (ip[i/3] / 10) % 10;
     else
-      idx = ip[i/3] % 10;
+      idx = (symb_size - 1) -  ip[i/3] % 10;
                               
     LISTWHEEL_SetPos(  WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + i), idx );
     LISTWHEEL_SetSel( WM_GetDialogItem( hWin, GUI_ID_LISTWHEEL0 + i), idx );
@@ -445,9 +493,13 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_UP:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
+                    if( idx > 0 )
                     {
-                        idx     = 0;
+                        idx--;
+                    }
+                    else
+                    {
+                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
                     }
                     
                     LISTWHEEL_SetPos( hWheel, idx );
@@ -459,13 +511,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
                 case GUI_KEY_DOWN:
                     idx     = LISTWHEEL_GetPos( hWheel );
-                    if( idx > 0 )
+                    if( ++idx >= LISTWHEEL_GetNumItems( hWheel ) )
                     {
-                        idx--;
-                    }
-                    else
-                    {
-                        idx     = LISTWHEEL_GetNumItems( hWheel ) - 1;
+                        idx     = 0;
                     }
 
                     LISTWHEEL_SetPos( hWheel, idx );
@@ -648,9 +696,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                     {                                            
                         for (int i = 0; i < 4; i++)
                         {
-                          ip.u8[i] = LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) ) ) * 100;
-                          ip.u8[i] += LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) + 1 ) ) * 10;
-                          ip.u8[i] += LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) + 2 ) ) * 1;
+                          ip.u8[i] = ((symb2_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) ))) * 100;
+                          ip.u8[i] += ((symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) + 1 ))) * 10;
+                          ip.u8[i] += ((symb_size - 1) - LISTWHEEL_GetPos( WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + (i*3) + 2 ))) * 1;
                         }
                         
                         if(dev.gui.scr_idx == SCR_IDX_SETUP_SERVICE_NETWORK_IP)
@@ -704,18 +752,21 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
               hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL0 + i);
 #if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480    
               if((GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL0 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL3 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL6 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL9)
-                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 60, symb, 3 );              
+                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 60, symb2, symb2_size );              
               else
-                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 60, symb, sizeof( symb ) / sizeof( char * ) );
+                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 60, symb, symb_size );
 #elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600 
-              gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 75, symb, sizeof( symb ) / sizeof( char * ) );            
+              if((GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL0 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL3 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL6 || (GUI_ID_LISTWHEEL0 + i) == GUI_ID_LISTWHEEL9)
+                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 75, symb2, symb2_size );              
+              else
+                gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0 + i, 75, symb, symb_size );           
 #endif           
               if (i % 3 == 0)
-                idx = ip_byte / 100;
+                idx = (symb2_size - 1) - ip_byte / 100;
               else if (i % 3 == 1)
-                idx = (ip_byte / 10) % 10;
+                idx = (symb_size - 1) - (ip_byte / 10) % 10;
               else
-                idx = ip_byte % 10;
+                idx = (symb_size - 1) - ip_byte % 10;
                                         
               LISTWHEEL_SetPos( hItem, idx );
               LISTWHEEL_SetSel( hItem, idx );

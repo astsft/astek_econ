@@ -53,6 +53,22 @@ mdbs_coil_read(                         const   size_t                  idx,
     case MDBS_COIL_CALIBRATION_SPAN:
       *data = 0;
       break; 
+      
+#if defined(USE_VALIDATION)      
+    case MDBS_COIL_VALIDATION_SPAN:
+      if(dev.validation.state == IN_PROGRESS)
+        *data = 1;
+      else
+        *data = 0;
+      break;
+            
+    case MDBS_COIL_VALIDATION_ZERO:
+      if(dev.validation.state == IN_PROGRESS)
+        *data = 1;
+      else
+        *data = 0;      
+      break;
+#endif          
     
     case MDBS_COIL_RESERVED_0007:
     case MDBS_COIL_RESERVED_0008:
@@ -401,6 +417,7 @@ mdbs_hreg_read(                         const   size_t                  addr,
 {
         mdbs_err_t      err     = MDBS_ERR_NONE;
         int32_t     ppm;
+        int32_t     ppb;
         uint32_t    temp = 0;
 
         switch( addr )
@@ -479,12 +496,37 @@ mdbs_hreg_read(                         const   size_t                  addr,
                   
                 case MDBS_TERM_HREG_INFO_RESERVED_25:        
                 case MDBS_TERM_HREG_INFO_RESERVED_26:        
-                case MDBS_TERM_HREG_INFO_RESERVED_27:
-                case MDBS_TERM_HREG_INFO_RESERVED_28:        
-                case MDBS_TERM_HREG_INFO_RESERVED_29:        
-                case MDBS_TERM_HREG_INFO_RESERVED_30:
-                case MDBS_TERM_HREG_INFO_RESERVED_31:                                    
                   *data   = 0;
+                  break;
+                case MDBS_TERM_HREG_INFO_TAG_00:
+                  temp = dev.info.tag->c_tag[0];
+                  temp <<= 8;
+                  temp |= dev.info.tag->c_tag[1];
+                  *data = temp;
+                  break;
+                case MDBS_TERM_HREG_INFO_TAG_01:   
+                  temp = dev.info.tag->c_tag[2];
+                  temp <<= 8;
+                  temp |= dev.info.tag->c_tag[3];
+                  *data = temp;
+                  break;                  
+                case MDBS_TERM_HREG_INFO_TAG_02:        
+                  temp = dev.info.tag->c_tag[4];
+                  temp <<= 8;
+                  temp |= dev.info.tag->c_tag[5];
+                  *data = temp;
+                  break;                  
+                case MDBS_TERM_HREG_INFO_TAG_03:
+                  temp = dev.info.tag->c_tag[6];
+                  temp <<= 8;
+                  temp |= dev.info.tag->c_tag[7];
+                  *data = temp;
+                  break;                  
+                case MDBS_TERM_HREG_INFO_TAG_04:                                    
+                  temp = dev.info.tag->c_tag[8];
+                  temp <<= 8;
+                  temp |= dev.info.tag->c_tag[9];
+                  *data = temp;
                   break;
                   
                 //--------------------------------------------------------------                  
@@ -546,31 +588,40 @@ mdbs_hreg_read(                         const   size_t                  addr,
                         break;
                         
                 // CONFIG ------------------------------------------------------        
-                case MDBS_HREG_RANGE1_PPM_MSB:
-                  *data   = dev.cl420.range[0].ppm >> 16;
+                case MDBS_HREG_RANGE1_PPB_MSB:
+                  *data   = dev.cl420.range[0].ppb >> 16;
                   break;
-                case MDBS_HREG_RANGE1_PPM_LSB:
-                  *data   = dev.cl420.range[0].ppm & 0x0000FFFF;
+                case MDBS_HREG_RANGE1_PPB_LSB:
+                  *data   = dev.cl420.range[0].ppb & 0x0000FFFF;
                   break;
-                case MDBS_HREG_RANGE2_PPM_MSB:
-                  *data   = dev.cl420.range[1].ppm >> 16;
+                case MDBS_HREG_RANGE2_PPB_MSB:
+                  *data   = dev.cl420.range[1].ppb >> 16;
                   break;
-                case MDBS_HREG_RANGE2_PPM_LSB:
-                  *data   = dev.cl420.range[2].ppm & 0x0000FFFF;
+                case MDBS_HREG_RANGE2_PPB_LSB:
+                  *data   = dev.cl420.range[2].ppb & 0x0000FFFF;
                   break;
-                case MDBS_HREG_RANGE3_PPM_MSB:
-                  *data   = dev.cl420.range[2].ppm >> 16;
+                case MDBS_HREG_RANGE3_PPB_MSB:
+                  *data   = dev.cl420.range[2].ppb >> 16;
                   break;
-                case MDBS_HREG_RANGE3_PPM_LSB:
-                  *data   = dev.cl420.range[2].ppm & 0x0000FFFF;
+                case MDBS_HREG_RANGE3_PPB_LSB:
+                  *data   = dev.cl420.range[2].ppb & 0x0000FFFF;
                   break;
                 case MDBS_HREG_CURRENT_RANGE:
                   *data   = dev.cl420.range_idx;
                   break; 
                   
                 case MDBS_TERM_HREG_STS_RESERVED_207:
+                  *data   = 0;
+                  break;
+                
                 case MDBS_HREG_LPF_CUTOFF:
+                  *data = dev.cfg.lpf_cutoff;
+                  break;
+                  
                 case MDBS_HREG_LPF_ORDER:
+                  *data = dev.cfg.lpf_order;
+                  break;
+                  
                 case MDBS_HREG_GAIN:             
                 case MDBS_TERM_HREG_STS_RESERVED_20B:
                 case MDBS_HREG_T_COMP:
@@ -610,7 +661,7 @@ mdbs_hreg_read(                         const   size_t                  addr,
                   break;
                   
                 case MDBS_TERM_HREG_ERROR_REG_LSB:
-                  *data   = dev.state.error_status & 0x00FF;
+                  *data   = dev.state.error_status & 0x0000FFFF;
                   break;
                   
                 case MDBS_TERM_HREG_WARNING_REG_MSB:
@@ -618,7 +669,7 @@ mdbs_hreg_read(                         const   size_t                  addr,
                   break;
                   
                 case MDBS_TERM_HREG_WARNING_REG_LSB:
-                  *data   = dev.state.warnings_status & 0x00FF;
+                  *data   = dev.state.warnings_status & 0x0000FFFF;
                   break;
                   
                 case MODBUS_HREG_STS_ERROR_FILTER_COUNT:  *data = (dev.cfg.error_filter_count); break;
@@ -630,7 +681,7 @@ mdbs_hreg_read(                         const   size_t                  addr,
                   
                 case MDBS_HREG_TIMESTAMP_LSB:
                   temp = dev.mcu->rtc.get_timestamp();
-                  *data = temp&0x00FF;
+                  *data = temp&0x0000FFFF;
                   break;
                   
                 case MDBS_TERM_HREG_STS_RESERVED_407:
@@ -690,22 +741,283 @@ mdbs_hreg_read(                         const   size_t                  addr,
                 case MDBS_TERM_HREG_STS_RESERVED_43F:
                         *data   = 0;
                         break;
-//--------------------------------------------------------------                        
+                //--------------------------------------------------------------
+#if defined(USE_VALIDATION)                        
+                case MDBS_VALIDATION_VALUE_PPB_MSB:
+                  ppb         = dev.validation.value.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_VALIDATION_VALUE_PPB_LSB:
+                  ppb         = dev.validation.value.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;                  
+                  
+                case MDBS_VALIDATION_DEVIATION_PPB_MSB:
+                  ppb         = dev.validation.deviation.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_VALIDATION_DEVIATION_PPB_LSB:
+                  ppb         = dev.validation.deviation.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;  
+                  
+                case MDBS_VALIDATION_TRANSITION_TIME:                 
+                  *data   = dev.validation.timings.transition_time; 
+                  break;                   
+                  
+                case MDBS_VALIDATION_MEASURE_TIME:                 
+                  *data   = dev.validation.timings.measure_time; 
+                  break;                                     
+                  
+                case MDBS_VALIDATION_RETURN_TIME:                 
+                  *data   = dev.validation.timings.return_time; 
+                  break;    
+                  
+                case MDBS_VALIDATION_RESERVED_507:
+                case MDBS_VALIDATION_RESERVED_508:  
+                  *data   = 0;
+                  break;
+                  
+                  
+                case MDBS_VALIDATION_START:                 
+                  *data = dev.validation.start;
+                  break;    
+                  
+                case MDBS_VALIDATION_RESERVED_50A:
+                case MDBS_VALIDATION_RESERVED_50B:  
+                  *data   = 0;
+                  break;           
+                  
+                case MDBS_VALIDATION_PROCESS_VALUE_PPB_MSB:
+                  ppb         = (dev.validation.ppb_hi << 16) | (dev.validation.ppb_lo & 0xFFFF);                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;                   
+                  
+                case MDBS_VALIDATION_PROCESS_VALUE_PPB_LSB:
+                  ppb         = (dev.validation.ppb_hi << 16) | (dev.validation.ppb_lo & 0xFFFF);
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = dev.validation.ppb_lo;
+                  break;                                    
+                  
+                case MDBS_VALIDATION_STATE:
+                  *data   = dev.validation.state; 
+                  break;         
+                  
+                case MDBS_VALIDATION_RESERVED_50F:
+                case MDBS_VALIDATION_RESERVED_510:  
+                  *data   = 0;
+                  break;                   
+                                                      
+                case MDBS_VALIDATION_MEAS_VALUE_PPB_MSB:
+                  ppb         = dev.validation.measure_value;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_VALIDATION_MEAS_VALUE_PPB_LSB:
+                  ppb         = dev.validation.measure_value;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;  
+                  
+                case MDBS_VALIDATION_MEAS_DEVIATION_PPB_MSB:
+                  ppb         = dev.validation.measure_deviation;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_VALIDATION_MEAS_DEVIATION_PPB_LSB:
+                  ppb         = dev.validation.measure_deviation;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;             
+                  
+                case MDBS_VALIDATION_RESULT:                 
+                  *data   = dev.validation.result; 
+                  break;                
+#endif             
+                  
+#if defined(USE_REMOTE_CALIBRATION) 
+                case MDBS_REMOTE_CALIBRATION_SPAN_VALUE_PPB_MSB:
+                  ppb         = dev.calibration.span.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_REMOTE_CALIBRATION_SPAN_VALUE_PPB_LSB:
+                  ppb         = dev.calibration.span.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;                  
+                  
+                case MDBS_REMOTE_CALIBRATION_ZERO_VALUE_PPB_MSB:
+                  ppb         = dev.calibration.zero.ppb;                         
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_REMOTE_CALIBRATION_ZERO_VALUE_PPB_LSB:
+                  ppb         = dev.calibration.zero.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;  
+                  
+                case MDBS_REMOTE_CALIBRATION_DEVIATION_VALUE_PPB_MSB:
+                  ppb         = dev.calibration.deviation.ppb;                         
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;
+                  
+                case MDBS_REMOTE_CALIBRATION_DEVIATION_VALUE_PPB_LSB:
+                  ppb         =  dev.calibration.deviation.ppb;                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb & 0xFFFF;
+                  break;                    
+                  
+                case MDBS_REMOTE_CALIBRATION_TRANSITION_TIME:                 
+                  *data   = dev.calibration.timings.transition_time; 
+                  break;                   
+                  
+                case MDBS_REMOTE_CALIBRATION_MEASURE_TIME:                 
+                  *data   = dev.calibration.timings.measure_time; 
+                  break;                                     
+                  
+                case MDBS_REMOTE_CALIBRATION_RETURN_TIME:                 
+                  *data   = dev.calibration.timings.return_time; 
+                  break;    
+                  
+                case MDBS_REMOTE_CALIBRATION_SLOPE_TIME:                 
+                  *data   = dev.calibration.timings.stable_slope_time; 
+                  break;          
+                  
+                case MDBS_REMOTE_CALIBRATION_SLOPE_VALUE:                 
+                  *data   = dev.calibration.max_slope; 
+                  break;   
+                  
+                case MDBS_REMOTE_CALIBRATION_ENABLE:                 
+                  *data = dev.calibration.remote_calibration_enabled;
+                  break;                      
+                  
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070C:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070D:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070E:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070F: 
+                  *data = 0;
+                  break;    
+                  
+                                                                                       
+                case MDBS_REMOTE_CALIBRATION_SPAN_START:
+                  if (dev.state.process_status == PROCESS_CALIBRATION_SPAN)
+                    *data = dev.calibration.start;
+                  else 
+                    *data = 0;
+                  break;    
+                  
+                case MDBS_REMOTE_CALIBRATION_ZERO_START:                 
+                  if (dev.state.process_status == PROCESS_CALIBRATION_ZERO)
+                    *data = dev.calibration.start;
+                  else 
+                    *data = 0;                  
+                  break;             
+                  
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0712:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0713:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0714:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0715: 
+                  *data = 0;
+                  break;  
+                  
+                case MDBS_REMOTE_CALIBRATION_PROCESS_SLOPE:
+                    *data   = dev.sens->meas.slope;
+                  break;                      
+                                                                                                                            
+                case MDBS_REMOTE_CALIBRATION_PROCESS_VALUE_PPB_MSB:
+                  ppb         = (dev.calibration.ppb_hi << 16) | (dev.calibration.ppb_lo & 0xFFFF);                        
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data   = ppb >> 16;
+                  break;                   
+                  
+                case MDBS_REMOTE_CALIBRATION_PROCESS_VALUE_PPB_LSB:
+                  ppb         = (dev.calibration.ppb_hi << 16) | (dev.calibration.ppb_lo & 0xFFFF);  
+                  if (ppb < 0) 
+                    *data = 0;
+                  else
+                    *data = dev.calibration.ppb_lo;
+                  break;                                    
+                  
+                case MDBS_REMOTE_CALIBRATION_STATE:
+                  *data   = dev.calibration.state; 
+                  break;         
+                  
+                case MDBS_REMOTE_CALIBRATION_RESERVED_071A:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_071B:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_071C:            
+                case MDBS_REMOTE_CALIBRATION_RESERVED_071D: 
+                  *data = 0;
+                  break;                    
+                                    
+                case MDBS_REMOTE_CALIBRATION_RESULT:                 
+                  *data   = dev.calibration.result; 
+                  break;                  
+#endif                  
+                        
+                //--------------------------------------------------------------
                         
                 case MDBS_TERM_HREG_SENS_OXGN_PPM_HI:
-                        ppm = dev.sens->meas.ppm.integral;
+                        ppm = dev.sens->meas.ppm.i32;
                         if (ppm < 0)
                           *data = 0;
                         else
-                          *data   = dev.sens->meas.ppm.integral >> 16;
+                          *data   = dev.sens->meas.ppm.i32 >> 16;
                         break;
 
                 case MDBS_TERM_HREG_SENS_OXGN_PPM_LO:
-                        ppm = dev.sens->meas.ppm.integral;
+                        ppm = dev.sens->meas.ppm.i32;
                         if (ppm < 0)
                           *data = 0;
                         else
-                          *data   = dev.sens->meas.ppm.integral & 0xFFFF;
+                          *data   = dev.sens->meas.ppm.i32 & 0xFFFF;
                         break;
 
                 case MDBS_TERM_HREG_SENS_TEMP_DIGC_PRIM:
@@ -847,6 +1159,215 @@ mdbs_hreg_read(                         const   size_t                  addr,
                 case MDBS_TERM_HREG_SENS_CAL_SPAN_PPM_LO:
                         *data   = dev.sens->cal.span.ppm.u16[ 0];
                         break;
+                        
+                case MDBS_TERM_HREG_SENS_OXGN_PPB_HI:
+                        ppb         = (dev.sens->modbus_ppb_hi << 16) | (dev.sens->modbus_ppb_lo & 0xFFFF);                        
+                        if (ppb < 0) 
+                          *data = 0;
+                        else
+                          *data   = ppb >> 16;
+                        break;                  
+                  
+                case MDBS_TERM_HREG_SENS_OXGN_PPB_LO:
+                       ppb         = (dev.sens->modbus_ppb_hi << 16) | (dev.sens->modbus_ppb_lo & 0xFFFF);                       
+                       if (ppb < 0) 
+                         *data = 0;
+                       else
+                         *data   = ppb & 0x0000FFFF;
+                       break;
+                       
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_PRIM_2:
+                      temp = dev.sens->meas.digc.integral * 100;
+                      temp += dev.sens->meas.digc.fractional; 
+                      *data = temp;
+                      break;
+                      
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_SEC_2:                      
+                case MDBS_TERM_HREG_SENS_PRES_PA_HI_2:
+                case MDBS_TERM_HREG_SENS_PRES_PA_LO_2:  
+                     *data = 0;
+                     break;
+                        
+                case MDBS_TERM_HREG_SENS_SLOPE_2:
+                        *data = dev.sens->meas.slope;
+                        break;     
+                        
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_cDGR_2:                           
+                case MDBS_TERM_HREG_SENS_VDDA_mV_2:        
+                case MDBS_TERM_HREG_SENS_ADC_mV_2:
+                case MDBS_TERM_HREG_SENS_ADC_RAW_HI_2:
+                case MDBS_TERM_HREG_SENS_ADC_RAW_LO_2:        
+                        *data   = 0;
+                        break;                        
+        
+                case MDBS_TERM_HREG_RESERVED_1802:
+                case MDBS_TERM_HREG_RESERVED_1803:        
+                case MDBS_TERM_HREG_RESERVED_1808:
+                case MDBS_TERM_HREG_RESERVED_1809:
+                case MDBS_TERM_HREG_RESERVED_180A:
+                case MDBS_TERM_HREG_RESERVED_180B:
+                case MDBS_TERM_HREG_RESERVED_180D:
+                case MDBS_TERM_HREG_RESERVED_180E:
+                case MDBS_TERM_HREG_RESERVED_180F:
+                case MDBS_TERM_HREG_RESERVED_1812:
+                case MDBS_TERM_HREG_RESERVED_1813:
+                case MDBS_TERM_HREG_RESERVED_1815:
+                case MDBS_TERM_HREG_RESERVED_1816:
+                case MDBS_TERM_HREG_RESERVED_1817:        
+                case MDBS_TERM_HREG_RESERVED_181A:
+                case MDBS_TERM_HREG_RESERVED_181B:
+                case MDBS_TERM_HREG_RESERVED_181C:  
+                case MDBS_TERM_HREG_RESERVED_181D:
+                case MDBS_TERM_HREG_RESERVED_181E:
+                case MDBS_TERM_HREG_RESERVED_181F:                         
+                        *data = 0;
+                        break;
+                //--------------------------------------------------------------        
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_TIMESTMP_HI:
+                        *data = dev.sens->cal.zero.timestamp.u16[1];                  
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_TIMESTMP_LO:                       
+                        *data = dev.sens->cal.zero.timestamp.u16[0];                        
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1C03:
+                case MDBS_TERM_HREG_RESERVED_1C04:    
+                case MDBS_TERM_HREG_RESERVED_1C05:
+                case MDBS_TERM_HREG_RESERVED_1C06:        
+                case MDBS_TERM_HREG_RESERVED_1C07:
+                case MDBS_TERM_HREG_RESERVED_1C08:
+                case MDBS_TERM_HREG_RESERVED_1C09:        
+                case MDBS_TERM_HREG_RESERVED_1C0A:
+                case MDBS_TERM_HREG_RESERVED_1C0B: 
+                        *data = 0;
+                        break;
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_ADC_RAW_MSB:
+                        *data = dev.sens->cal.zero.raw.u16[1];
+                        break;
+                
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_ADC_RAW_LSB:
+                        *data = dev.sens->cal.zero.raw.u16[0];
+                        break;
+                  
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_HI:
+                        *data = dev.sens->cal.zero.ppb.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_LO:
+                        *data = dev.sens->cal.zero.ppb.u16[0];
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_TIMESTMP_HI:
+                        *data = dev.sens->cal.span.timestamp.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_TIMESTMP_LO:
+                        *data = dev.sens->cal.span.timestamp.u16[0];                  
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1C12:
+                case MDBS_TERM_HREG_RESERVED_1C13:    
+                case MDBS_TERM_HREG_RESERVED_1C14:
+                case MDBS_TERM_HREG_RESERVED_1C15:     
+                case MDBS_TERM_HREG_RESERVED_1C16:
+                case MDBS_TERM_HREG_RESERVED_1C17:        
+                case MDBS_TERM_HREG_RESERVED_1C18:
+                case MDBS_TERM_HREG_RESERVED_1C19:        
+                case MDBS_TERM_HREG_RESERVED_1C1A:
+                case MDBS_TERM_HREG_RESERVED_1C1B:  
+                        *data = 0;
+                        break;
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_ADC_RAW_MSB:
+                        *data = dev.sens->cal.span.raw.u16[1];
+                        break;
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_ADC_RAW_LSB:  
+                        *data = dev.sens->cal.span.raw.u16[0];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_HI:
+                        *data = dev.sens->cal.span.ppb.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_LO:
+                        *data = dev.sens->cal.span.ppb.u16[0];
+                        break;   
+                        
+ //--------------------------------------------------------------                                
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_TIMESTMP_HI:
+                        *data = dev.sens->cal_back.zero.timestamp.u16[1];                  
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_TIMESTMP_LO:                       
+                        *data = dev.sens->cal_back.zero.timestamp.u16[0];                        
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1D02:
+                case MDBS_TERM_HREG_RESERVED_1D03:    
+                case MDBS_TERM_HREG_RESERVED_1D04:
+                case MDBS_TERM_HREG_RESERVED_1D05:        
+                case MDBS_TERM_HREG_RESERVED_1D06:
+                case MDBS_TERM_HREG_RESERVED_1D07:       
+                case MDBS_TERM_HREG_RESERVED_1D08:
+                case MDBS_TERM_HREG_RESERVED_1D09:        
+                case MDBS_TERM_HREG_RESERVED_1D0A:
+                case MDBS_TERM_HREG_RESERVED_1D0B:        
+                        *data = 0;
+                        break;
+                  
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_ADC_RAW_MSB:
+                        *data = dev.sens->cal_back.zero.raw.u16[1];
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_ADC_RAW_LSB:   
+                        *data =  dev.sens->cal_back.zero.raw.u16[0];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_HI:
+                        *data = dev.sens->cal_back.zero.ppb.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_LO:
+                        *data = dev.sens->cal_back.zero.ppb.u16[0];
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_TIMESTMP_HI:
+                        *data = dev.sens->cal_back.span.timestamp.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_TIMESTMP_LO:
+                        *data = dev.sens->cal_back.span.timestamp.u16[0];                  
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1D12:                        
+                case MDBS_TERM_HREG_RESERVED_1D13:    
+                case MDBS_TERM_HREG_RESERVED_1D14:
+                case MDBS_TERM_HREG_RESERVED_1D15:     
+                case MDBS_TERM_HREG_RESERVED_1D16:
+                case MDBS_TERM_HREG_RESERVED_1D17:        
+                case MDBS_TERM_HREG_RESERVED_1D18:
+                case MDBS_TERM_HREG_RESERVED_1D19:        
+                case MDBS_TERM_HREG_RESERVED_1D1A:
+                case MDBS_TERM_HREG_RESERVED_1D1B:   
+                        *data = 0;
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_ADC_RAW_MSB:
+                        *data = dev.sens->cal_back.span.raw.u16[1];                  
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_ADC_RAW_LSB:    
+                        *data = dev.sens->cal_back.span.raw.u16[0];                  
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_HI:
+                        *data = dev.sens->cal_back.span.ppb.u16[1];
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_LO:
+                        *data = dev.sens->cal_back.span.ppb.u16[0];
+                        break;                            
 
                 default:
                         err     = MDBS_ERR_ILLEGAL_DATA_ADDRESS;
@@ -863,8 +1384,9 @@ mdbs_hreg_write(                        const   size_t                  idx,
 {
         mdbs_err_t      err     = MDBS_ERR_NONE;
         static uint32_t temp = 0;
-        time_t time_temp;
         struct tm *     ts;
+        int32_t ppb;
+        static time_t time_temp;
 
         switch( idx )
         {
@@ -893,14 +1415,34 @@ mdbs_hreg_write(                        const   size_t                  idx,
                 case MDBS_TERM_HREG_SERIAL_NUM_06:
                 case MDBS_TERM_HREG_SERIAL_NUM_07:
                 case MDBS_TERM_HREG_INFO_RESERVED_25:        
-                case MDBS_TERM_HREG_INFO_RESERVED_26:        
-                case MDBS_TERM_HREG_INFO_RESERVED_27:
-                case MDBS_TERM_HREG_INFO_RESERVED_28:        
-                case MDBS_TERM_HREG_INFO_RESERVED_29:        
-                case MDBS_TERM_HREG_INFO_RESERVED_30:
-                case MDBS_TERM_HREG_INFO_RESERVED_31:                  
-                        //do nothing, read-only register
-                        break;
+                case MDBS_TERM_HREG_INFO_RESERVED_26:   
+                    break;
+                    
+                case MDBS_TERM_HREG_INFO_TAG_00:
+                  temp = *data;
+                  dev.info.tag->c_tag[0] = temp >> 8;
+                  dev.info.tag->c_tag[1] = temp & 0x00FF; 
+                  break;                  
+                case MDBS_TERM_HREG_INFO_TAG_01: 
+                  temp = *data;
+                  dev.info.tag->c_tag[2] = temp >> 8;
+                  dev.info.tag->c_tag[3] = temp & 0x00FF; 
+                  break;                   
+                case MDBS_TERM_HREG_INFO_TAG_02:        
+                  temp = *data;
+                  dev.info.tag->c_tag[4] = temp >> 8;
+                  dev.info.tag->c_tag[5] = temp & 0x00FF; 
+                  break;                   
+                case MDBS_TERM_HREG_INFO_TAG_03:
+                  temp = *data;
+                  dev.info.tag->c_tag[6] = temp >> 8;
+                  dev.info.tag->c_tag[7] = temp & 0x00FF; 
+                  break;                   
+                case MDBS_TERM_HREG_INFO_TAG_04:                  
+                  temp = *data;
+                  dev.info.tag->c_tag[8] = temp >> 8;
+                  dev.info.tag->c_tag[9] = temp & 0x00FF; 
+                  break;
                         
                 case MDBS_TERM_HREG_DEVICE_RESERVED_255:                 
                   if (*data == 0x19D8 && temp!= 0)
@@ -967,31 +1509,46 @@ mdbs_hreg_write(                        const   size_t                  idx,
                         //do nothing, read-only registers
                         break;
                         
-                case MDBS_HREG_RANGE1_PPM_MSB:
-                    dev.cl420.range[0].ppm = *data << 16 ;
+                case MDBS_HREG_RANGE1_PPB_MSB:
+                    dev.cl420.range[0].ppb = *data << 16 ;                    
                     break;
-                case MDBS_HREG_RANGE1_PPM_LSB:
-                    dev.cl420.range[0].ppm |= *data;
+                case MDBS_HREG_RANGE1_PPB_LSB:
+                    dev.cl420.range[0].ppb |= *data;
+                    dev.cl420.range[0].ppm = dev.cl420.range[0].ppb / 1000;
                     send_cmd_for_cloop_write_range(); 
                     break;                 
-                case MDBS_HREG_RANGE2_PPM_MSB:
-                    dev.cl420.range[1].ppm = *data << 16;
+                case MDBS_HREG_RANGE2_PPB_MSB:
+                    dev.cl420.range[1].ppb = *data << 16;
                     break;           
-                case MDBS_HREG_RANGE2_PPM_LSB:
-                    dev.cl420.range[1].ppm |= *data;
+                case MDBS_HREG_RANGE2_PPB_LSB:
+                    dev.cl420.range[1].ppb |= *data;
+                    dev.cl420.range[1].ppm = dev.cl420.range[1].ppb / 1000;
                     send_cmd_for_cloop_write_range();
                     break;                 
-                case MDBS_HREG_RANGE3_PPM_MSB:
-                    dev.cl420.range[2].ppm = *data << 16;
+                case MDBS_HREG_RANGE3_PPB_MSB:
+                    dev.cl420.range[2].ppb = *data << 16;
                     break;               
-                case MDBS_HREG_RANGE3_PPM_LSB:
-                    dev.cl420.range[2].ppm |= *data;
+                case MDBS_HREG_RANGE3_PPB_LSB:
+                    dev.cl420.range[2].ppb |= *data;
+                    dev.cl420.range[2].ppm = dev.cl420.range[2].ppb / 1000;                    
                     send_cmd_for_cloop_write_range();
                     break;                 
                 case MDBS_HREG_CURRENT_RANGE:
                     dev.cl420.range_idx = *data;
                     send_cmd_for_cloop_write_range();
                     break;        
+                    
+                case MDBS_HREG_LPF_CUTOFF:
+                  dev.cfg.lpf_cutoff = *data;
+                  task_ibus_sens_conf_lpf_update(dev.cfg.lpf_cutoff,
+                                                 dev.cfg.lpf_order);
+                  break;
+                  
+                case MDBS_HREG_LPF_ORDER:
+                  dev.cfg.lpf_order = *data;
+                  task_ibus_sens_conf_lpf_update(dev.cfg.lpf_cutoff,
+                                                 dev.cfg.lpf_order);                  
+                   break;                    
                     
                 case MODBUS_HREG_STS_ERROR_FILTER_COUNT:    if (*data <= 10) dev.cfg.error_filter_count = *data;  break;         
                 
@@ -1009,6 +1566,211 @@ mdbs_hreg_write(                        const   size_t                  idx,
                   break;                    
 //------------------------------------------------------------------------------
 
+#if defined(USE_VALIDATION)                  
+                case MDBS_VALIDATION_VALUE_PPB_MSB:
+                        ppb = *data;
+                        ppb <<= 16;
+                        dev.validation.value.ppb = ppb;
+                        break;
+
+                case MDBS_VALIDATION_VALUE_PPB_LSB:
+                        ppb = *data;
+                        dev.validation.value.ppb |=ppb ;
+                        break;                   
+                  
+                case MDBS_VALIDATION_DEVIATION_PPB_MSB:
+                        ppb = *data;
+                        ppb <<= 16;
+                        dev.validation.deviation.ppb = ppb;
+                        break;
+                        
+                case MDBS_VALIDATION_DEVIATION_PPB_LSB:                        
+                        ppb = *data;
+                        dev.validation.deviation.ppb |=ppb ;
+                        break;    
+                        
+                case MDBS_VALIDATION_TRANSITION_TIME:
+                        dev.validation.timings.transition_time = *data;
+                        break;
+                        
+                case MDBS_VALIDATION_MEASURE_TIME:
+                        dev.validation.timings.measure_time = *data;                  
+                        break;
+                        
+                case MDBS_VALIDATION_RETURN_TIME:                       
+                        dev.validation.timings.return_time = *data;                  
+                        break;
+                        
+                case MDBS_VALIDATION_START:
+                        switch (*data) {
+                        case VALIDATION_STOP: 
+                           dev.validation.start = VALIDATION_STOP;
+                          send_cmd_for_remote_validation_break();
+                          break;                        
+                        case VALIDATION_REMOTE_START:
+                           dev.validation.start = VALIDATION_REMOTE_START;
+                           send_cmd_for_remote_validation_start();
+                           break;                                                  
+                        }
+                        break;
+                        
+                case MDBS_VALIDATION_RESERVED_507:
+                case MDBS_VALIDATION_RESERVED_508: 
+                case MDBS_VALIDATION_RESERVED_50A:
+                case MDBS_VALIDATION_RESERVED_50B:  
+                case MDBS_VALIDATION_PROCESS_VALUE_PPB_MSB:
+                case MDBS_VALIDATION_PROCESS_VALUE_PPB_LSB:                      
+                case MDBS_VALIDATION_STATE:     
+                case MDBS_VALIDATION_RESERVED_50F:
+                case MDBS_VALIDATION_RESERVED_510:                   
+                case MDBS_VALIDATION_MEAS_VALUE_PPB_MSB:
+                case MDBS_VALIDATION_MEAS_VALUE_PPB_LSB:
+                case MDBS_VALIDATION_MEAS_DEVIATION_PPB_MSB:
+                case MDBS_VALIDATION_MEAS_DEVIATION_PPB_LSB: 
+                case MDBS_VALIDATION_RESULT:                  
+                        break;
+#endif            
+                        
+#if defined(USE_REMOTE_CALIBRATION)                  
+                case MDBS_REMOTE_CALIBRATION_SPAN_VALUE_PPB_MSB:
+                        ppb = *data;
+                        ppb <<= 16;
+                        dev.calibration.span.ppb = ppb;
+                        break;
+
+                case MDBS_REMOTE_CALIBRATION_SPAN_VALUE_PPB_LSB:
+                        ppb = *data;
+                        dev.calibration.span.ppb |=ppb ;
+                        break;                   
+                  
+                case MDBS_REMOTE_CALIBRATION_ZERO_VALUE_PPB_MSB:
+                        ppb = *data;
+                        ppb <<= 16;
+                        dev.calibration.zero.ppb = ppb;
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_ZERO_VALUE_PPB_LSB:                        
+                        ppb = *data;
+                        dev.calibration.zero.ppb |=ppb ;
+                        break;    
+                        
+                case MDBS_REMOTE_CALIBRATION_DEVIATION_VALUE_PPB_MSB:
+                        ppb = *data;
+                        ppb <<= 16;
+                        dev.calibration.deviation.ppb = ppb;
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_DEVIATION_VALUE_PPB_LSB:                        
+                        ppb = *data;
+                        dev.calibration.deviation.ppb |=ppb ;
+                        break;                           
+                        
+                case MDBS_REMOTE_CALIBRATION_TRANSITION_TIME:
+                        dev.calibration.timings.transition_time = *data;
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_MEASURE_TIME:
+                        dev.calibration.timings.measure_time = *data;                  
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_RETURN_TIME:                       
+                        dev.calibration.timings.return_time = *data;                  
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_SLOPE_TIME:                       
+                        dev.calibration.timings.stable_slope_time = *data;
+                        break;    
+                        
+                case MDBS_REMOTE_CALIBRATION_SLOPE_VALUE:                       
+                        dev.calibration.max_slope = *data;                  
+                        break;        
+                        
+                case MDBS_REMOTE_CALIBRATION_ENABLE:
+                        dev.calibration.remote_calibration_enabled = *data;
+                        break;
+
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070C:                        
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070D:
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070E:                        
+                case MDBS_REMOTE_CALIBRATION_RESERVED_070F:  
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_SPAN_START:
+                        switch (*data) {
+                        case CALIBRATION_STOP: 
+                           dev.calibration.start = CALIBRATION_STOP;
+                          send_cmd_for_remote_calibration_break();
+                          break;                        
+                        case CALIBRATION_REMOTE_START:
+                           dev.state.process_status = PROCESS_CALIBRATION_SPAN;
+                           dev.calibration.start = CALIBRATION_REMOTE_START;
+                           send_cmd_for_remote_calibration_span_start();
+                           break;                                                  
+                        }
+                        break;
+                        
+                case MDBS_REMOTE_CALIBRATION_ZERO_START:
+                        switch (*data) {
+                        case CALIBRATION_STOP: 
+                          dev.calibration.start = CALIBRATION_STOP;
+                          send_cmd_for_remote_calibration_break();
+                          break;                        
+                        case CALIBRATION_REMOTE_START:
+                           dev.state.process_status = PROCESS_CALIBRATION_ZERO;
+                           dev.calibration.start = CALIBRATION_REMOTE_START;
+                           send_cmd_for_remote_calibration_zero_start();
+                           break;                                                  
+                        }
+                        break;   
+                        
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0712:                        
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0713:
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0714:                        
+                case MDBS_REMOTE_CALIBRATION_RESERVED_0715:  
+                case MDBS_REMOTE_CALIBRATION_PROCESS_SLOPE:   
+                case MDBS_REMOTE_CALIBRATION_PROCESS_VALUE_PPB_MSB:
+                case MDBS_REMOTE_CALIBRATION_PROCESS_VALUE_PPB_LSB:                      
+                case MDBS_REMOTE_CALIBRATION_STATE:                      
+                case MDBS_REMOTE_CALIBRATION_RESULT:                  
+                        break;
+#endif                        
+                  
+                case MDBS_TERM_HREG_SENS_OXGN_PPM_HI:
+                case MDBS_TERM_HREG_SENS_OXGN_PPM_LO:
+                case MDBS_TERM_HREG_RESERVED_802:
+                case MDBS_TERM_HREG_RESERVED_803:        
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_PRIM:
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_SEC:
+                case MDBS_TERM_HREG_SENS_PRES_PA_HI:
+                case MDBS_TERM_HREG_SENS_PRES_PA_LO:
+                case MDBS_TERM_HREG_RESERVED_808:
+                case MDBS_TERM_HREG_RESERVED_809:
+                case MDBS_TERM_HREG_RESERVED_80A:
+                case MDBS_TERM_HREG_RESERVED_80B:
+                case MDBS_TERM_HREG_SENS_SLOPE:
+                case MDBS_TERM_HREG_RESERVED_80D:
+                case MDBS_TERM_HREG_RESERVED_80E:
+                case MDBS_TERM_HREG_RESERVED_80F:
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_cDGR:
+                case MDBS_TERM_HREG_SENS_VDDA_mV:
+                case MDBS_TERM_HREG_RESERVED_812:
+                case MDBS_TERM_HREG_RESERVED_813:
+                case MDBS_TERM_HREG_SENS_ADC_mV: 
+                case MDBS_TERM_HREG_RESERVED_815:
+                case MDBS_TERM_HREG_RESERVED_816:
+                case MDBS_TERM_HREG_RESERVED_817:  
+                case MDBS_TERM_HREG_SENS_ADC_RAW_HI: 
+                case MDBS_TERM_HREG_SENS_ADC_RAW_LO:         
+                case MDBS_TERM_HREG_RESERVED_81A:
+                case MDBS_TERM_HREG_RESERVED_81B:
+                case MDBS_TERM_HREG_RESERVED_81C:  
+                case MDBS_TERM_HREG_RESERVED_81D:
+                case MDBS_TERM_HREG_RESERVED_81E:
+                case MDBS_TERM_HREG_RESERVED_81F: 
+                        //do nothing, read-only registers
+                    break;
+
+                //--------------------------------------------------------------
                 case MDBS_TERM_HREG_SENS_CAL_ZERO_PPM_TIMESTMP_HI:
                         dev.sens->cal.zero.timestamp.u16[1]  = *data;
                         break;
@@ -1070,7 +1832,197 @@ mdbs_hreg_write(                        const   size_t                  idx,
                 case MDBS_TERM_HREG_SENS_CAL_SPAN_PPM_LO:
                         dev.sens->cal.span.ppm.u16[ 0] = *data;
                         break;
+                        
+                //--------------------------------------------------------------        
+                        
+                case MDBS_TERM_HREG_SENS_OXGN_PPB_HI:
+                case MDBS_TERM_HREG_SENS_OXGN_PPB_LO:
+                case MDBS_TERM_HREG_RESERVED_1802:
+                case MDBS_TERM_HREG_RESERVED_1803:        
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_PRIM_2:
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_SEC_2:
+                case MDBS_TERM_HREG_SENS_PRES_PA_HI_2:
+                case MDBS_TERM_HREG_SENS_PRES_PA_LO_2:
+                case MDBS_TERM_HREG_RESERVED_1808:
+                case MDBS_TERM_HREG_RESERVED_1809:
+                case MDBS_TERM_HREG_RESERVED_180A:
+                case MDBS_TERM_HREG_RESERVED_180B:
+                case MDBS_TERM_HREG_SENS_SLOPE_2:
+                case MDBS_TERM_HREG_RESERVED_180D:
+                case MDBS_TERM_HREG_RESERVED_180E:
+                case MDBS_TERM_HREG_RESERVED_180F:
+                case MDBS_TERM_HREG_SENS_TEMP_DIGC_cDGR_2:
+                case MDBS_TERM_HREG_SENS_VDDA_mV_2:
+                case MDBS_TERM_HREG_RESERVED_1812:
+                case MDBS_TERM_HREG_RESERVED_1813:
+                case MDBS_TERM_HREG_SENS_ADC_mV_2: 
+                case MDBS_TERM_HREG_RESERVED_1815:
+                case MDBS_TERM_HREG_RESERVED_1816:
+                case MDBS_TERM_HREG_RESERVED_1817:  
+                case MDBS_TERM_HREG_SENS_ADC_RAW_HI_2: 
+                case MDBS_TERM_HREG_SENS_ADC_RAW_LO_2:         
+                case MDBS_TERM_HREG_RESERVED_181A:
+                case MDBS_TERM_HREG_RESERVED_181B:
+                case MDBS_TERM_HREG_RESERVED_181C:  
+                case MDBS_TERM_HREG_RESERVED_181D:
+                case MDBS_TERM_HREG_RESERVED_181E:
+                case MDBS_TERM_HREG_RESERVED_181F: 
+                        //do nothing, read-only registers
+                    break;                         
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_TIMESTMP_HI:
+                        dev.sens->cal.zero.timestamp.u16[1]  = *data;                        
+                        break;
 
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_TIMESTMP_LO:
+                        dev.sens->cal.zero.timestamp.u16[0]  = *data;                        
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1C02:            
+                case MDBS_TERM_HREG_RESERVED_1C03:                       
+                case MDBS_TERM_HREG_RESERVED_1C04:                
+                case MDBS_TERM_HREG_RESERVED_1C05:               
+                case MDBS_TERM_HREG_RESERVED_1C06:          
+                case MDBS_TERM_HREG_RESERVED_1C07:             
+                case MDBS_TERM_HREG_RESERVED_1C08:
+                case MDBS_TERM_HREG_RESERVED_1C09:        
+                case MDBS_TERM_HREG_RESERVED_1C0A:
+                case MDBS_TERM_HREG_RESERVED_1C0B:   
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_ADC_RAW_MSB:
+                        dev.sens->cal.zero.raw.u16[1] = *data;                        
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_ADC_RAW_LSB:     
+                        dev.sens->cal.zero.raw.u16[0] = *data;                        
+                        break;                  
+                  
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_HI:
+                        dev.sens->cal.zero.ppb.u16[1]    = *data;
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_PPB_LO:
+                        dev.sens->cal.zero.ppb.u16[0]    = *data;
+                        dev.sens->cal.zero.ppm.i32 = dev.sens->cal.zero.ppb.i32 / 1000;
+                        task_hmi_cal_update( 0 );
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_TIMESTMP_HI:
+                        dev.sens->cal.span.timestamp.u16[1]  = *data;                        
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_TIMESTMP_LO:
+                        dev.sens->cal.span.timestamp.u16[0]  = *data;                                          
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1C12:
+                case MDBS_TERM_HREG_RESERVED_1C13:     
+                case MDBS_TERM_HREG_RESERVED_1C14:
+                case MDBS_TERM_HREG_RESERVED_1C15:                       
+                case MDBS_TERM_HREG_RESERVED_1C16:
+                case MDBS_TERM_HREG_RESERVED_1C17:       
+                case MDBS_TERM_HREG_RESERVED_1C18:
+                case MDBS_TERM_HREG_RESERVED_1C19:        
+                case MDBS_TERM_HREG_RESERVED_1C1A:
+                case MDBS_TERM_HREG_RESERVED_1C1B:  
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_ADC_RAW_MSB:
+                        dev.sens->cal.span.raw.u16[1] = *data;                        
+                        break;                  
+                  
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_ADC_RAW_LSB:  
+                        dev.sens->cal.span.raw.u16[0] = *data;                        
+                        break;  
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_HI:
+                        dev.sens->cal.span.ppb.u16[1]    = *data;
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_PPB_LO:
+                        dev.sens->cal.span.ppb.u16[0]    = *data;
+                        dev.sens->cal.span.ppm.i32 = dev.sens->cal.span.ppb.i32 / 1000;
+                        task_hmi_cal_update( 1 );                        
+                        break;    
+                        
+//------------------------------------------------------------------------------                         
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_TIMESTMP_HI:
+                        dev.sens->cal_back.zero.timestamp.u16[1]  = *data;                        
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_TIMESTMP_LO:
+                        dev.sens->cal_back.zero.timestamp.u16[0]  = *data;                        
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1D02:
+                case MDBS_TERM_HREG_RESERVED_1D03:   
+                case MDBS_TERM_HREG_RESERVED_1D04:
+                case MDBS_TERM_HREG_RESERVED_1D05:     
+                case MDBS_TERM_HREG_RESERVED_1D06:
+                case MDBS_TERM_HREG_RESERVED_1D07:        
+                case MDBS_TERM_HREG_RESERVED_1D08:
+                case MDBS_TERM_HREG_RESERVED_1D09:        
+                case MDBS_TERM_HREG_RESERVED_1D0A:
+                case MDBS_TERM_HREG_RESERVED_1D0B:   
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_ADC_RAW_MSB:
+                        dev.sens->cal_back.zero.raw.u16[1] = *data;                        
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_ADC_RAW_LSB:     
+                        dev.sens->cal_back.zero.raw.u16[0] = *data;                                                
+                        break;                  
+                  
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_HI:
+                        dev.sens->cal_back.zero.ppb.u16[1] = *data;
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_ZERO_BACK_PPB_LO:
+                        dev.sens->cal_back.zero.ppb.u16[0] = *data;
+                        dev.sens->cal_back.zero.ppm.i32 = dev.sens->cal_back.zero.ppb.i32 / 1000;
+                        task_hmi_cal_restore( 0 );
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_TIMESTMP_HI:
+                        dev.sens->cal_back.span.timestamp.u16[1]  = *data;                        
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_TIMESTMP_LO:
+                        dev.sens->cal_back.span.timestamp.u16[0]  = *data;                                          
+                        break;
+                        
+                case MDBS_TERM_HREG_RESERVED_1D12: 
+                case MDBS_TERM_HREG_RESERVED_1D13:    
+                case MDBS_TERM_HREG_RESERVED_1D14:    
+                case MDBS_TERM_HREG_RESERVED_1D15:    
+                case MDBS_TERM_HREG_RESERVED_1D16:    
+                case MDBS_TERM_HREG_RESERVED_1D17:                        
+                case MDBS_TERM_HREG_RESERVED_1D18:
+                case MDBS_TERM_HREG_RESERVED_1D19:        
+                case MDBS_TERM_HREG_RESERVED_1D1A:
+                case MDBS_TERM_HREG_RESERVED_1D1B:  
+                        break;
+                        
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_ADC_RAW_MSB:
+                        dev.sens->cal_back.span.raw.u16[1] = *data;                        
+                        break;                  
+                  
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_ADC_RAW_LSB:  
+                        dev.sens->cal_back.span.raw.u16[0] = *data;                        
+                        break;  
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_HI:
+                        dev.sens->cal_back.span.ppb.u16[1] = *data;
+                        break;
+
+                case MDBS_TERM_HREG_SENS_CAL_SPAN_BACK_PPB_LO:
+                        dev.sens->cal_back.span.ppb.u16[0] = *data;
+                        task_hmi_cal_restore( 1 );                        
+                        break;                        
+                                                                                              
                 default:
                         err     = MDBS_ERR_ILLEGAL_DATA_ADDRESS;
                         break;

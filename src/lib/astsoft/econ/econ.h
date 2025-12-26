@@ -25,6 +25,7 @@ typedef struct  econ_cal_point_s
 {
     econ_type_t         raw;
     econ_type_t         ppm;
+    econ_type_t         ppb;
     econ_type_t         timestamp;
 } econ_cal_point_t;
 
@@ -45,8 +46,8 @@ typedef struct  econ_meas_s
 
     struct
     {
-        int32_t             integral;
-        uint32_t            fractional;
+        int32_t         i32;
+        uint16_t        u16[2];
     } ppm;
 
     struct
@@ -54,6 +55,12 @@ typedef struct  econ_meas_s
         int32_t             integral;
         uint32_t            fractional;
     } digc;
+    
+    union
+    {
+      int32_t  i32;
+      uint16_t u16[2];
+    } ppb;
 
     int16_t             slope;
 } econ_meas_t;
@@ -65,7 +72,12 @@ typedef struct  econ_s
     econ_meas_t         meas;
     uint16_t            error;
     uint16_t            link_err_cnt;
-    int16_t             link_err;
+    int16_t             link_err;   
+    
+    uint16_t        modbus_ppm_hi;
+    uint16_t        modbus_ppm_lo;
+    uint16_t        modbus_ppb_hi;
+    uint16_t        modbus_ppb_lo;
 } econ_t;
 
 
@@ -74,6 +86,7 @@ typedef struct  econ_s
 *******************************************************************************/
 void        econ_cal_restore( econ_t * );
 int32_t     econ_raw2ppm( econ_t *, const uint32_t );
+int32_t     econ_calc_slope (const int32_t raw);
 
 
 #endif	//ECON_H

@@ -19,17 +19,17 @@ static const GUI_WIDGET_CREATE_INFO     dialog_info[] =
 {
     { WINDOW_CreateIndirect,    "", 0,                                  0,  80, 800, 400, 0, 0x0, 0 },
 
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DIAGNOSTICS,       64, 12,   304,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RESET_PASSWORD,    64, 88,   304,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RESET_SETTINGS,    64, 164,  304,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_NETWORK,           64, 240,  304,  64, 0, 0x0, 0 },    
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MEASURE,         64, 12,   304,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_DIAGNOSTICS,     64, 88,   304,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RESET_PASSWORD,  64, 164,  304,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_NETWORK,         64, 240,  304,  64, 0, 0x0, 0 },    
     
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RELAY,            432, 12,  304,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CURRENT_LOOP,     432, 88,  304,  64, 0, 0x0, 0 },
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MODBUS,           432, 164, 304,  64, 0, 0x0, 0 },    
-//    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MEASURE,           432, 240, 304,  64, 0, 0x0, 0 }, 
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RESET_SETTINGS, 432, 12,  304,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_RELAY,          432, 88,  304,  64, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_CURRENT_LOOP,   432, 164, 304,  64, 0, 0x0, 0 },    
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_MODBUS,         432, 240, 304,  64, 0, 0x0, 0 }, 
     
-    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_BACK,                 0, 320, 800,  80, 0, 0x0, 0 },
+    { BUTTON_CreateIndirect,    "", GUI_ID_BUTTON_BACK,             0, 320, 800,  80, 0, 0x0, 0 },
 };
 
 
@@ -47,9 +47,9 @@ init_dialog(                                            WM_HWIN         hWin )
     hItem   = WM_GetDialogItem( hWin, GUI_ID_TEXT_BACKPLANE );
     TEXT_SetBkColor(        hItem, GUI_BLACK                                );
 
-    //hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_MEASURE );
-    //BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_MEASURE      ));
-    //BUTTON_SetFocusable(    hItem, 1                                        );
+    hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_MEASURE );
+    BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_MEASURE      ));
+    BUTTON_SetFocusable(    hItem, 1                                        );
 
     hItem   = WM_GetDialogItem( hWin, GUI_ID_BUTTON_DIAGNOSTICS );
     BUTTON_SetText(         hItem, l10n_str_get( dev.cfg.lang, L10N_STR_ID_DIAGNOSTICS   ));
@@ -115,10 +115,12 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
                         GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
                         GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
                         GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
+                        GUI_StoreKeyMsg( GUI_KEY_BACKTAB, 1 );
                         beep_play( BEEP_SHRT );
                         break;
 
                 case GUI_KEY_RIGHT:
+                        GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
                         GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
                         GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );
                         GUI_StoreKeyMsg( GUI_KEY_TAB, 1 );

@@ -21,7 +21,6 @@
 #include "dev_info.h"
 #include "dev\nvm\nvm.h"
 #include "econ.h"
-#include "dev\sens\sens.h"
 #include "dev\log\log.h"
 #include "dev\meas\meas.h"
 #include "dev\cl420\cl420.h"
@@ -42,12 +41,18 @@
 #define PID_TEMP_TOO_HI_ERR	(1 << 6)
 #define STARTUP_ERR	        (1 << 7)
 #define EXT_RELAY_LINK_ERR	(1 << 8)
+#define VALIDATION_ERR          (1 << 9)
+#define CALIBRATION_ERR         (1 << 10)
 
 // WARNINGS YELLOW
 #define PID_TEMP_NOT_IN_RANGE_HI_WAR    (1 << 0)
 #define PID_TEMP_NOT_IN_RANGE_LOW_WAR   (1 << 1)
 #define MEASURE_VALUE_HI_LEVEL_WAR      (1 << 2)
 #define MEASURE_VALUE_LOW_LEVEL_WAR     (1 << 3)
+#define VALIDATION_START_WAR            (1 << 4)
+#define CALIBRATION_ZERO_START_WAR      (1 << 5)
+#define CALIBRATION_SPAN_START_WAR      (1 << 6)
+#define CALIBRATION_START_WAR           (1 << 7)
 
 //CALLIBRATION TIMESTAMP ADDR IN BACKUP SRAM
 #define CAL0_TIMESTAMP_ADDR             BKPSRAM_BASE
@@ -65,11 +70,14 @@ extern uint8_t range_units_default;
 
 typedef enum process_status_e
 {
-  PROCESS_MEASURE,
-  PROCESS_CALIBRATION,
+  PROCESS_MEASURE = 0,
+  PROCESS_ERROR,
+  PROCESS_CALIBRATION_ZERO,
+  PROCESS_CALIBRATION_SPAN,
+  PROCESS_VALIDATION_SPAN,  
+  PROCESS_VALIDATION_ZERO,
   PROCESS_CLOOP_CALIBRATION,
-  PROCESS_VERIFICATION,
-  PROCESS_ERROR
+  PROCESS_CLOOP_VALIDATION,
 } process_status_t;
 
 /*******************************************************************************
@@ -234,6 +242,7 @@ typedef struct  dev_timings_s
   uint32_t transition_time;
   uint32_t measure_time;
   uint32_t return_time;  
+  uint32_t stable_slope_time;
 }timings_t;
 
 typedef enum validation_state_e
@@ -253,7 +262,7 @@ typedef enum validation_start_e
 {
   VALIDATION_STOP = 0,
   VALIDATION_REMOTE_START,  
-  VALIDATION_BREAK,   
+  VALIDATION_MANUAL_START,   
 } validation_start_t;
 
 typedef struct  dev_validation_s
@@ -268,8 +277,46 @@ typedef struct  dev_validation_s
   validation_state_t    state;
   validation_result_t   result;
   validation_start_t    start;
+  uint16_t              ppb_hi;
+  uint16_t              ppb_lo;
 }
 dev_validation_t;
+
+typedef enum calibration_state_e
+{
+  CALIBRATION_FINISH = 0,
+  CALIBRATION_IN_PROGRESS = 1,
+} calibration_state_t;
+
+typedef enum calibration_result_e
+{
+  CALIBRATION_SUCCESS = 0,
+  CALIBRATION_FAIL,
+  CALIBRATION_CANCELED,   
+} calibration_result_t;
+
+typedef enum calibration_start_e
+{
+  CALIBRATION_STOP = 0,
+  CALIBRATION_REMOTE_START,  
+  CALIBRATION_MANUAL_START,   
+} calibration_start_t;
+
+typedef struct  dev_remote_calibr_s
+{
+  value_t                zero;
+  value_t                span;  
+  value_t                deviation;
+  timings_t              timings;
+  calibration_state_t    state;
+  calibration_result_t   result;
+  calibration_start_t    start; 
+  bool                   remote_calibration_enabled;
+  int32_t                max_slope;
+  uint16_t              ppb_hi;
+  uint16_t              ppb_lo;
+}
+dev_calibr_t;
 
 
 /*******************************************************************************
@@ -293,7 +340,10 @@ typedef enum relay_mode_s
 {
   THRESHOLD_MODE,
   ERROR_MODE,
-  NOT_ACTIVE_MODE
+  NOT_ACTIVE_MODE,
+#if defined(USE_VALIDATION)    
+  VALIDATION_MODE,  
+#endif
 } relay_mode_e;
 
 typedef enum relay_state_s
@@ -375,6 +425,8 @@ typedef struct  dev_s
     dev_state_t                 state;
     dev_cloop_t *               cloop;
     dev_net_t *                 net;
+    dev_validation_t            validation;
+    dev_calibr_t                calibration;    
 } dev_t;
 
 

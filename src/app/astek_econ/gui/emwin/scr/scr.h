@@ -23,23 +23,25 @@ typedef enum    scr_idx_e
 {
     SCR_IDX_MEASURE                 = 0,
     SCR_IDX_CALIBRATE,
-    //SCR_IDX_CALIBRATE_FILTER,
-    //SCR_IDX_CALIBRATE_SPAN,
-    SCR_IDX_CALIBRATE_FACTORY_SETTINGS,
+    SCR_IDX_CALIBRATE_AUTO,
+    SCR_IDX_CALIBRATION_AUTO_CYCLE_TIME,
+    SCR_IDX_CALIBRATION_SETUP,
+    SCR_IDX_CALIBRATION_STEP1,
+    SCR_IDX_CALIBRATION_STEP2,
+    SCR_IDX_CALIBRATION_STEP3,
+    SCR_IDX_CALIBRATE_MANUAL,    
     SCR_IDX_CALIBRATE_POINT,
     SCR_IDX_CALIBRATE_RESTORE,
+    SCR_IDX_CALIBRATION_SETUP_ZERO,
+    SCR_IDX_CALIBRATION_SETUP_SPAN,
+    SCR_IDX_CALIBRATION_SETUP_DEVIATION,
+    SCR_IDX_CALIBRATION_SETUP_SLOPE,
+    SCR_IDX_CALIBRATION_SETUP_TRANSITION_TIME,
+    SCR_IDX_CALIBRATION_SETUP_MEASURE_TIME,
+    SCR_IDX_CALIBRATION_SETUP_RETURN_TIME,
+    SCR_IDX_CALIBRATION_SETUP_SLOPE_TIME,
     SCR_IDX_CONSOLE,
     SCR_IDX_SETUP,
-    SCR_IDX_SETUP_CALIBRATION,
-    SCR_IDX_SETUP_CALIBRATION_AUTO,
-    //SCR_IDX_SETUP_CALIBRATION_AUTO_CHECK,
-    //SCR_IDX_SETUP_CALIBRATION_AUTO_CHECK_ERROR,
-    SCR_IDX_SETUP_CALIBRATION_AUTO_CYCLE,
-    SCR_IDX_SETUP_CALIBRATION_AUTO_PURGE,
-    SCR_IDX_SETUP_CALIBRATION_AUTO_LAUNCH,
-
-    //SCR_IDX_SETUP_CALIBRATION_PASSWORD,
-    //SCR_IDX_SETUP_CALIBRATION_PASSWORD_ERROR,
     SCR_IDX_SETUP_MEASURE,
     SCR_IDX_SETUP_MEASURE_SENSOR,
     SCR_IDX_SETUP_MEASURE_CL420,
@@ -88,11 +90,20 @@ typedef enum    scr_idx_e
     SCR_IDX_SETUP_SYSTEM_LANGUAGE,
     SCR_IDX_SETUP_SYSTEM_PASSWORD,
     SCR_IDX_SETUP_SYSTEM_PASSWORD_ERROR,
-    //SCR_IDX_SETUP_SYSTEM_SERVICE,
-    //SCR_IDX_SETUP_CALIBRATION,
-    //SCR_IDX_SETUP_SYSTEM_SERVICE_FACTORY_RESET_ERROR,
-    //SCR_IDX_SETUP_SYSTEM_SERVICE_FACTORY_RESET_SUCCESS,
     SCR_IDX_SETUP_SYSTEM_TIME,
+    SCR_IDX_SETUP_SYSTEM_INFO_TAG,
+    SCR_IDX_VALIDATION,
+    SCR_IDX_VALIDATION_SETUP,
+    SCR_IDX_VALIDATION_SETUP_VALUE,
+    SCR_IDX_VALIDATION_SETUP_DEVIATION,
+    SCR_IDX_VALIDATION_SETUP_TRANSITION_TIME,
+    SCR_IDX_VALIDATION_SETUP_MEASURE_TIME,
+    SCR_IDX_VALIDATION_SETUP_RETURN_TIME,
+    SCR_IDX_VALIDATION_STEP1,
+    SCR_IDX_VALIDATION_STEP2,
+    SCR_IDX_VALIDATION_STEP3,
+    
+
     SCR_IDX_LAST,
 } scr_idx_t;
 
@@ -122,30 +133,9 @@ WM_HWIN scr_calibrate_point( void );
 WM_HWIN scr_calibrate_restore( void );
 WM_HWIN scr_console( void );
 WM_HWIN scr_setup( void );
-//WM_HWIN scr_setup_help( void );
-WM_HWIN scr_setup_calibration( void );
-WM_HWIN scr_setup_calibration_auto_cycle( void );
-WM_HWIN scr_setup_calibration_auto_flow( void );
-WM_HWIN scr_setup_calibration_auto( void );
-//WM_HWIN scr_setup_calibrate_auto_check( void );
-//WM_HWIN scr_setup_calibrate_auto_check_error( void );
-WM_HWIN scr_setup_calibration_auto_start( void );
-//WM_HWIN scr_setup_calibrate_point_low( void );
-//WM_HWIN scr_setup_calibrate_point_low_check( void );
-//WM_HWIN scr_setup_calibrate_point_low_check_error( void );
-//WM_HWIN scr_setup_calibrate_remotely( void );
-//WM_HWIN scr_setup_calibrate_remotely_check( void );
-//WM_HWIN scr_setup_calibrate_remotely_check_error( void );
-WM_HWIN scr_setup_calibration_password( void );
-WM_HWIN scr_setup_calibration_password_error( void );
-//WM_HWIN scr_setup_calibrate_restore( void );
-//WM_HWIN scr_setup_calibrate_restore_check( void );
-//WM_HWIN scr_setup_calibrate_restore_check_error( void );
-WM_HWIN scr_setup_measure( void );
 WM_HWIN scr_setup_measure_cl420( void );
 WM_HWIN scr_setup_measure_cl420_value( void );
 WM_HWIN scr_setup_measure_discrete_output( void );
-WM_HWIN scr_setup_measure_sensor( void );
 WM_HWIN scr_setup_output( void );
 WM_HWIN scr_setup_range( void );
 WM_HWIN scr_setup_range_value( void );
@@ -186,9 +176,20 @@ WM_HWIN scr_setup_system_service_correction( void );
 WM_HWIN scr_setup_system_service_factory_reset_error( void );
 WM_HWIN scr_setup_system_service_factory_reset_success( void );
 WM_HWIN scr_setup_system_time( void );
-//WM_HWIN scr_setup_threshold( void );
-//WM_HWIN scr_setup_threshold_value( void );
+WM_HWIN scr_setup_system_info_tag( void );
 WM_HWIN scr_status_bar( void );
-
-
+WM_HWIN scr_calibrate_manual( void );
+WM_HWIN scr_calibrate_auto( void );
+WM_HWIN scr_calibration_setup( void );
+WM_HWIN scr_calibrate_auto_cycle_time( void );
+WM_HWIN scr_calibration_step1( void );
+WM_HWIN scr_calibration_step2( void );
+WM_HWIN scr_calibration_step3( void );
+WM_HWIN scr_validation( void );
+WM_HWIN scr_validation_setup_time( void );
+WM_HWIN scr_validation_setup( void );
+WM_HWIN scr_validation_setup_value( void );
+WM_HWIN scr_validation_step1( void );
+WM_HWIN scr_validation_step2( void );
+WM_HWIN scr_validation_step3( void );
 #endif  //SCR_H

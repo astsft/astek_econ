@@ -16,6 +16,7 @@
 #include "config.h"
 #include "modbus.h"
 
+
 #ifdef EXT_FLASH
   #include "hw2331_ext_flash.h"
 #endif
@@ -27,7 +28,7 @@ extern  QueueHandle_t           que_hmi_hndl;
         uint32_t                task_stck_start[ configMINIMAL_STACK_SIZE ];
         osStaticThreadDef_t     tcb_start;
         osThreadId              task_hndl_start;
-
+        
 #pragma data_alignment = 8
 econ_t          sens;
 
@@ -50,6 +51,7 @@ dev_mcu_t       dev_mcu =
 dev_ext_relay_t ext_relay;
 dev_cloop_t cloop;
 dev_net_t   net;
+dev_tag_t   tag;
 
 #pragma data_alignment = 8
 dev_t           dev =
@@ -84,11 +86,13 @@ dev_t           dev =
     .info.uid_u16[ 5] = (uint16_t *) (UID_BASE_ADDRESS + 10),
     .info.uid_u16[ 6] = (uint16_t *) (UID_BASE_ADDRESS + 12),
     .info.uid_u16[ 7] = (uint16_t *) (UID_BASE_ADDRESS + 14),
+    .info.tag               = &tag,
 
     .cfg.display_mode       = DEV_DSPL_MODE_PERCENTS,
     .ext_relay              = &ext_relay,
     .cloop                  = &cloop,
     .net                    = &net,
+
 };
 
 /*******************************************************************************
