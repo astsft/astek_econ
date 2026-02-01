@@ -14,7 +14,7 @@
 #include <time.h>
 #include "GUI.h"
 #include "trace/trace.h"
-
+#include "config.h"
 
 /*******************************************************************************
 *
@@ -36,6 +36,8 @@ void    task_hmi_cal_restore( const int );
 //void    task_hmi_cal_backup_restore( const int );
 //void    task_hmi_cal_factory_settings_update( const int );
 
+#if CONFIG_HARDWARE_ID == 0x2331
 void    task_net( const void * );
+#endif   
 
 #endif  //MAIN_H

@@ -9,20 +9,25 @@ echo -------------------------------------------------------------------------
 echo Build ALL
 
 echo Project: %project1%
-echo Boad: %hw1%
 
 echo #define ASBACK_HW2353REV3 > ../src/app/preconfig.h
-"C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw1%.ewp release
 "C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
 
 echo #define EKON_2025 >> ../src/app/preconfig.h
-"C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw1%.ewp release
+"C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
+
+echo #define USE_VALIDATION >> ../src/app/preconfig.h
+echo #define USE_REMOTE_CALIBRATION >> ../src/app/preconfig.h
 "C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
 
 echo #define ASBACK_HW2353REV5 > ../src/app/preconfig.h
 "C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
+
 echo #define EKON_2025 >> ../src/app/preconfig.h
 "C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
 
+echo #define USE_VALIDATION >> ../src/app/preconfig.h
+echo #define USE_REMOTE_CALIBRATION >> ../src/app/preconfig.h
+"C:\Program Files\IAR Systems\Embedded Workbench 9.1\common\bin\iarbuild.exe" %workDir%\%project1%.hw%hw2%.ewp release
 
 

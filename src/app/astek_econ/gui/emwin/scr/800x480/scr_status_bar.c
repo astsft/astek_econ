@@ -62,9 +62,9 @@ void
 dialog_callback(                                WM_MESSAGE *            pMsg )
 {
     WM_HWIN         hItem;
-    uint8_t         h, m;
     char            str[6];
-    int             err;
+    time_t          timestamp;
+    struct tm *     ts;
 
 
     switch( pMsg->MsgId )
@@ -76,9 +76,9 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
         case WM_TIMER:
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_TEXT_SBAR_TIME );
-            h       = dev.mcu->rtc.get_hour();
-            m       = dev.mcu->rtc.get_minute();
-            snprintf( str, sizeof(str), "%02d:%02d", h, m );
+            timestamp = dev.mcu->rtc.get_timestamp();
+            ts = localtime(&timestamp);
+            snprintf( str, sizeof(str), "%02d:%02d", ts->tm_hour, ts->tm_min);
             TEXT_SetText( hItem, str );
 
             // Set Green

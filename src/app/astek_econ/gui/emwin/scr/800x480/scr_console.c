@@ -232,7 +232,7 @@ complete_listview (WM_HWIN         hItem)
     
     time = log_data.timestamp;
     ts = localtime(&time);
-    snprintf(data_str, 11, "%04d/%02d/%02d\0", ts->tm_year + 1900, ts->tm_mon,  ts->tm_mday);
+    snprintf(data_str, 11, "%04d/%02d/%02d\0", ts->tm_year + 1900, ts->tm_mon + 1,  ts->tm_mday);
     snprintf( time_str, 6, "%02d:%02d\0", ts->tm_hour, ts->tm_min);
     
     if (log_data.event_type == LOG_TYPE_WARNING)
@@ -342,7 +342,7 @@ update( WM_HWIN         hWin )
       
       time = log_data.timestamp;
       ts = localtime(&time);
-      snprintf(data_str, 11, "%04d/%02d/%02d\0", ts->tm_year + 1900, ts->tm_mon,  ts->tm_mday);
+      snprintf(data_str, 11, "%04d/%02d/%02d\0", ts->tm_year + 1900, ts->tm_mon + 1,  ts->tm_mday);
       snprintf( time_str, 6, "%02d:%02d\0", ts->tm_hour, ts->tm_min);
       
       if (log_data.event_type == LOG_TYPE_WARNING)

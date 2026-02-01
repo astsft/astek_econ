@@ -1483,11 +1483,11 @@
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\asback</state>
                     <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\spi_flash\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\external_flash</state>
-                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\app\astek_4021\hw\hw2331r2\eth</state>
-                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500</state>
-                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Ethernet</state>
-                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Ethernet\W5500</state>
-                    <state>$PROJ_DIR$\..\..\..\..\astek_4021\src\bsp\hw2331r2\w5500\ioLibrary_Driver\Internet\httpServer</state>
+                    <state>$PROJ_DIR$\..\..\..\src\app\astek_econ\hw\hw2331r2\eth</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Ethernet\W5500</state>
+                    <state>$PROJ_DIR$\..\..\..\src\bsp\hw2331_rev3\w5500\ioLibrary_Driver\Internet\httpServer</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>

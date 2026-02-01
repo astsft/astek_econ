@@ -233,7 +233,8 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
     int             idx_year;
     int             idx_month;
     int             idx_day;
-
+    time_t          timestamp;
+    struct tm *     ts;
 
     switch( pMsg->MsgId )
     {
@@ -345,6 +346,8 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 
         case WM_INIT_DIALOG:
             init_dialog( pMsg->hWin );
+            timestamp = dev.mcu->rtc.get_timestamp();
+            ts = localtime(&timestamp);            
 
             hItem   = WM_GetDialogItem( pMsg->hWin, GUI_ID_LISTWHEEL2 );
 #if LCD_SPEC_XSIZE == 800 && LCD_SPEC_YSIZE == 480            
@@ -352,7 +355,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 #elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL2, 50, day, sizeof( day ) / sizeof( char * ) );            
 #endif            
-            idx     = dev.mcu->rtc.get_day();
+            idx     = ts->tm_mday;
             LISTWHEEL_SetPos( hItem, (sizeof( day ) / sizeof( char * )) - idx );
             LISTWHEEL_SetSel( hItem, (sizeof( day ) / sizeof( char * )) - idx );
 
@@ -362,7 +365,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 #elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL1, 50, month, sizeof( month ) / sizeof( char * ) );            
 #endif            
-            idx     = dev.mcu->rtc.get_month();
+            idx     = ts->tm_mon + 1;
             LISTWHEEL_SetPos( hItem, (sizeof( month ) / sizeof( char * )) - idx );
             LISTWHEEL_SetSel( hItem, (sizeof( month ) / sizeof( char * )) - idx );
 
@@ -372,7 +375,7 @@ dialog_callback(                                WM_MESSAGE *            pMsg )
 #elif LCD_SPEC_XSIZE == 1024 && LCD_SPEC_YSIZE == 600
             gui_init_listwheel( pMsg->hWin, GUI_ID_LISTWHEEL0, 50, year, sizeof( year ) / sizeof( char * ) );            
 #endif                        
-            idx     = dev.mcu->rtc.get_year() - 30;
+            idx     = ts->tm_year + 1900 - 2000;
             LISTWHEEL_SetPos( hItem, (sizeof( year ) / sizeof( char * )) - 1 - idx );
             LISTWHEEL_SetSel( hItem, (sizeof( year ) / sizeof( char * )) - 1 - idx );
 

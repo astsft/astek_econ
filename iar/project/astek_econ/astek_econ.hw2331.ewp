@@ -2261,6 +2261,15 @@
                 </file>
             </group>
             <group>
+                <name>filter</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\app\common\filter\sma.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\src\app\common\filter\sma16.c</name>
+                </file>
+            </group>
+            <group>
                 <name>gui</name>
                 <group>
                     <name>emwin</name>
@@ -2290,6 +2299,27 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto_cycle_time.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto_setup.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto_step1.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto_step2.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_auto_step3.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_manual.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_calibrate_point.c</name>
                             </file>
                             <file>
@@ -2305,31 +2335,10 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_calibrate.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_calibrate_auto.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_calibrate_auto_cycle.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_calibrate_auto_launch.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_calibrate_auto_purge.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_measure.c</name>
-                            </file>
-                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_measure_cl420.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_measure_cl420_value.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_measure_sensor.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service.c</name>
@@ -2347,6 +2356,9 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_channel.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_diagnostic.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_cloop_error_level.c</name>
                             </file>
                             <file>
@@ -2360,6 +2372,21 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_measure.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_modbus.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_ip.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_mac.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_network_port.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_service_relay.c</name>
@@ -2401,6 +2428,12 @@
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_system_date.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_system_info.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_system_info_tag.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_setup_system_language.c</name>
                             </file>
                             <file>
@@ -2412,7 +2445,31 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_status_bar.c</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_setup.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_setup_time.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_setup_value.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_step1.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_step2.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\800x480\scr_validation_step3.c</name>
+                            </file>
                         </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\src\app\common\gui\emwin\res\astek_logo_800x480_png.c</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\gui\emwin\scr\scr.c</name>
                         </file>
@@ -2526,6 +2583,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_m2m.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_net.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\src\app\astek_econ\task_start.c</name>

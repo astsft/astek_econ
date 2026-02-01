@@ -256,8 +256,10 @@ modbus_ascii_client_read( void )
     //
     //memcpy(dev.sens->meas.get_str, test, 25);
                     
-    //lrc = LRC("010300270002");                          
-
+    //lrc = LRC("010300270002");     
+                
+    uint32_t i = dev.cfg.error_filter_count;
+    do {                
     strncpy( (char *) mdbs_adu_xmit, str, sizeof(str) );
 
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_adu_xmit, MDBS_RTU_ADU_SIZEOF );
@@ -269,6 +271,7 @@ modbus_ascii_client_read( void )
     internal_uart_recv( mdbs_adu_recv, MDBS_RTU_ADU_SIZEOF );
 
     rcvd = xQueueReceive( que_mdbs_clnt_hndl, &result, pdMS_TO_TICKS(1000) );
+    } while((rcvd == pdFALSE) && (i > 0));
 
     if( rcvd == pdFALSE )
     {

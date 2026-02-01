@@ -466,31 +466,31 @@ mdbs_hreg_read(                         const   size_t                  addr,
                         *data   = 0;
                         break;
 
-                case MDBS_TERM_HREG_SERIAL_NUM_00:
+                case MDBS_TERM_HREG_UID_00:
                   *data   = *dev.info.uid_u16[5];
                   break;
-                case MDBS_TERM_HREG_SERIAL_NUM_01:
+                case MDBS_TERM_HREG_UID_01:
                   *data   = *dev.info.uid_u16[4];
                   break;                  
-                case MDBS_TERM_HREG_SERIAL_NUM_02:
+                case MDBS_TERM_HREG_UID_02:
                   *data   = *dev.info.uid_u16[3];
                   break;                  
-                case MDBS_TERM_HREG_SERIAL_NUM_03:
+                case MDBS_TERM_HREG_UID_03:
                   *data   = *dev.info.uid_u16[2];
                   break;                  
-                case MDBS_TERM_HREG_SERIAL_NUM_04:
+                case MDBS_TERM_HREG_UID_04:
                   *data   = *dev.info.uid_u16[1];
                   break;                  
-                case MDBS_TERM_HREG_SERIAL_NUM_05:
+                case MDBS_TERM_HREG_UID_05:
                  *data   = *dev.info.uid_u16[0];
                   break;
-                case MDBS_TERM_HREG_SERIAL_NUM_06:
+                case MDBS_TERM_HREG_UID_06:
                   *data  = 0;
                   break;                                    
-                case MDBS_TERM_HREG_SERIAL_NUM_07:
+                case MDBS_TERM_HREG_UID_07:
                   *data  = 0;
                   break;                                    
-                case MDBS_TERM_HREG_SERIAL_NUM_08:
+                case MDBS_TERM_HREG_UID_08:
                   *data   = 0;
                   break;           
                   
@@ -628,16 +628,16 @@ mdbs_hreg_read(                         const   size_t                  addr,
                 case MDBS_HREG_P_COMP:    
                 case MDBS_TERM_HREG_STS_RESERVED_20E:
                 case MDBS_TERM_HREG_STS_RESERVED_20F: 
-                case MDBS_HREG_POLY_A_MSB:
-                case MDBS_HREG_POLY_A_LSB:
-                case MDBS_HREG_POLY_B_MSB:
-                case MDBS_HREG_POLY_B_LSB:
-                case MDBS_HREG_POLY_C_MSB:
-                case MDBS_HREG_POLY_C_LSB:
-                case MDBS_HREG_POLY_D_MSB:
-                case MDBS_HREG_POLY_D_LSB:
-                case MDBS_HREG_POLY_E_MSB:
-                case MDBS_HREG_POLY_E_LSB:
+                case MDBS_TERM_HREG_STS_RESERVED_210:
+                case MDBS_TERM_HREG_STS_RESERVED_211:
+                case MDBS_TERM_HREG_STS_RESERVED_212:
+                case MDBS_TERM_HREG_STS_RESERVED_213:
+                case MDBS_TERM_HREG_STS_RESERVED_214:
+                case MDBS_TERM_HREG_STS_RESERVED_215:
+                case MDBS_TERM_HREG_STS_RESERVED_216:
+                case MDBS_TERM_HREG_STS_RESERVED_217:
+                case MDBS_TERM_HREG_STS_RESERVED_218:
+                case MDBS_TERM_HREG_STS_RESERVED_219:
                 case MDBS_TERM_HREG_STS_RESERVED_21A:
                 case MDBS_TERM_HREG_STS_RESERVED_21B:
                 case MDBS_TERM_HREG_STS_RESERVED_21C:
@@ -1406,14 +1406,14 @@ mdbs_hreg_write(                        const   size_t                  idx,
                 case MDBS_HREG_INFO_000D:
                 case MDBS_HREG_INFO_000E:
                 case MDBS_HREG_INFO_000F:                  
-                case MDBS_TERM_HREG_SERIAL_NUM_00:
-                case MDBS_TERM_HREG_SERIAL_NUM_01:
-                case MDBS_TERM_HREG_SERIAL_NUM_02:
-                case MDBS_TERM_HREG_SERIAL_NUM_03:
-                case MDBS_TERM_HREG_SERIAL_NUM_04:
-                case MDBS_TERM_HREG_SERIAL_NUM_05:
-                case MDBS_TERM_HREG_SERIAL_NUM_06:
-                case MDBS_TERM_HREG_SERIAL_NUM_07:
+                case MDBS_TERM_HREG_UID_00:
+                case MDBS_TERM_HREG_UID_01:
+                case MDBS_TERM_HREG_UID_02:
+                case MDBS_TERM_HREG_UID_03:
+                case MDBS_TERM_HREG_UID_04:
+                case MDBS_TERM_HREG_UID_05:
+                case MDBS_TERM_HREG_UID_06:
+                case MDBS_TERM_HREG_UID_07:
                 case MDBS_TERM_HREG_INFO_RESERVED_25:        
                 case MDBS_TERM_HREG_INFO_RESERVED_26:   
                     break;

@@ -12,7 +12,7 @@
 
 #define CONFIG_MCU_SYSTICK_HZ           100ul
 
-#define CONFIG_DEVICE_ID                0xEC0
+#define CONFIG_DEVICE_ID                0xEC01
 #define CONFIG_DEVICE_STR               "astek_econ"
 
 #define CONFIG_THLD_LTCH_DELAY_SMPL     4

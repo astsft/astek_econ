@@ -87,8 +87,20 @@ if ($hw_name -eq "2331_rev3")
 	{
 		$ekon_2025=""
 	}
+	
+	$SEL = Select-String -Path $preconfig_path -Pattern "USE_VALIDATION"
 
-	Remove-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025*.*
-	Move-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$newfilename -Destination $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025$newfilename
+	if ($SEL -ne $null)
+	{
+	    $use_validation="USE_VALIDATION\"
+		$use_validation
+	}
+	else
+	{
+		$use_validation=""
+	}	
+
+	Remove-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025\$use_validation*.*
+	Move-Item -Path $script_path\..\..\hex\$app_name\$hw_name\$newfilename -Destination $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025\$use_validation$newfilename
 	"Move fw to $script_path\..\..\hex\$app_name\$hw_name\$asback_hw\$ekon_2025$newfilename"	
 }
