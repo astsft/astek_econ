@@ -259,7 +259,8 @@ modbus_ascii_client_read( void )
     //lrc = LRC("010300270002");     
                 
     uint32_t i = dev.cfg.error_filter_count;
-    do {                
+    do { 
+    i--;
     strncpy( (char *) mdbs_adu_xmit, str, sizeof(str) );
 
     SCB_CleanDCache_by_Addr( (uint32_t *) mdbs_adu_xmit, MDBS_RTU_ADU_SIZEOF );
