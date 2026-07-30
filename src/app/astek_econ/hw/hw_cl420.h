@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#define DEFAULT_4MA_RAW                     0x158
+#define DEFAULT_20MA_RAW                    0x800
+#define DEFAULT_TOOHI_RAW                   0x8A0
+
 int cloop_hw_init (void);
 int cloop_get_info(void);
 int cloop_get_cal(void);

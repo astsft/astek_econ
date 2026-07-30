@@ -1552,6 +1552,10 @@ task_ibus(                      const   void *          argument )
     uint16_t        u16;
     econ_t *        sens        = dev.sens;
     dev_cl420_t *   dev_cl420   = &(dev.cl420);
+    
+    cloop_hw_init();    
+    cloop_set_raw(1, DEFAULT_4MA_RAW);
+    cloop_set_raw(2, DEFAULT_4MA_RAW);    
 
     dev_init( &dev );
     
@@ -1579,13 +1583,11 @@ task_ibus(                      const   void *          argument )
     set_sensor_status(dev.sens->link_err);
     sens->meas.ppm.i32   = 0;
 
-    
     dev.cloop->link_err = 1;
     set_cloop_status(dev.cloop->link_err);
     dev.ext_relay->link_err = 1;
     set_ext_relay_status(dev.ext_relay->link_err);    
     
-    cloop_hw_init();
     relay_hw_init();
     task_ibus_boards_init();
     
