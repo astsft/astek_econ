@@ -33,8 +33,6 @@ if exist "%workDir%%todayName%" (
 timeout /t 1 >nul
 md "%workDir%%todayName%"
 
-for /l %%x in (0,1,2) do (
-	echo Copy %worspace_name:~0,-2%%%x%worspace_name:~-1% hex:
-	xcopy /s/e %worspace_name:~0,-2%%%x%worspace_name:~-1% %workDir%%day%_%month%_%year%\%worspace_name:~0,-2%%%x%worspace_name:~-1%\
-	echo -------------------------------------------------------------------------
-)
+echo Copy %worspace_name% hex:
+xcopy /s/e %worspace_name% %workDir%%day%_%month%_%year%\%worspace_name%\
+echo -------------------------------------------------------------------------
